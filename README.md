@@ -1,5 +1,7 @@
 # Haskell bindings for the Slack web API
 
+- Hackage: <https://hackage.haskell.org/package/slack-web>
+
 ## Example
 
 ```
