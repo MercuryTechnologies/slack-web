@@ -4,6 +4,27 @@ version: 0.1.0
 build-type: Simple
 cabal-version: >= 1.21
 
+license: MIT
+license-file: LICENSE.md
+
+copyright: 2017 Juan Pedro Villa Isaza
+author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
+maintainer: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
+
+homepage: https://github.com/jpvillaisaza/slack-web
+bug-reports: https://github.com/jpvillaisaza/slack-web/issues
+
+synopsis: Bindings for the Slack web API
+description: Haskell bindings for the Slack web API.
+
+category: Web
+
+tested-with: GHC == 8.0.2
+
+extra-source-files:
+  CHANGELOG.md
+  README.md
+
 
 library
   hs-source-dirs:
