@@ -49,3 +49,7 @@ Right ...
 > Slack.run manager (apiTest Api.mkTestReq { testReqFoo = Just "bar" })
 Right ...
 ```
+
+## License
+
+Licensed under the MIT license. See [LICENSE.md](LICENSE.md).
