@@ -34,6 +34,7 @@ import Servant.Client
 import Servant.Client.Generic
 
 -- slack-web
+import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 
 -- transformers
@@ -45,6 +46,10 @@ import Control.Monad.IO.Class
 --
 
 type Api =
+    "channels.create"
+      :> ReqBody '[FormUrlEncoded] Channel.CreateReq
+      :> Post '[JSON] Channel.CreateRsp
+  :<|>
     "chat.postMessage"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] Chat.PostMsgRsp
@@ -60,7 +65,15 @@ data Cli =
       --
       --
 
-      chatPostMessage
+      channelsCreate
+        :: Channel.CreateReq
+        -> ClientM Channel.CreateRsp
+
+      -- |
+      --
+      --
+
+    , chatPostMessage
         :: Chat.PostMsgReq
         -> ClientM Chat.PostMsgRsp
 

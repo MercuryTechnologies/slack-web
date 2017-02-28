@@ -72,7 +72,7 @@ data PostMsgReq =
     , postMsgReqThreadTs :: Maybe Text
     , postMsgReqReplyBroadcast :: Maybe Bool
     }
-  deriving (Generic, Show)
+  deriving (Eq, Generic, Show)
 
 
 -- |
@@ -129,7 +129,7 @@ data PostMsgRsp =
     , postMsgRspTs :: String
     , postMsgRspMessage :: PostMsg
     }
-  deriving (Generic, Show)
+  deriving (Eq, Generic, Show)
 
 
 -- |

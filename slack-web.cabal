@@ -31,6 +31,7 @@ library
       src
   exposed-modules:
       Web.Slack
+      Web.Slack.Channel
       Web.Slack.Chat
       Web.Slack.Util
   build-depends:
