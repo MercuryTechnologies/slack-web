@@ -43,6 +43,7 @@ import Servant.Client
 import Servant.Client.Generic
 
 -- slack-web
+import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
@@ -56,6 +57,10 @@ import Control.Monad.IO.Class
 --
 
 type Api =
+    "api.test"
+      :> ReqBody '[FormUrlEncoded] Api.TestReq
+      :> Post '[JSON] Api.TestRsp
+  :<|>
     "auth.test"
       :> ReqBody '[FormUrlEncoded] Auth.TestReq
       :> Post '[JSON] Auth.TestRsp
@@ -77,11 +82,21 @@ data Cli =
   Cli
     { -- |
       --
+      -- Check API calling code.
+      --
+      -- <https://api.slack.com/methods/api.test>
+
+      apiTest
+        :: Api.TestReq
+        -> ClientM Api.TestRsp
+
+      -- |
+      --
       -- Check authentication and identity.
       --
       -- <https://api.slack.com/methods/auth.test>
 
-      authTest
+    , authTest
         :: Auth.TestReq
         -> ClientM Auth.TestRsp
 
