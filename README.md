@@ -2,6 +2,8 @@
 
 - Hackage: <https://hackage.haskell.org/package/slack-web>
 
+- Slack web API: <https://api.slack.com/web>
+
 ## Example
 
 ```
