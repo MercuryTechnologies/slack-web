@@ -34,6 +34,7 @@ import Servant.Client
 import Servant.Client.Generic
 
 -- slack-web
+import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 
@@ -46,6 +47,10 @@ import Control.Monad.IO.Class
 --
 
 type Api =
+    "auth.test"
+      :> ReqBody '[FormUrlEncoded] Auth.TestReq
+      :> Post '[JSON] Auth.TestRsp
+  :<|>
     "channels.create"
       :> ReqBody '[FormUrlEncoded] Channel.CreateReq
       :> Post '[JSON] Channel.CreateRsp
@@ -65,7 +70,15 @@ data Cli =
       --
       --
 
-      channelsCreate
+      authTest
+        :: Auth.TestReq
+        -> ClientM Auth.TestRsp
+
+      -- |
+      --
+      --
+
+    , channelsCreate
         :: Channel.CreateReq
         -> ClientM Channel.CreateRsp
 

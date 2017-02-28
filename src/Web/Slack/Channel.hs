@@ -112,12 +112,25 @@ data CreateReq =
   deriving (Eq, Generic, Show)
 
 
+-- |
+--
+--
+
 $(deriveJSON (jsonOpts "createReq") ''CreateReq)
 
+
+-- |
+--
+--
 
 instance ToForm CreateReq where
   toForm =
     genericToForm (formOpts "createReq")
+
+
+-- |
+--
+--
 
 mkCreateReq
   :: Text
@@ -129,6 +142,7 @@ mkCreateReq token name =
     , createReqName = name
     , createReqValidate = Nothing
     }
+
 
 -- |
 --
