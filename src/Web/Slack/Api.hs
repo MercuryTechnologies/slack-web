@@ -13,6 +13,10 @@
 
 
 module Web.Slack.Api
+  ( TestReq(..)
+  , mkTestReq
+  , TestRsp(..)
+  )
   where
 
 -- aeson
@@ -57,6 +61,18 @@ $(deriveJSON (jsonOpts "testReq") ''TestReq)
 instance ToForm TestReq where
   toForm =
     genericToForm (formOpts "testReq")
+
+
+-- |
+--
+--
+
+mkTestReq :: TestReq
+mkTestReq =
+  TestReq
+    { testReqError = Nothing
+    , testReqFoo = Nothing
+    }
 
 
 -- |
