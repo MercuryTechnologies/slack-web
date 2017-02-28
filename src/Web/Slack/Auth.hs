@@ -2,6 +2,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Web.Slack.Auth
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
+
 module Web.Slack.Auth
   where
 

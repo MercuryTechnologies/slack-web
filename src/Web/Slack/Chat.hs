@@ -2,6 +2,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Web.Slack.Chat
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
 module Web.Slack.Chat
   ( PostMsg(..)
   , PostMsgReq(..)

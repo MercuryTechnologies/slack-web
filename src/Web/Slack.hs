@@ -5,6 +5,15 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Web.Slack
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
 module Web.Slack
   ( Cli(..)
   , mkCli
@@ -68,7 +77,9 @@ data Cli =
   Cli
     { -- |
       --
+      -- Check authentication and identity.
       --
+      -- <https://api.slack.com/methods/auth.test>
 
       authTest
         :: Auth.TestReq
@@ -76,7 +87,9 @@ data Cli =
 
       -- |
       --
+      -- Create a channel.
       --
+      -- <https://api.slack.com/methods/channels.create>
 
     , channelsCreate
         :: Channel.CreateReq
@@ -84,7 +97,9 @@ data Cli =
 
       -- |
       --
+      -- Send a message to a channel.
       --
+      -- <https://api.slack.com/methods/chat.postMessage>
 
     , chatPostMessage
         :: Chat.PostMsgReq

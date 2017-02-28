@@ -2,6 +2,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Web.Slack.Channel
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
 module Web.Slack.Channel
   ( Channel(..)
   , Purpose(..)
