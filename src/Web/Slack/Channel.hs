@@ -114,8 +114,7 @@ $(deriveJSON (jsonOpts "topic") ''Topic)
 
 data CreateReq =
   CreateReq
-    { createReqToken :: Text
-    , createReqName :: Text
+    { createReqName :: Text
     , createReqValidate :: Maybe Bool
     }
   deriving (Eq, Generic, Show)
@@ -143,12 +142,10 @@ instance ToForm CreateReq where
 
 mkCreateReq
   :: Text
-  -> Text
   -> CreateReq
-mkCreateReq token name =
+mkCreateReq name =
   CreateReq
-    { createReqToken = token
-    , createReqName = name
+    { createReqName = name
     , createReqValidate = Nothing
     }
 

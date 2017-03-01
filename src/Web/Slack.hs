@@ -1,4 +1,6 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
 ----------------------------------------------------------------------
@@ -17,6 +19,7 @@ module Web.Slack
   , authTest
   , chatPostMessage
   , channelsCreate
+  , authenticateReq
   )
   where
 
@@ -34,12 +37,16 @@ import Servant.API
 
 -- servant-client
 import Servant.Client
+import Servant.Common.Req (Req, appendToQueryString)
 
 -- slack-web
 import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
+
+-- text
+import Data.Text (Text)
 
 -- transformers
 import Control.Monad.IO.Class
@@ -55,14 +62,16 @@ type Api =
       :> Post '[JSON] Api.TestRsp
   :<|>
     "auth.test"
-      :> ReqBody '[FormUrlEncoded] Auth.TestReq
+      :> AuthProtect "token"
       :> Post '[JSON] Auth.TestRsp
   :<|>
     "channels.create"
+      :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Channel.CreateReq
       :> Post '[JSON] Channel.CreateRsp
   :<|>
     "chat.postMessage"
+      :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] Chat.PostMsgRsp
 
@@ -77,6 +86,7 @@ apiTest
   :: Api.TestReq
   -> ClientM Api.TestRsp
 
+
 -- |
 --
 -- Check authentication and identity.
@@ -84,8 +94,15 @@ apiTest
 -- <https://api.slack.com/methods/auth.test>
 
 authTest
-  :: Auth.TestReq
+  :: Text
   -> ClientM Auth.TestRsp
+authTest token =
+  authTest_ (mkAuthenticateReq token authenticateReq)
+
+authTest_
+  :: AuthenticateReq (AuthProtect "token")
+  -> ClientM Auth.TestRsp
+
 
 -- |
 --
@@ -94,8 +111,17 @@ authTest
 -- <https://api.slack.com/methods/channels.create>
 
 channelsCreate
-  :: Channel.CreateReq
+  :: Text
+  -> Channel.CreateReq
   -> ClientM Channel.CreateRsp
+channelsCreate token =
+  channelsCreate_ (mkAuthenticateReq token authenticateReq)
+
+channelsCreate_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Channel.CreateReq
+  -> ClientM Channel.CreateRsp
+
 
 -- |
 --
@@ -104,15 +130,44 @@ channelsCreate
 -- <https://api.slack.com/methods/chat.postMessage>
 
 chatPostMessage
-  :: Chat.PostMsgReq
+  :: Text
+  -> Chat.PostMsgReq
+  -> ClientM Chat.PostMsgRsp
+chatPostMessage token =
+  chatPostMessage_ (mkAuthenticateReq token authenticateReq)
+
+chatPostMessage_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Chat.PostMsgReq
   -> ClientM Chat.PostMsgRsp
 
+
 apiTest
-  :<|> authTest
-  :<|> channelsCreate
-  :<|> chatPostMessage
+  :<|> authTest_
+  :<|> channelsCreate_
+  :<|> chatPostMessage_
   =
   client (Proxy :: Proxy Api)
+
+
+-- |
+--
+--
+
+type instance AuthClientData (AuthProtect "token") =
+  Text
+
+
+-- |
+--
+--
+
+authenticateReq
+  :: Text
+  -> Req
+  -> Req
+authenticateReq token =
+  appendToQueryString "token" (Just token)
 
 
 -- |

@@ -66,8 +66,7 @@ $(deriveJSON (jsonOpts "postMsg") ''PostMsg)
 
 data PostMsgReq =
   PostMsgReq
-    { postMsgReqToken :: Text
-    , postMsgReqChannel :: Text
+    { postMsgReqChannel :: Text
     , postMsgReqText :: Text
     , postMsgReqParse :: Maybe Text
     , postMsgReqLinkNames :: Maybe Bool
@@ -107,12 +106,10 @@ instance ToForm PostMsgReq where
 mkPostMsgReq
   :: Text
   -> Text
-  -> Text
   -> PostMsgReq
-mkPostMsgReq token channel text =
+mkPostMsgReq channel text =
   PostMsgReq
-    { postMsgReqToken = token
-    , postMsgReqChannel = channel
+    { postMsgReqChannel = channel
     , postMsgReqText = text
     , postMsgReqParse = Nothing
     , postMsgReqLinkNames = Nothing
