@@ -15,6 +15,7 @@ module Web.Slack.Util
 
 -- aeson
 import Data.Aeson.TH
+import Data.Aeson.Types
 
 -- base
 import Data.Char
@@ -73,12 +74,4 @@ addUnderscores
   :: String
   -> String
 addUnderscores =
-  let
-    go res [] = res
-    go [] (x:xs) = go [toLower x] xs
-    go res (x:xs)
-      | isUpper x = go (toLower x : '_' : res) xs
-      | otherwise = go (x : res) xs
-
-  in
-    reverse . go []
+  camelTo2 '_'
