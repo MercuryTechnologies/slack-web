@@ -1,8 +1,4 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
 ----------------------------------------------------------------------
@@ -15,19 +11,17 @@
 ----------------------------------------------------------------------
 
 module Web.Slack
-  ( Cli(..)
-  , mkCli
-  , run
+  ( run
   , mkManager
+  , apiTest
+  , authTest
+  , chatPostMessage
+  , channelsCreate
   )
   where
 
 -- base
 import Data.Proxy (Proxy(..))
-import GHC.Generics (Generic)
-
--- generics-sop
-import qualified Generics.SOP (Generic)
 
 -- http-client
 import Network.HTTP.Client (Manager, newManager)
@@ -40,7 +34,6 @@ import Servant.API
 
 -- servant-client
 import Servant.Client
-import Servant.Client.Generic
 
 -- slack-web
 import qualified Web.Slack.Api as Api
@@ -76,75 +69,50 @@ type Api =
 
 -- |
 --
+-- Check API calling code.
 --
+-- <https://api.slack.com/methods/api.test>
 
-data Cli =
-  Cli
-    { -- |
-      --
-      -- Check API calling code.
-      --
-      -- <https://api.slack.com/methods/api.test>
-
-      apiTest
-        :: Api.TestReq
-        -> ClientM Api.TestRsp
-
-      -- |
-      --
-      -- Check authentication and identity.
-      --
-      -- <https://api.slack.com/methods/auth.test>
-
-    , authTest
-        :: Auth.TestReq
-        -> ClientM Auth.TestRsp
-
-      -- |
-      --
-      -- Create a channel.
-      --
-      -- <https://api.slack.com/methods/channels.create>
-
-    , channelsCreate
-        :: Channel.CreateReq
-        -> ClientM Channel.CreateRsp
-
-      -- |
-      --
-      -- Send a message to a channel.
-      --
-      -- <https://api.slack.com/methods/chat.postMessage>
-
-    , chatPostMessage
-        :: Chat.PostMsgReq
-        -> ClientM Chat.PostMsgRsp
-
-    }
-  deriving (Generic)
-
+apiTest
+  :: Api.TestReq
+  -> ClientM Api.TestRsp
 
 -- |
 --
+-- Check authentication and identity.
 --
+-- <https://api.slack.com/methods/auth.test>
 
-instance Generics.SOP.Generic Cli
-
+authTest
+  :: Auth.TestReq
+  -> ClientM Auth.TestRsp
 
 -- |
 --
+-- Create a channel.
 --
+-- <https://api.slack.com/methods/channels.create>
 
-instance (Client Api ~ cli) => ClientLike cli Cli
-
+channelsCreate
+  :: Channel.CreateReq
+  -> ClientM Channel.CreateRsp
 
 -- |
 --
+-- Send a message to a channel.
 --
+-- <https://api.slack.com/methods/chat.postMessage>
 
-mkCli :: Cli
-mkCli =
-  mkClient (client (Proxy :: Proxy Api))
+chatPostMessage
+  :: Chat.PostMsgReq
+  -> ClientM Chat.PostMsgRsp
+
+apiTest
+  :<|> authTest
+  :<|> channelsCreate
+  :<|> chatPostMessage
+  =
+  client (Proxy :: Proxy Api)
 
 
 -- |

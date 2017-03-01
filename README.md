@@ -31,22 +31,13 @@
 ```
 
 ```
-> :set -XRecordWildCards
-> Slack.Cli{..} = Slack.mkCli
-apiTest :: ...
-authTest :: ...
-channelsCreate :: ...
-chatPostMessage :: ...
-```
-
-```
-> Slack.run manager (apiTest Api.mkTestReq)
+> Slack.run manager (Slack.apiTest Api.mkTestReq)
 Right ...
 ```
 
 ```
 > :set -XOverloadedStrings
-> Slack.run manager (apiTest Api.mkTestReq { testReqFoo = Just "bar" })
+> Slack.run manager (Slack.apiTest Api.mkTestReq { Api.testReqFoo = Just "bar" })
 Right ...
 ```
 
