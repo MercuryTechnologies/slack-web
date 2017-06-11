@@ -18,6 +18,9 @@ module Web.Slack.Channel
   , CreateReq(..)
   , mkCreateReq
   , CreateRsp(..)
+  , ListReq(..)
+  , mkListReq
+  , ListRsp(..)
   )
   where
 
@@ -50,10 +53,10 @@ data Channel =
     , channelIsArchived :: Bool
     , channelIsMember :: Bool
     , channelIsGeneral :: Bool
-    , channelLastRead :: Text
+    , channelLastRead :: Maybe Text
     , channelLatest :: Maybe Text
-    , channelUnreadCount :: Integer
-    , channelUnreadCountDisplay :: Integer
+    , channelUnreadCount :: Maybe Integer
+    , channelUnreadCountDisplay :: Maybe Integer
     , channelMembers :: [Text]
     , channelTopic :: Topic
     , channelPurpose :: Purpose
@@ -166,3 +169,61 @@ data CreateRsp =
 --
 --
 $(deriveJSON (jsonOpts "createRsp") ''CreateRsp)
+
+-- |
+--
+--
+
+data ListReq =
+  ListReq
+    { listReqExcludeArchived :: Maybe Bool
+    , listReqExcludeMembers :: Maybe Bool
+    }
+  deriving (Eq, Generic, Show)
+
+
+-- |
+--
+--
+
+$(deriveJSON (jsonOpts "listReq") ''ListReq)
+
+
+-- |
+--
+--
+
+instance ToForm ListReq where
+  toForm =
+    genericToForm (formOpts "listReq")
+
+
+-- |
+--
+--
+
+mkListReq
+  :: ListReq
+mkListReq =
+  ListReq
+    { listReqExcludeArchived = Nothing
+    , listReqExcludeMembers = Nothing
+    }
+
+
+-- |
+--
+--
+
+data ListRsp =
+  ListRsp
+    { listRspOk :: Bool
+    , listRspChannels :: [Channel]
+    }
+  deriving (Eq, Generic, Show)
+
+
+-- |
+--
+--
+$(deriveJSON (jsonOpts "listRsp") ''ListRsp)
