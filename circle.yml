@@ -9,9 +9,6 @@ dependencies:
     - stack build --only-dependencies
     - stack build --only-dependencies --resolver lts-8.3
 
-  pre:
-    - curl -sSL https://get.haskellstack.org/ | sh
-
 test:
 
   override:
