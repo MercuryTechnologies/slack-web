@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -21,10 +22,16 @@ module Web.Slack.Channel
   , ListReq(..)
   , mkListReq
   , ListRsp(..)
+  , HistoryReq(..)
+  , SlackTimestamp(..)
+  , mkHistoryReq
+  , HistoryRsp(..)
+  , Message(..)
   )
   where
 
 -- aeson
+import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -38,7 +45,14 @@ import Web.Slack.Util
 
 -- text
 import Data.Text (Text)
+import Data.Text.Read (decimal)
 
+-- time
+import Data.Time.Clock
+import Data.Time.Clock.POSIX
+
+-- errors
+import Control.Error (hush)
 
 -- |
 --
@@ -227,3 +241,93 @@ data ListRsp =
 --
 --
 $(deriveJSON (jsonOpts "listRsp") ''ListRsp)
+
+-- |
+--
+--
+
+data HistoryReq =
+  HistoryReq
+    { historyReqChannel :: Text
+    }
+  deriving (Eq, Generic, Show)
+
+
+-- |
+--
+--
+
+$(deriveJSON (jsonOpts "historyReq") ''HistoryReq)
+
+
+-- |
+--
+--
+
+instance ToForm HistoryReq where
+  toForm =
+    genericToForm (formOpts "historyReq")
+
+
+-- |
+--
+--
+
+mkHistoryReq
+  :: Text
+  -> HistoryReq
+mkHistoryReq channel =
+  HistoryReq
+    { historyReqChannel = channel
+    }
+
+
+-- |
+--
+--
+
+data MessageType = MessageTypeMessage
+  deriving (Eq, Show)
+
+instance FromJSON MessageType where
+  parseJSON "message" = pure MessageTypeMessage
+  parseJSON _ = fail "Invalid MessageType"
+
+data SlackTimestamp =
+  SlackTimestamp
+    { slackTimestampTs :: Text
+    , slackTimestampTime :: UTCTime
+    } deriving (Eq, Show)
+
+instance FromJSON SlackTimestamp where
+  parseJSON = withText "Slack ts" $ \contents ->
+    maybe (fail "Invalid slack ts")
+          (pure . SlackTimestamp contents)
+          (slackTimestampToTime contents)
+
+slackTimestampToTime :: Text -> Maybe UTCTime
+slackTimestampToTime txt =
+  posixSecondsToUTCTime . realToFrac @Integer . fst <$> hush (decimal txt)
+
+data Message =
+  Message
+    { messageType :: MessageType
+    , messageUser :: Maybe Text -- not present for bot messages at least
+    , messageText :: Text
+    , messageTs :: SlackTimestamp
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveFromJSON (jsonOpts "message") ''Message)
+
+data HistoryRsp =
+  HistoryRsp
+    { historyRspOk :: Bool
+    , historyRspMessages :: [Message]
+    }
+  deriving (Eq, Generic, Show)
+
+-- |
+--
+--
+$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
