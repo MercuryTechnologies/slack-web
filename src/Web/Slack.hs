@@ -20,6 +20,7 @@ module Web.Slack
   , chatPostMessage
   , channelsCreate
   , channelsList
+  , channelsHistory
   , authenticateReq
   )
   where
@@ -76,6 +77,11 @@ type Api =
       :> ReqBody '[FormUrlEncoded] Channel.ListReq
       :> Post '[JSON] Channel.ListRsp
   :<|>
+    "channels.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Channel.HistoryReq
+      :> Post '[JSON] Channel.HistoryRsp
+  :<|>
     "chat.postMessage"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
@@ -130,9 +136,9 @@ channelsCreate_
 
 -- |
 --
--- Retrieve channel history.
+-- Retrieve channel list.
 --
--- <https://api.slack.com/methods/channels.history>
+-- <https://api.slack.com/methods/channels.list>
 
 channelsList
   :: Text
@@ -145,6 +151,24 @@ channelsList_
   :: AuthenticateReq (AuthProtect "token")
   -> Channel.ListReq
   -> ClientM Channel.ListRsp
+
+-- |
+--
+-- Retrieve channel history.
+--
+-- <https://api.slack.com/methods/channels.history>
+
+channelsHistory
+  :: Text
+  -> Channel.HistoryReq
+  -> ClientM Channel.HistoryRsp
+channelsHistory token =
+  channelsHistory_ (mkAuthenticateReq token authenticateReq)
+
+channelsHistory_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Channel.HistoryReq
+  -> ClientM Channel.HistoryRsp
 
 -- |
 --
@@ -169,6 +193,7 @@ apiTest
   :<|> authTest_
   :<|> channelsCreate_
   :<|> channelsList_
+  :<|> channelsHistory_
   :<|> chatPostMessage_
   =
   client (Proxy :: Proxy Api)
