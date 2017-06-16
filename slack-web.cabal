@@ -35,6 +35,8 @@ library
       Web.Slack.Auth
       Web.Slack.Channel
       Web.Slack.Chat
+      Web.Slack.Common
+      Web.Slack.Im
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.2
