@@ -21,6 +21,8 @@ module Web.Slack
   , channelsCreate
   , channelsList
   , channelsHistory
+  , imHistory
+  , imList
   , authenticateReq
   )
   where
@@ -46,6 +48,8 @@ import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
+import qualified Web.Slack.Common as Common
+import qualified Web.Slack.Im as Im
 
 -- text
 import Data.Text (Text)
@@ -72,20 +76,29 @@ type Api =
       :> ReqBody '[FormUrlEncoded] Channel.CreateReq
       :> Post '[JSON] Channel.CreateRsp
   :<|>
+    "channels.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] Common.HistoryRsp
+  :<|>
     "channels.list"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Channel.ListReq
       :> Post '[JSON] Channel.ListRsp
   :<|>
-    "channels.history"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Channel.HistoryReq
-      :> Post '[JSON] Channel.HistoryRsp
-  :<|>
     "chat.postMessage"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] Chat.PostMsgRsp
+  :<|>
+    "im.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] Common.HistoryRsp
+  :<|>
+    "im.list"
+      :> AuthProtect "token"
+      :> Post '[JSON] Im.ListRsp
 
 
 -- |
@@ -160,15 +173,15 @@ channelsList_
 
 channelsHistory
   :: Text
-  -> Channel.HistoryReq
-  -> ClientM Channel.HistoryRsp
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
 channelsHistory token =
   channelsHistory_ (mkAuthenticateReq token authenticateReq)
 
 channelsHistory_
   :: AuthenticateReq (AuthProtect "token")
-  -> Channel.HistoryReq
-  -> ClientM Channel.HistoryRsp
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
 
 -- |
 --
@@ -188,13 +201,48 @@ chatPostMessage_
   -> Chat.PostMsgReq
   -> ClientM Chat.PostMsgRsp
 
+-- |
+--
+-- Returns a list of all im channels that the user has
+--
+-- <https://api.slack.com/methods/im.list>
+
+imList
+  :: Text
+  -> ClientM Im.ListRsp
+imList token =
+  imList_ (mkAuthenticateReq token authenticateReq)
+
+imList_
+  :: AuthenticateReq (AuthProtect "token")
+  -> ClientM Im.ListRsp
+
+-- |
+--
+-- Retrieve channel history.
+--
+-- <https://api.slack.com/methods/im.history>
+
+imHistory
+  :: Text
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
+imHistory token =
+  imHistory_ (mkAuthenticateReq token authenticateReq)
+
+imHistory_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
 
 apiTest
   :<|> authTest_
   :<|> channelsCreate_
-  :<|> channelsList_
   :<|> channelsHistory_
+  :<|> channelsList_
   :<|> chatPostMessage_
+  :<|> imHistory_
+  :<|> imList_
   =
   client (Proxy :: Proxy Api)
 
