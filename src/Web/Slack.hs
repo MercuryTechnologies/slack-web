@@ -23,6 +23,8 @@ module Web.Slack
   , channelsHistory
   , imHistory
   , imList
+  , mpimList
+  , mpimHistory
   , authenticateReq
   )
   where
@@ -50,6 +52,7 @@ import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
+import qualified Web.Slack.Mpim as Mpim
 
 -- text
 import Data.Text (Text)
@@ -99,6 +102,15 @@ type Api =
     "im.list"
       :> AuthProtect "token"
       :> Post '[JSON] Im.ListRsp
+  :<|>
+    "mpim.list"
+      :> AuthProtect "token"
+      :> Post '[JSON] Mpim.ListRsp
+  :<|>
+    "mpim.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] Common.HistoryRsp
 
 
 -- |
@@ -203,7 +215,7 @@ chatPostMessage_
 
 -- |
 --
--- Returns a list of all im channels that the user has
+-- Returns a list of all direct message channels that the user has
 --
 -- <https://api.slack.com/methods/im.list>
 
@@ -219,7 +231,7 @@ imList_
 
 -- |
 --
--- Retrieve channel history.
+-- Retrieve direct message channel history.
 --
 -- <https://api.slack.com/methods/im.history>
 
@@ -235,6 +247,40 @@ imHistory_
   -> Common.HistoryReq
   -> ClientM Common.HistoryRsp
 
+-- |
+--
+-- Returns a list of all multiparty direct message channels that the user has
+--
+-- <https://api.slack.com/methods/mpim.list>
+
+mpimList
+  :: Text
+  -> ClientM Mpim.ListRsp
+mpimList token =
+  mpimList_ (mkAuthenticateReq token authenticateReq)
+
+mpimList_
+  :: AuthenticateReq (AuthProtect "token")
+  -> ClientM Mpim.ListRsp
+
+-- |
+--
+-- Retrieve multiparty direct message channel history.
+--
+-- <https://api.slack.com/methods/mpim.history>
+
+mpimHistory
+  :: Text
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
+mpimHistory token =
+  mpimHistory_ (mkAuthenticateReq token authenticateReq)
+
+mpimHistory_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
+
 apiTest
   :<|> authTest_
   :<|> channelsCreate_
@@ -243,6 +289,8 @@ apiTest
   :<|> chatPostMessage_
   :<|> imHistory_
   :<|> imList_
+  :<|> mpimList_
+  :<|> mpimHistory_
   =
   client (Proxy :: Proxy Api)
 
