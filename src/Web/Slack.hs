@@ -27,6 +27,7 @@ module Web.Slack
   , imList
   , mpimList
   , mpimHistory
+  , usersList
   , authenticateReq
   )
   where
@@ -55,6 +56,7 @@ import qualified Web.Slack.Chat as Chat
 import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
 import qualified Web.Slack.Group as Group
+import qualified Web.Slack.User as User
 
 -- text
 import Data.Text (Text)
@@ -122,6 +124,10 @@ type Api =
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
       :> Post '[JSON] Common.HistoryRsp
+  :<|>
+    "users.list"
+      :> AuthProtect "token"
+      :> Post '[JSON] User.ListRsp
 
 
 -- |
@@ -330,6 +336,23 @@ mpimHistory_
   -> Common.HistoryReq
   -> ClientM Common.HistoryRsp
 
+-- |
+--
+-- This method returns a list of all users in the team.
+-- This includes deleted/deactivated users.
+--
+-- <https://api.slack.com/methods/users.list>
+
+usersList
+  :: Text
+  -> ClientM User.ListRsp
+usersList token =
+  usersList_ (mkAuthenticateReq token authenticateReq)
+
+usersList_
+  :: AuthenticateReq (AuthProtect "token")
+  -> ClientM User.ListRsp
+
 apiTest
   :<|> authTest_
   :<|> channelsCreate_
@@ -342,6 +365,7 @@ apiTest
   :<|> imList_
   :<|> mpimList_
   :<|> mpimHistory_
+  :<|> usersList_
   =
   client (Proxy :: Proxy Api)
 
