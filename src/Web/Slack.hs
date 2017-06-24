@@ -21,6 +21,8 @@ module Web.Slack
   , channelsCreate
   , channelsList
   , channelsHistory
+  , groupsHistory
+  , groupsList
   , imHistory
   , imList
   , mpimList
@@ -52,7 +54,7 @@ import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
-import qualified Web.Slack.Mpim as Mpim
+import qualified Web.Slack.Group as Group
 
 -- text
 import Data.Text (Text)
@@ -94,6 +96,15 @@ type Api =
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] Chat.PostMsgRsp
   :<|>
+    "groups.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] Common.HistoryRsp
+  :<|>
+     "groups.list"
+      :> AuthProtect "token"
+      :> Post '[JSON] Group.ListRsp
+  :<|>
     "im.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
@@ -105,7 +116,7 @@ type Api =
   :<|>
     "mpim.list"
       :> AuthProtect "token"
-      :> Post '[JSON] Mpim.ListRsp
+      :> Post '[JSON] Group.ListRsp
   :<|>
     "mpim.history"
       :> AuthProtect "token"
@@ -215,6 +226,44 @@ chatPostMessage_
 
 -- |
 --
+-- This method returns a list of private channels in the team that the caller
+-- is in and archived groups that the caller was in. The list of
+-- (non-deactivated) members in each private channel is also returned.
+--
+-- <https://api.slack.com/methods/groups.list>
+
+groupsList
+  :: Text
+  -> ClientM Group.ListRsp
+groupsList token =
+  groupsList_ (mkAuthenticateReq token authenticateReq)
+
+groupsList_
+  :: AuthenticateReq (AuthProtect "token")
+  -> ClientM Group.ListRsp
+
+-- |
+--
+-- This method returns a portion of messages/events from the specified
+-- private channel. To read the entire history for a private channel,
+-- call the method with no latest or oldest arguments, and then continue paging.
+--
+-- <https://api.slack.com/methods/groups.history>
+
+groupsHistory
+  :: Text
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
+groupsHistory token =
+  groupsHistory_ (mkAuthenticateReq token authenticateReq)
+
+groupsHistory_
+  :: AuthenticateReq (AuthProtect "token")
+  -> Common.HistoryReq
+  -> ClientM Common.HistoryRsp
+
+-- |
+--
 -- Returns a list of all direct message channels that the user has
 --
 -- <https://api.slack.com/methods/im.list>
@@ -255,13 +304,13 @@ imHistory_
 
 mpimList
   :: Text
-  -> ClientM Mpim.ListRsp
+  -> ClientM Group.ListRsp
 mpimList token =
   mpimList_ (mkAuthenticateReq token authenticateReq)
 
 mpimList_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM Mpim.ListRsp
+  -> ClientM Group.ListRsp
 
 -- |
 --
@@ -287,6 +336,8 @@ apiTest
   :<|> channelsHistory_
   :<|> channelsList_
   :<|> chatPostMessage_
+  :<|> groupsHistory_
+  :<|> groupsList_
   :<|> imHistory_
   :<|> imList_
   :<|> mpimList_

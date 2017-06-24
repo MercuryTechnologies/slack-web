@@ -1,18 +1,17 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 ----------------------------------------------------------------------
 -- |
--- Module: Web.Slack.Mpim
+-- Module: Web.Slack.Group
 -- Description:
 --
 --
 --
 ----------------------------------------------------------------------
 
-module Web.Slack.Mpim
+module Web.Slack.Group
   ( Group(..)
   , ListRsp(..)
   )
