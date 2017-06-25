@@ -23,6 +23,7 @@ module Web.Slack
   , channelsHistory
   , groupsHistory
   , groupsList
+  , historyFetchAll
   , imHistory
   , imList
   , mpimList
@@ -33,7 +34,11 @@ module Web.Slack
   where
 
 -- base
+import Data.Maybe
 import Data.Proxy (Proxy(..))
+
+-- error
+import Control.Error (lastZ, isNothing)
 
 -- http-client
 import Network.HTTP.Client (Manager, newManager)
@@ -197,6 +202,7 @@ channelsList_
 -- |
 --
 -- Retrieve channel history.
+-- Consider using 'historyFetchAll' in combination with this function
 --
 -- <https://api.slack.com/methods/channels.history>
 
@@ -253,6 +259,7 @@ groupsList_
 -- This method returns a portion of messages/events from the specified
 -- private channel. To read the entire history for a private channel,
 -- call the method with no latest or oldest arguments, and then continue paging.
+-- Consider using 'historyFetchAll' in combination with this function
 --
 -- <https://api.slack.com/methods/groups.history>
 
@@ -287,6 +294,7 @@ imList_
 -- |
 --
 -- Retrieve direct message channel history.
+-- Consider using 'historyFetchAll' in combination with this function
 --
 -- <https://api.slack.com/methods/im.history>
 
@@ -321,6 +329,7 @@ mpimList_
 -- |
 --
 -- Retrieve multiparty direct message channel history.
+-- Consider using 'historyFetchAll' in combination with this function
 --
 -- <https://api.slack.com/methods/mpim.history>
 
@@ -352,6 +361,44 @@ usersList token =
 usersList_
   :: AuthenticateReq (AuthProtect "token")
   -> ClientM User.ListRsp
+
+-- |
+-- Fetch all history items between two dates. The basic calls
+-- 'channelsHistory', 'groupsHistory', 'imHistory' and so on
+-- may not return exhaustive results if there were too many
+-- records. You need to use 'historyRspHasMore' to find out
+-- whether you got all the data.
+--
+-- This function will repeatedly call the underlying history
+-- function until all the data is fetched or until a call
+-- fails, merging the messages obtained from each call.
+historyFetchAll
+  :: Text -> (Text -> Common.HistoryReq -> ClientM Common.HistoryRsp)
+  -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
+  -> ClientM Common.HistoryRsp
+historyFetchAll token makeReq channel count oldest latest = do
+    rsp <- makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
+    let respMsgs = Common.historyRspMessages rsp
+    -- From slack apidoc: If there are more than 100 messages between
+    -- the two timestamps then the messages returned are the ones closest to latest.
+    -- In most cases an application will want the most recent messages
+    -- and will page backward from there.
+    --
+    -- for reference (does not apply here) => If oldest is provided but not
+    -- latest then the messages returned are those closest to oldest,
+    -- allowing you to page forward through history if desired.
+    let oldestReceived = Common.messageTs <$> lastZ respMsgs
+    if not (Common.historyRspOk rsp)
+       || not (Common.historyRspHasMore rsp)
+       || isNothing oldestReceived
+        then return rsp
+        else mergeResponses respMsgs <$> historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
+
+mergeResponses
+  :: [Common.Message]
+  -> Common.HistoryRsp
+  -> Common.HistoryRsp
+mergeResponses msgs rsp = rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp }
 
 apiTest
   :<|> authTest_
