@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -19,6 +20,8 @@ module Web.Slack.Common
     , mkHistoryReq
     , HistoryRsp(..)
     , Message(..)
+    , Color(unColor)
+    , UserId(unUserId)
     )
     where
 
@@ -49,11 +52,19 @@ import Data.Text.Read (decimal)
 import Data.Time.Clock
 import Data.Time.Clock.POSIX
 
+newtype Color = Color { unColor :: Text }
+  deriving (Eq, Generic, Show, FromJSON)
+
+newtype UserId = UserId { unUserId :: Text }
+  deriving (Eq, Generic, Show, FromJSON)
+
+
 data SlackTimestamp =
   SlackTimestamp
     { slackTimestampTs :: Text
     , slackTimestampTime :: UTCTime
-    } deriving (Eq, Show)
+    }
+  deriving (Eq, Show)
 
 mkSlackTimestamp :: UTCTime -> SlackTimestamp
 mkSlackTimestamp utctime = SlackTimestamp (T.pack (show unixts) <> ".000000") utctime
@@ -129,7 +140,7 @@ instance FromJSON MessageType where
 data Message =
   Message
     { messageType :: MessageType
-    , messageUser :: Maybe Text -- not present for bot messages at least
+    , messageUser :: Maybe UserId -- not present for bot messages at least
     , messageText :: Text
     , messageTs :: SlackTimestamp
     }

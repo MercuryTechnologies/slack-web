@@ -1,19 +1,18 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 ----------------------------------------------------------------------
 -- |
--- Module: Web.Slack.Im
+-- Module: Web.Slack.User
 -- Description:
 --
 --
 --
 ----------------------------------------------------------------------
 
-module Web.Slack.Im
-  ( Im(..)
+module Web.Slack.User
+  ( User(..)
   , ListRsp(..)
   )
   where
@@ -25,8 +24,8 @@ import Data.Aeson.TH
 import GHC.Generics (Generic)
 
 -- slack-web
-import Web.Slack.Util
 import Web.Slack.Common
+import Web.Slack.Util
 
 -- text
 import Data.Text (Text)
@@ -34,22 +33,27 @@ import Data.Text (Text)
 -- time
 import Data.Time.Clock.POSIX
 
-data Im =
-  Im
-    { imId :: Text
-    , imIsIm :: Bool
-    , imUser :: UserId
-    , imCreated :: POSIXTime
-    , imIsUserDeleted :: Bool
+data User =
+  User
+    { userId :: UserId
+    , userName :: Text
+    , userDeleted :: Bool
+    , userColor :: Maybe Color
+    , userIsAdmin :: Maybe Bool
+    , userIsOwner :: Maybe Bool
+    , userIsPrimaryOwner :: Maybe Bool
+    , userIsRestricted :: Maybe Bool
+    , userIsUltraRestricted :: Maybe Bool
+    , userUpdated :: POSIXTime
     }
   deriving (Eq, Generic, Show)
 
-$(deriveFromJSON (jsonOpts "im") ''Im)
+$(deriveFromJSON (jsonOpts "user") ''User)
 
 data ListRsp =
   ListRsp
     { listRspOk :: Bool
-    , listRspIms :: [Im]
+    , listRspMembers :: [User]
     }
   deriving (Eq, Generic, Show)
 
