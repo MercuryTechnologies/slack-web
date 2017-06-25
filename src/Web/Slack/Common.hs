@@ -3,6 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedLists #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -110,8 +112,14 @@ $(deriveFromJSON (jsonOpts "historyReq") ''HistoryReq)
 --
 
 instance ToForm HistoryReq where
-  toForm =
-    genericToForm (formOpts "historyReq")
+  -- can't use genericToForm because slack expects booleans as 0/1
+  toForm HistoryReq{..} =
+      [ ("channel", toQueryParam historyReqChannel)
+      , ("count", toQueryParam historyReqCount)
+      , ("latest", toQueryParam historyReqLatest)
+      , ("oldest", toQueryParam historyReqOldest)
+      , ("inclusive", toQueryParam (if historyReqInclusive then 1::Int else 0))
+      ]
 
 
 -- |
