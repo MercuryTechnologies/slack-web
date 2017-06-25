@@ -67,8 +67,8 @@ data SlackTimestamp =
   deriving (Eq, Show)
 
 mkSlackTimestamp :: UTCTime -> SlackTimestamp
-mkSlackTimestamp utctime = SlackTimestamp (T.pack (show unixts) <> ".000000") utctime
-  where unixts = utcTimeToPOSIXSeconds utctime
+mkSlackTimestamp utctime = SlackTimestamp (T.pack (show @Integer unixts) <> ".000000") utctime
+  where unixts = floor $ toRational $ utcTimeToPOSIXSeconds utctime
 
 instance ToHttpApiData SlackTimestamp where
   toQueryParam (SlackTimestamp contents _) = contents
