@@ -25,6 +25,7 @@ module Web.Slack.Channel
   where
 
 -- aeson
+import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -157,10 +158,10 @@ mkCreateReq name =
 --
 --
 
-data CreateRsp =
-  CreateRsp
-    { createRspOk :: Bool
-    , createRspChannel :: Channel
+data CreateRsp
+  = CreateRspError Text
+  | CreateRsp
+    { createRspChannel :: Channel
     }
   deriving (Eq, Generic, Show)
 
@@ -168,11 +169,9 @@ data CreateRsp =
 -- |
 --
 --
-$(deriveJSON (jsonOpts "createRsp") ''CreateRsp)
-
--- |
---
---
+instance FromJSON CreateRsp where
+  parseJSON = fromJsonWithOk "CreateRsp" CreateRspError $ \o ->
+                CreateRsp <$> o .: "channel"
 
 data ListReq =
   ListReq
@@ -215,15 +214,13 @@ mkListReq =
 --
 --
 
-data ListRsp =
-  ListRsp
-    { listRspOk :: Bool
-    , listRspChannels :: [Channel]
+data ListRsp
+  = ListRspError Text
+  | ListRsp
+    { listRspChannels :: [Channel]
     }
   deriving (Eq, Generic, Show)
 
-
--- |
---
---
-$(deriveJSON (jsonOpts "listRsp") ''ListRsp)
+instance FromJSON ListRsp where
+  parseJSON = fromJsonWithOk "ListRsp" ListRspError $ \o ->
+                ListRsp <$> o .: "channels"

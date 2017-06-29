@@ -20,6 +20,7 @@ module Web.Slack.Chat
   where
 
 -- aeson
+import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -129,17 +130,14 @@ mkPostMsgReq channel text =
 --
 --
 
-data PostMsgRsp =
-  PostMsgRsp
-    { postMsgRspOk :: Bool
-    , postMsgRspTs :: String
+data PostMsgRsp
+  = PostMsgRspError Text
+  | PostMsgRsp
+    { postMsgRspTs :: String
     , postMsgRspMessage :: PostMsg
     }
   deriving (Eq, Generic, Show)
 
-
--- |
---
---
-
-$(deriveJSON (jsonOpts "postMsgRsp") ''PostMsgRsp)
+instance FromJSON PostMsgRsp where
+  parseJSON = fromJsonWithOk "PostMsgRsp" PostMsgRspError $ \o ->
+                PostMsgRsp <$> o .: "ts" <*> o .: "message"

@@ -60,7 +60,6 @@ newtype Color = Color { unColor :: Text }
 newtype UserId = UserId { unUserId :: Text }
   deriving (Eq, Generic, Show, FromJSON)
 
-
 data SlackTimestamp =
   SlackTimestamp
     { slackTimestampTs :: Text
@@ -156,15 +155,14 @@ data Message =
 
 $(deriveFromJSON (jsonOpts "message") ''Message)
 
-data HistoryRsp =
-  HistoryRsp
-    { historyRspOk :: Bool
-    , historyRspMessages :: [Message]
+data HistoryRsp
+  = HistoryRspError Text
+  | HistoryRsp
+    { historyRspMessages :: [Message]
     , historyRspHasMore :: Bool
     }
   deriving (Eq, Generic, Show)
 
--- |
---
---
-$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
+instance FromJSON HistoryRsp where
+  parseJSON = fromJsonWithOk "HistoryRsp" HistoryRspError $ \o ->
+                HistoryRsp <$> o .: "messages" <*> o .: "has_more"

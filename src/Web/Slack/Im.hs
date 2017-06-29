@@ -19,6 +19,7 @@ module Web.Slack.Im
   where
 
 -- aeson
+import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -46,11 +47,13 @@ data Im =
 
 $(deriveFromJSON (jsonOpts "im") ''Im)
 
-data ListRsp =
-  ListRsp
-    { listRspOk :: Bool
-    , listRspIms :: [Im]
+data ListRsp
+  = ListRspError Text
+  | ListRsp
+    { listRspIms :: [Im]
     }
   deriving (Eq, Generic, Show)
 
-$(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+instance FromJSON ListRsp where
+  parseJSON = fromJsonWithOk "ListRsp" ListRspError $ \o ->
+                ListRsp <$> o .: "ims"

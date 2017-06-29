@@ -20,6 +20,7 @@ module Web.Slack.Api
   where
 
 -- aeson
+import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -79,16 +80,16 @@ mkTestReq =
 --
 --
 
-data TestRsp =
-  TestRsp
-    { testRspOk :: Bool
-    , testRspArgs :: Maybe TestReq
+data TestRsp
+  = TestRspError Text
+  | TestRsp
+    { testRspArgs :: Maybe TestReq
     }
   deriving (Eq, Generic, Show)
-
 
 -- |
 --
 --
-
-$(deriveJSON (jsonOpts "testRsp") ''TestRsp)
+instance FromJSON TestRsp where
+  parseJSON = fromJsonWithOk "TestRsp" TestRspError $ \o ->
+                TestRsp <$> o .: "args"
