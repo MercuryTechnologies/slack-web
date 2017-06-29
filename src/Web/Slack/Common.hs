@@ -155,14 +155,13 @@ data Message =
 
 $(deriveFromJSON (jsonOpts "message") ''Message)
 
-data HistoryRsp
-  = HistoryRspError Text
-  | HistoryRsp
+data HistoryRsp =
+  HistoryRsp
     { historyRspMessages :: [Message]
     , historyRspHasMore :: Bool
     }
   deriving (Eq, Generic, Show)
 
 instance FromJSON HistoryRsp where
-  parseJSON = fromJsonWithOk "HistoryRsp" HistoryRspError $ \o ->
+  parseJSON = fromJsonWithOk "HistoryRsp" $ \o ->
                 HistoryRsp <$> o .: "messages" <*> o .: "has_more"

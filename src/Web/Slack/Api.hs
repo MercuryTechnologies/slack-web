@@ -80,9 +80,8 @@ mkTestReq =
 --
 --
 
-data TestRsp
-  = TestRspError Text
-  | TestRsp
+data TestRsp =
+  TestRsp
     { testRspArgs :: Maybe TestReq
     }
   deriving (Eq, Generic, Show)
@@ -91,5 +90,5 @@ data TestRsp
 --
 --
 instance FromJSON TestRsp where
-  parseJSON = fromJsonWithOk "TestRsp" TestRspError $ \o ->
+  parseJSON = fromJsonWithOk "TestRsp" $ \o ->
                 TestRsp <$> o .: "args"

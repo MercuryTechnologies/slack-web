@@ -158,9 +158,8 @@ mkCreateReq name =
 --
 --
 
-data CreateRsp
-  = CreateRspError Text
-  | CreateRsp
+data CreateRsp =
+  CreateRsp
     { createRspChannel :: Channel
     }
   deriving (Eq, Generic, Show)
@@ -170,7 +169,7 @@ data CreateRsp
 --
 --
 instance FromJSON CreateRsp where
-  parseJSON = fromJsonWithOk "CreateRsp" CreateRspError $ \o ->
+  parseJSON = fromJsonWithOk "CreateRsp" $ \o ->
                 CreateRsp <$> o .: "channel"
 
 data ListReq =
@@ -214,13 +213,12 @@ mkListReq =
 --
 --
 
-data ListRsp
-  = ListRspError Text
-  | ListRsp
+data ListRsp =
+  ListRsp
     { listRspChannels :: [Channel]
     }
   deriving (Eq, Generic, Show)
 
 instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" ListRspError $ \o ->
+  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
                 ListRsp <$> o .: "channels"

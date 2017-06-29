@@ -32,9 +32,8 @@ import Data.Text (Text)
 --
 --
 
-data TestRsp
-  = TestRspError Text
-  | TestRsp
+data TestRsp =
+  TestRsp
     { testRspUrl :: Text
     , testRspTeam :: Text
     , testRspUser :: Text
@@ -46,7 +45,7 @@ data TestRsp
 
 
 instance FromJSON TestRsp where
-  parseJSON = fromJsonWithOk "TestRsp" TestRspError $ \o ->
+  parseJSON = fromJsonWithOk "TestRsp" $ \o ->
                 TestRsp <$> o .: "url" <*> o .: "team" <*> o .: "user"
                         <*> o .: "team_id" <*> o .: "user_id"
                         <*> o .: "enterprise_id"

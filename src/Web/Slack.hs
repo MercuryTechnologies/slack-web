@@ -377,23 +377,21 @@ historyFetchAll
   -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
   -> ClientM Common.HistoryRsp
 historyFetchAll token makeReq channel count oldest latest = do
-    rsp <- makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
-    case rsp of
-      Common.HistoryRspError _ -> return rsp
-      Common.HistoryRsp msgs hasMore -> do
-        -- From slack apidoc: If there are more than 100 messages between
-        -- the two timestamps then the messages returned are the ones closest to latest.
-        -- In most cases an application will want the most recent messages
-        -- and will page backward from there.
-        --
-        -- for reference (does not apply here) => If oldest is provided but not
-        -- latest then the messages returned are those closest to oldest,
-        -- allowing you to page forward through history if desired.
-        let oldestReceived = Common.messageTs <$> lastZ msgs
-        if not hasMore || isNothing oldestReceived
-            then return rsp
-            else mergeResponses msgs <$>
-                 historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
+    rsp@(Common.HistoryRsp msgs hasMore) <-
+        makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
+    -- From slack apidoc: If there are more than 100 messages between
+    -- the two timestamps then the messages returned are the ones closest to latest.
+    -- In most cases an application will want the most recent messages
+    -- and will page backward from there.
+    --
+    -- for reference (does not apply here) => If oldest is provided but not
+    -- latest then the messages returned are those closest to oldest,
+    -- allowing you to page forward through history if desired.
+    let oldestReceived = Common.messageTs <$> lastZ msgs
+    if not hasMore || isNothing oldestReceived
+        then return rsp
+        else mergeResponses msgs <$>
+             historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
 
 mergeResponses
   :: [Common.Message]

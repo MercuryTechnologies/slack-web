@@ -47,13 +47,12 @@ data Group =
 
 $(deriveJSON (jsonOpts "group") ''Group)
 
-data ListRsp
-  = ListRspError Text
-  | ListRsp
+data ListRsp =
+  ListRsp
     { listRspGroups :: [Group]
     }
   deriving (Eq, Generic, Show)
 
 instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" ListRspError $ \o ->
+  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
                 ListRsp <$> o .: "groups"

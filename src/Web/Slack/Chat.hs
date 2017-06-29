@@ -130,14 +130,13 @@ mkPostMsgReq channel text =
 --
 --
 
-data PostMsgRsp
-  = PostMsgRspError Text
-  | PostMsgRsp
+data PostMsgRsp =
+  PostMsgRsp
     { postMsgRspTs :: String
     , postMsgRspMessage :: PostMsg
     }
   deriving (Eq, Generic, Show)
 
 instance FromJSON PostMsgRsp where
-  parseJSON = fromJsonWithOk "PostMsgRsp" PostMsgRspError $ \o ->
+  parseJSON = fromJsonWithOk "PostMsgRsp" $ \o ->
                 PostMsgRsp <$> o .: "ts" <*> o .: "message"

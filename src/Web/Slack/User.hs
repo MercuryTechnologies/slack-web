@@ -51,13 +51,12 @@ data User =
 
 $(deriveFromJSON (jsonOpts "user") ''User)
 
-data ListRsp
-  = ListRspError Text
-  | ListRsp
+data ListRsp =
+  ListRsp
     { listRspMembers :: [User]
     }
   deriving (Eq, Generic, Show)
 
 instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" ListRspError $ \o ->
+  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
                 ListRsp <$> o .: "members"
