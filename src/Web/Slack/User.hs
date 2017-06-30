@@ -52,8 +52,7 @@ $(deriveFromJSON (jsonOpts "user") ''User)
 
 data ListRsp =
   ListRsp
-    { listRspOk :: Bool
-    , listRspMembers :: [User]
+    { listRspMembers :: [User]
     }
   deriving (Eq, Generic, Show)
 

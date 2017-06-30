@@ -34,8 +34,7 @@ import Data.Text (Text)
 
 data TestRsp =
   TestRsp
-    { testRspOk :: Bool
-    , testRspUrl :: Text
+    { testRspUrl :: Text
     , testRspTeam :: Text
     , testRspUser :: Text
     , testRspTeamId :: Text
@@ -44,9 +43,5 @@ data TestRsp =
     }
   deriving (Eq, Generic, Show)
 
-
--- |
---
---
 
 $(deriveJSON (jsonOpts "testRsp") ''TestRsp)

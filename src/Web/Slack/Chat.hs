@@ -131,15 +131,9 @@ mkPostMsgReq channel text =
 
 data PostMsgRsp =
   PostMsgRsp
-    { postMsgRspOk :: Bool
-    , postMsgRspTs :: String
+    { postMsgRspTs :: String
     , postMsgRspMessage :: PostMsg
     }
   deriving (Eq, Generic, Show)
 
-
--- |
---
---
-
-$(deriveJSON (jsonOpts "postMsgRsp") ''PostMsgRsp)
+$(deriveFromJSON (jsonOpts "postMsgRsp") ''PostMsgRsp)

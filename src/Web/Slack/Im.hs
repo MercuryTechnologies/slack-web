@@ -48,8 +48,7 @@ $(deriveFromJSON (jsonOpts "im") ''Im)
 
 data ListRsp =
   ListRsp
-    { listRspOk :: Bool
-    , listRspIms :: [Im]
+    { listRspIms :: [Im]
     }
   deriving (Eq, Generic, Show)
 

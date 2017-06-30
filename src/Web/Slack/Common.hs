@@ -24,6 +24,8 @@ module Web.Slack.Common
     , Message(..)
     , Color(unColor)
     , UserId(unUserId)
+    , SlackError(..)
+    , Response
     )
     where
 
@@ -59,7 +61,6 @@ newtype Color = Color { unColor :: Text }
 
 newtype UserId = UserId { unUserId :: Text }
   deriving (Eq, Generic, Show, FromJSON)
-
 
 data SlackTimestamp =
   SlackTimestamp
@@ -158,13 +159,22 @@ $(deriveFromJSON (jsonOpts "message") ''Message)
 
 data HistoryRsp =
   HistoryRsp
-    { historyRspOk :: Bool
-    , historyRspMessages :: [Message]
+    { historyRspMessages :: [Message]
     , historyRspHasMore :: Bool
     }
   deriving (Eq, Generic, Show)
 
+$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
+
 -- |
 --
 --
-$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
+data SlackError = SlackError { slackErrorError :: Text }
+  deriving (Eq, Generic, Show)
+
+$(deriveFromJSON (jsonOpts "slackError") ''SlackError)
+
+-- |
+--
+--
+type Response a = Either SlackError a

@@ -48,8 +48,7 @@ $(deriveJSON (jsonOpts "group") ''Group)
 
 data ListRsp =
   ListRsp
-    { listRspOk :: Bool
-    , listRspGroups :: [Group]
+    { listRspGroups :: [Group]
     }
   deriving (Eq, Generic, Show)
 

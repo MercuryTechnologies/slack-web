@@ -81,14 +81,11 @@ mkTestReq =
 
 data TestRsp =
   TestRsp
-    { testRspOk :: Bool
-    , testRspArgs :: Maybe TestReq
+    { testRspArgs :: Maybe TestReq
     }
   deriving (Eq, Generic, Show)
-
 
 -- |
 --
 --
-
-$(deriveJSON (jsonOpts "testRsp") ''TestRsp)
+$(deriveFromJSON (jsonOpts "testRsp") ''TestRsp)

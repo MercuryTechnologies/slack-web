@@ -159,8 +159,7 @@ mkCreateReq name =
 
 data CreateRsp =
   CreateRsp
-    { createRspOk :: Bool
-    , createRspChannel :: Channel
+    { createRspChannel :: Channel
     }
   deriving (Eq, Generic, Show)
 
@@ -168,11 +167,7 @@ data CreateRsp =
 -- |
 --
 --
-$(deriveJSON (jsonOpts "createRsp") ''CreateRsp)
-
--- |
---
---
+$(deriveFromJSON (jsonOpts "createRsp") ''CreateRsp)
 
 data ListReq =
   ListReq
@@ -217,13 +212,8 @@ mkListReq =
 
 data ListRsp =
   ListRsp
-    { listRspOk :: Bool
-    , listRspChannels :: [Channel]
+    { listRspChannels :: [Channel]
     }
   deriving (Eq, Generic, Show)
 
-
--- |
---
---
-$(deriveJSON (jsonOpts "listRsp") ''ListRsp)
+$(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
