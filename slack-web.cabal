@@ -39,6 +39,7 @@ library
       Web.Slack.Group
       Web.Slack.Im
       Web.Slack.User
+  other-modules:
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.2
