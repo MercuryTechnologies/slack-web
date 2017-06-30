@@ -25,7 +25,6 @@ module Web.Slack.Channel
   where
 
 -- aeson
-import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -168,9 +167,7 @@ data CreateRsp =
 -- |
 --
 --
-instance FromJSON CreateRsp where
-  parseJSON = fromJsonWithOk "CreateRsp" $ \o ->
-                CreateRsp <$> o .: "channel"
+$(deriveFromJSON (jsonOpts "createRsp") ''CreateRsp)
 
 data ListReq =
   ListReq
@@ -219,6 +216,4 @@ data ListRsp =
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
-                ListRsp <$> o .: "channels"
+$(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

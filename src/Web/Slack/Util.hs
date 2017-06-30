@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 ----------------------------------------------------------------------
 -- |
 -- Module: Web.Slack.Util
@@ -12,7 +10,6 @@
 module Web.Slack.Util
   ( formOpts
   , jsonOpts
-  , fromJsonWithOk
   )
   where
 
@@ -78,10 +75,3 @@ addUnderscores
   -> String
 addUnderscores =
   camelTo2 '_'
-
-fromJsonWithOk :: String -> (Object -> Parser a) -> Value -> Parser a
-fromJsonWithOk objName okReader = withObject objName $ \o -> do
-      ok <- o .: "ok"
-      if ok
-         then okReader o
-         else fail =<< o .: "error"

@@ -24,6 +24,8 @@ module Web.Slack.Common
     , Message(..)
     , Color(unColor)
     , UserId(unUserId)
+    , SlackError(..)
+    , Response
     )
     where
 
@@ -162,6 +164,17 @@ data HistoryRsp =
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON HistoryRsp where
-  parseJSON = fromJsonWithOk "HistoryRsp" $ \o ->
-                HistoryRsp <$> o .: "messages" <*> o .: "has_more"
+$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
+
+-- |
+--
+--
+data SlackError = SlackError { slackErrorError :: Text }
+  deriving (Eq, Generic, Show)
+
+$(deriveFromJSON (jsonOpts "slackError") ''SlackError)
+
+-- |
+--
+--
+type Response a = Either SlackError a

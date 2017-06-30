@@ -20,7 +20,6 @@ module Web.Slack.Chat
   where
 
 -- aeson
-import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -137,6 +136,4 @@ data PostMsgRsp =
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON PostMsgRsp where
-  parseJSON = fromJsonWithOk "PostMsgRsp" $ \o ->
-                PostMsgRsp <$> o .: "ts" <*> o .: "message"
+$(deriveFromJSON (jsonOpts "postMsgRsp") ''PostMsgRsp)

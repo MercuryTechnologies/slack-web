@@ -33,6 +33,9 @@ module Web.Slack
   )
   where
 
+-- aeson
+import Data.Aeson
+
 -- base
 import Data.Maybe
 import Data.Proxy (Proxy(..))
@@ -69,6 +72,17 @@ import Data.Text (Text)
 -- transformers
 import Control.Monad.IO.Class
 
+-- |
+-- Internal type!
+--
+newtype ResponseJSON a = ResponseJSON { unResponseJSON :: Either Common.SlackError a }
+
+instance FromJSON a => FromJSON (ResponseJSON a) where
+    parseJSON = withObject "Response" $ \o -> do
+        ok <- o .: "ok"
+        ResponseJSON <$> if ok
+           then Right <$> parseJSON (Object o)
+           else Left . Common.SlackError <$> o .: "error"
 
 -- |
 --
@@ -77,62 +91,62 @@ import Control.Monad.IO.Class
 type Api =
     "api.test"
       :> ReqBody '[FormUrlEncoded] Api.TestReq
-      :> Post '[JSON] Api.TestRsp
+      :> Post '[JSON] (ResponseJSON Api.TestRsp)
   :<|>
     "auth.test"
       :> AuthProtect "token"
-      :> Post '[JSON] Auth.TestRsp
+      :> Post '[JSON] (ResponseJSON Auth.TestRsp)
   :<|>
     "channels.create"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Channel.CreateReq
-      :> Post '[JSON] Channel.CreateRsp
+      :> Post '[JSON] (ResponseJSON Channel.CreateRsp)
   :<|>
     "channels.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] Common.HistoryRsp
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "channels.list"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Channel.ListReq
-      :> Post '[JSON] Channel.ListRsp
+      :> Post '[JSON] (ResponseJSON Channel.ListRsp)
   :<|>
     "chat.postMessage"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
-      :> Post '[JSON] Chat.PostMsgRsp
+      :> Post '[JSON] (ResponseJSON Chat.PostMsgRsp)
   :<|>
     "groups.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] Common.HistoryRsp
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
      "groups.list"
       :> AuthProtect "token"
-      :> Post '[JSON] Group.ListRsp
+      :> Post '[JSON] (ResponseJSON Group.ListRsp)
   :<|>
     "im.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] Common.HistoryRsp
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "im.list"
       :> AuthProtect "token"
-      :> Post '[JSON] Im.ListRsp
+      :> Post '[JSON] (ResponseJSON Im.ListRsp)
   :<|>
     "mpim.list"
       :> AuthProtect "token"
-      :> Post '[JSON] Group.ListRsp
+      :> Post '[JSON] (ResponseJSON Group.ListRsp)
   :<|>
     "mpim.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] Common.HistoryRsp
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "users.list"
       :> AuthProtect "token"
-      :> Post '[JSON] User.ListRsp
+      :> Post '[JSON] (ResponseJSON User.ListRsp)
 
 
 -- |
@@ -143,8 +157,12 @@ type Api =
 
 apiTest
   :: Api.TestReq
-  -> ClientM Api.TestRsp
+  -> ClientM (Common.Response Api.TestRsp)
+apiTest req = unResponseJSON <$> apiTest_ req
 
+apiTest_
+  :: Api.TestReq
+  -> ClientM (ResponseJSON Api.TestRsp)
 
 -- |
 --
@@ -154,13 +172,13 @@ apiTest
 
 authTest
   :: Text
-  -> ClientM Auth.TestRsp
-authTest token =
+  -> ClientM (Common.Response Auth.TestRsp)
+authTest token = unResponseJSON <$>
   authTest_ (mkAuthenticateReq token authenticateReq)
 
 authTest_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM Auth.TestRsp
+  -> ClientM (ResponseJSON Auth.TestRsp)
 
 
 -- |
@@ -172,14 +190,14 @@ authTest_
 channelsCreate
   :: Text
   -> Channel.CreateReq
-  -> ClientM Channel.CreateRsp
-channelsCreate token =
+  -> ClientM (Common.Response Channel.CreateRsp)
+channelsCreate token = fmap unResponseJSON .
   channelsCreate_ (mkAuthenticateReq token authenticateReq)
 
 channelsCreate_
   :: AuthenticateReq (AuthProtect "token")
   -> Channel.CreateReq
-  -> ClientM Channel.CreateRsp
+  -> ClientM (ResponseJSON Channel.CreateRsp)
 
 -- |
 --
@@ -190,14 +208,14 @@ channelsCreate_
 channelsList
   :: Text
   -> Channel.ListReq
-  -> ClientM Channel.ListRsp
-channelsList token =
+  -> ClientM (Common.Response Channel.ListRsp)
+channelsList token = fmap unResponseJSON .
   channelsList_ (mkAuthenticateReq token authenticateReq)
 
 channelsList_
   :: AuthenticateReq (AuthProtect "token")
   -> Channel.ListReq
-  -> ClientM Channel.ListRsp
+  -> ClientM (ResponseJSON Channel.ListRsp)
 
 -- |
 --
@@ -209,14 +227,14 @@ channelsList_
 channelsHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
-channelsHistory token =
+  -> ClientM (Common.Response Common.HistoryRsp)
+channelsHistory token = fmap unResponseJSON .
   channelsHistory_ (mkAuthenticateReq token authenticateReq)
 
 channelsHistory_
   :: AuthenticateReq (AuthProtect "token")
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
+  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 -- |
 --
@@ -227,14 +245,14 @@ channelsHistory_
 chatPostMessage
   :: Text
   -> Chat.PostMsgReq
-  -> ClientM Chat.PostMsgRsp
-chatPostMessage token =
+  -> ClientM (Common.Response Chat.PostMsgRsp)
+chatPostMessage token = fmap unResponseJSON .
   chatPostMessage_ (mkAuthenticateReq token authenticateReq)
 
 chatPostMessage_
   :: AuthenticateReq (AuthProtect "token")
   -> Chat.PostMsgReq
-  -> ClientM Chat.PostMsgRsp
+  -> ClientM (ResponseJSON Chat.PostMsgRsp)
 
 -- |
 --
@@ -246,13 +264,13 @@ chatPostMessage_
 
 groupsList
   :: Text
-  -> ClientM Group.ListRsp
-groupsList token =
+  -> ClientM (Common.Response Group.ListRsp)
+groupsList token = unResponseJSON <$>
   groupsList_ (mkAuthenticateReq token authenticateReq)
 
 groupsList_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM Group.ListRsp
+  -> ClientM (ResponseJSON Group.ListRsp)
 
 -- |
 --
@@ -266,14 +284,14 @@ groupsList_
 groupsHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
-groupsHistory token =
+  -> ClientM (Common.Response Common.HistoryRsp)
+groupsHistory token = fmap unResponseJSON .
   groupsHistory_ (mkAuthenticateReq token authenticateReq)
 
 groupsHistory_
   :: AuthenticateReq (AuthProtect "token")
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
+  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 -- |
 --
@@ -283,13 +301,13 @@ groupsHistory_
 
 imList
   :: Text
-  -> ClientM Im.ListRsp
-imList token =
+  -> ClientM (Common.Response Im.ListRsp)
+imList token = unResponseJSON <$>
   imList_ (mkAuthenticateReq token authenticateReq)
 
 imList_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM Im.ListRsp
+  -> ClientM (ResponseJSON Im.ListRsp)
 
 -- |
 --
@@ -301,14 +319,14 @@ imList_
 imHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
-imHistory token =
+  -> ClientM (Common.Response Common.HistoryRsp)
+imHistory token = fmap unResponseJSON .
   imHistory_ (mkAuthenticateReq token authenticateReq)
 
 imHistory_
   :: AuthenticateReq (AuthProtect "token")
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
+  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 -- |
 --
@@ -318,13 +336,13 @@ imHistory_
 
 mpimList
   :: Text
-  -> ClientM Group.ListRsp
-mpimList token =
+  -> ClientM (Common.Response Group.ListRsp)
+mpimList token = unResponseJSON <$>
   mpimList_ (mkAuthenticateReq token authenticateReq)
 
 mpimList_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM Group.ListRsp
+  -> ClientM (ResponseJSON Group.ListRsp)
 
 -- |
 --
@@ -336,14 +354,14 @@ mpimList_
 mpimHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
-mpimHistory token =
+  -> ClientM (Common.Response Common.HistoryRsp)
+mpimHistory token = fmap unResponseJSON .
   mpimHistory_ (mkAuthenticateReq token authenticateReq)
 
 mpimHistory_
   :: AuthenticateReq (AuthProtect "token")
   -> Common.HistoryReq
-  -> ClientM Common.HistoryRsp
+  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 -- |
 --
@@ -354,13 +372,13 @@ mpimHistory_
 
 usersList
   :: Text
-  -> ClientM User.ListRsp
-usersList token =
+  -> ClientM (Common.Response User.ListRsp)
+usersList token = unResponseJSON <$>
   usersList_ (mkAuthenticateReq token authenticateReq)
 
 usersList_
   :: AuthenticateReq (AuthProtect "token")
-  -> ClientM User.ListRsp
+  -> ClientM (ResponseJSON User.ListRsp)
 
 -- |
 -- Fetch all history items between two dates. The basic calls
@@ -373,12 +391,10 @@ usersList_
 -- function until all the data is fetched or until a call
 -- fails, merging the messages obtained from each call.
 historyFetchAll
-  :: Text -> (Text -> Common.HistoryReq -> ClientM Common.HistoryRsp)
+  :: Text -> (Text -> Common.HistoryReq -> ClientM (Common.Response Common.HistoryRsp))
   -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
-  -> ClientM Common.HistoryRsp
+  -> ClientM (Common.Response Common.HistoryRsp)
 historyFetchAll token makeReq channel count oldest latest = do
-    rsp@(Common.HistoryRsp msgs hasMore) <-
-        makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
     -- From slack apidoc: If there are more than 100 messages between
     -- the two timestamps then the messages returned are the ones closest to latest.
     -- In most cases an application will want the most recent messages
@@ -387,19 +403,25 @@ historyFetchAll token makeReq channel count oldest latest = do
     -- for reference (does not apply here) => If oldest is provided but not
     -- latest then the messages returned are those closest to oldest,
     -- allowing you to page forward through history if desired.
-    let oldestReceived = Common.messageTs <$> lastZ msgs
-    if not hasMore || isNothing oldestReceived
-        then return rsp
-        else mergeResponses msgs <$>
-             historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
+    rsp <- makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
+    case rsp of
+      Left _ -> return rsp
+      Right (Common.HistoryRsp msgs hasMore) -> do
+          let oldestReceived = Common.messageTs <$> lastZ msgs
+          if not hasMore || isNothing oldestReceived
+              then return rsp
+              else mergeResponses msgs <$>
+                   historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
 
 mergeResponses
   :: [Common.Message]
-  -> Common.HistoryRsp
-  -> Common.HistoryRsp
-mergeResponses msgs rsp = rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp }
+  -> Common.Response Common.HistoryRsp
+  -> Common.Response Common.HistoryRsp
+mergeResponses _ err@(Left _) = err
+mergeResponses msgs (Right rsp) =
+    Right (rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp })
 
-apiTest
+apiTest_
   :<|> authTest_
   :<|> channelsCreate_
   :<|> channelsHistory_

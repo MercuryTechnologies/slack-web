@@ -16,7 +16,7 @@ module Web.Slack.Auth
   where
 
 -- aeson
-import Data.Aeson
+import Data.Aeson.TH
 
 -- base
 import GHC.Generics (Generic)
@@ -44,8 +44,4 @@ data TestRsp =
   deriving (Eq, Generic, Show)
 
 
-instance FromJSON TestRsp where
-  parseJSON = fromJsonWithOk "TestRsp" $ \o ->
-                TestRsp <$> o .: "url" <*> o .: "team" <*> o .: "user"
-                        <*> o .: "team_id" <*> o .: "user_id"
-                        <*> o .: "enterprise_id"
+$(deriveJSON (jsonOpts "testRsp") ''TestRsp)

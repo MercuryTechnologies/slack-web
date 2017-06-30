@@ -18,7 +18,6 @@ module Web.Slack.User
   where
 
 -- aeson
-import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -57,6 +56,4 @@ data ListRsp =
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
-                ListRsp <$> o .: "members"
+$(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

@@ -18,7 +18,6 @@ module Web.Slack.Group
   where
 
 -- aeson
-import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -53,6 +52,4 @@ data ListRsp =
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON ListRsp where
-  parseJSON = fromJsonWithOk "ListRsp" $ \o ->
-                ListRsp <$> o .: "groups"
+$(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

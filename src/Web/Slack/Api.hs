@@ -20,7 +20,6 @@ module Web.Slack.Api
   where
 
 -- aeson
-import Data.Aeson
 import Data.Aeson.TH
 
 -- base
@@ -89,6 +88,4 @@ data TestRsp =
 -- |
 --
 --
-instance FromJSON TestRsp where
-  parseJSON = fromJsonWithOk "TestRsp" $ \o ->
-                TestRsp <$> o .: "args"
+$(deriveFromJSON (jsonOpts "testRsp") ''TestRsp)
