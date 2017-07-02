@@ -34,6 +34,7 @@ import GHC.Generics (Generic)
 import Web.FormUrlEncoded
 
 -- slack-web
+import Web.Slack.Common
 import Web.Slack.Util
 
 -- text
@@ -49,7 +50,7 @@ data Channel =
     { channelId :: Text
     , channelName :: Text
     , channelCreated :: Integer
-    , channelCreator :: Text
+    , channelCreator :: UserId
     , channelIsArchived :: Bool
     , channelIsMember :: Bool
     , channelIsGeneral :: Bool
@@ -57,7 +58,7 @@ data Channel =
     , channelLatest :: Maybe Text
     , channelUnreadCount :: Maybe Integer
     , channelUnreadCountDisplay :: Maybe Integer
-    , channelMembers :: [Text]
+    , channelMembers :: [UserId]
     , channelTopic :: Topic
     , channelPurpose :: Purpose
     }
@@ -94,7 +95,7 @@ data Topic =
 --
 --
 
-$(deriveJSON (jsonOpts "channel") ''Channel)
+$(deriveFromJSON (jsonOpts "channel") ''Channel)
 
 
 -- |
