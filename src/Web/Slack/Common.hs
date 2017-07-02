@@ -57,10 +57,10 @@ import Data.Time.Clock
 import Data.Time.Clock.POSIX
 
 newtype Color = Color { unColor :: Text }
-  deriving (Eq, Generic, Show, FromJSON)
+  deriving (Eq, Ord, Generic, Show, FromJSON)
 
 newtype UserId = UserId { unUserId :: Text }
-  deriving (Eq, Generic, Show, FromJSON)
+  deriving (Eq, Ord, Generic, Show, FromJSON)
 
 data SlackTimestamp =
   SlackTimestamp
@@ -68,6 +68,9 @@ data SlackTimestamp =
     , slackTimestampTime :: UTCTime
     }
   deriving (Eq, Show)
+
+instance Ord SlackTimestamp where
+    compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b
 
 mkSlackTimestamp :: UTCTime -> SlackTimestamp
 mkSlackTimestamp utctime = SlackTimestamp (T.pack (show @Integer unixts) <> ".000000") utctime
