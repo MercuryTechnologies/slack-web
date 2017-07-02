@@ -24,6 +24,7 @@ import Data.Aeson.TH
 import GHC.Generics (Generic)
 
 -- slack-web
+import Web.Slack.Common
 import Web.Slack.Util
 
 -- text
@@ -38,13 +39,13 @@ data Group =
     , groupName :: Text
     , groupIsMpim :: Bool
     , groupCreated :: POSIXTime
-    , groupCreator :: Text
+    , groupCreator :: UserId
     , groupIsArchived :: Bool
-    , groupMembers :: [Text]
+    , groupMembers :: [UserId]
     }
   deriving (Eq, Generic, Show)
 
-$(deriveJSON (jsonOpts "group") ''Group)
+$(deriveFromJSON (jsonOpts "group") ''Group)
 
 data ListRsp =
   ListRsp
