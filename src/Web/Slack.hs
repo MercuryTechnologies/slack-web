@@ -465,15 +465,20 @@ authenticateReq token =
 run
   :: MonadIO m
   => Manager
-  -> ClientM a
-  -> m (Either ServantError a)
+  -> ClientM (Common.Response a)
+  -> m (Either Common.SlackClientError a)
 run manager =
   let
     baseUrl =
       BaseUrl Https "slack.com" 443 "/api"
 
   in
-    liftIO . flip runClientM (ClientEnv manager baseUrl)
+    fmap unnestErrors . liftIO . flip runClientM (ClientEnv manager baseUrl)
+
+unnestErrors :: Either ServantError (Common.Response a) -> Either Common.SlackClientError a
+unnestErrors (Right (Right a)) = Right a
+unnestErrors (Right (Left serv)) = Left (Common.SlackCallError serv)
+unnestErrors (Left slackErr) = Left (Common.ServantError slackErr)
 
 
 -- |

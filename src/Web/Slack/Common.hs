@@ -25,6 +25,7 @@ module Web.Slack.Common
     , Color(unColor)
     , UserId(unUserId)
     , SlackError(..)
+    , SlackClientError(..)
     , Response
     )
     where
@@ -43,6 +44,9 @@ import Control.Error (hush)
 -- http-api-data
 import Web.FormUrlEncoded
 import Web.HttpApiData
+
+-- servant-client
+import Servant.Common.Req
 
 -- slack-web
 import Web.Slack.Util
@@ -180,4 +184,7 @@ $(deriveFromJSON (jsonOpts "slackError") ''SlackError)
 -- |
 --
 --
+data SlackClientError = ServantError ServantError | SlackCallError SlackError
+  deriving (Eq, Generic, Show)
+
 type Response a = Either SlackError a
