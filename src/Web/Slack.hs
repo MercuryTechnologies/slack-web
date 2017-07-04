@@ -30,6 +30,7 @@ module Web.Slack
   , mpimHistory
   , usersList
   , authenticateReq
+  , Response -- blackbox for users of the library
   )
   where
 
@@ -72,17 +73,29 @@ import Data.Text (Text)
 -- transformers
 import Control.Monad.IO.Class
 
+-- contains errors that can be returned by the slack API.
+-- constrast with 'SlackClientError' which additionally
+-- contains errors which occured during the network communication.
+data ResponseSlackError = ResponseSlackError Text
+  deriving (Eq, Show)
+
+-- |
+--
+-- type is opaque to library users (that's why a newtype won't do)
+newtype Response a = Response { unResponse :: Either ResponseSlackError a }
+
 -- |
 -- Internal type!
 --
-newtype ResponseJSON a = ResponseJSON { unResponseJSON :: Either Common.SlackError a }
+newtype ResponseJSON a = ResponseJSON { unResponseJSON :: Response a }
 
 instance FromJSON a => FromJSON (ResponseJSON a) where
     parseJSON = withObject "Response" $ \o -> do
         ok <- o .: "ok"
-        ResponseJSON <$> if ok
+        ResponseJSON . Response <$> if ok
            then Right <$> parseJSON (Object o)
-           else Left . Common.SlackError <$> o .: "error"
+           else Left . ResponseSlackError <$> o .: "error"
+
 
 -- |
 --
@@ -157,7 +170,7 @@ type Api =
 
 apiTest
   :: Api.TestReq
-  -> ClientM (Common.Response Api.TestRsp)
+  -> ClientM (Response Api.TestRsp)
 apiTest req = unResponseJSON <$> apiTest_ req
 
 apiTest_
@@ -172,7 +185,7 @@ apiTest_
 
 authTest
   :: Text
-  -> ClientM (Common.Response Auth.TestRsp)
+  -> ClientM (Response Auth.TestRsp)
 authTest token = unResponseJSON <$>
   authTest_ (mkAuthenticateReq token authenticateReq)
 
@@ -190,7 +203,7 @@ authTest_
 channelsCreate
   :: Text
   -> Channel.CreateReq
-  -> ClientM (Common.Response Channel.CreateRsp)
+  -> ClientM (Response Channel.CreateRsp)
 channelsCreate token = fmap unResponseJSON .
   channelsCreate_ (mkAuthenticateReq token authenticateReq)
 
@@ -208,7 +221,7 @@ channelsCreate_
 channelsList
   :: Text
   -> Channel.ListReq
-  -> ClientM (Common.Response Channel.ListRsp)
+  -> ClientM (Response Channel.ListRsp)
 channelsList token = fmap unResponseJSON .
   channelsList_ (mkAuthenticateReq token authenticateReq)
 
@@ -227,7 +240,7 @@ channelsList_
 channelsHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM (Common.Response Common.HistoryRsp)
+  -> ClientM (Response Common.HistoryRsp)
 channelsHistory token = fmap unResponseJSON .
   channelsHistory_ (mkAuthenticateReq token authenticateReq)
 
@@ -245,7 +258,7 @@ channelsHistory_
 chatPostMessage
   :: Text
   -> Chat.PostMsgReq
-  -> ClientM (Common.Response Chat.PostMsgRsp)
+  -> ClientM (Response Chat.PostMsgRsp)
 chatPostMessage token = fmap unResponseJSON .
   chatPostMessage_ (mkAuthenticateReq token authenticateReq)
 
@@ -264,7 +277,7 @@ chatPostMessage_
 
 groupsList
   :: Text
-  -> ClientM (Common.Response Group.ListRsp)
+  -> ClientM (Response Group.ListRsp)
 groupsList token = unResponseJSON <$>
   groupsList_ (mkAuthenticateReq token authenticateReq)
 
@@ -284,7 +297,7 @@ groupsList_
 groupsHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM (Common.Response Common.HistoryRsp)
+  -> ClientM (Response Common.HistoryRsp)
 groupsHistory token = fmap unResponseJSON .
   groupsHistory_ (mkAuthenticateReq token authenticateReq)
 
@@ -301,7 +314,7 @@ groupsHistory_
 
 imList
   :: Text
-  -> ClientM (Common.Response Im.ListRsp)
+  -> ClientM (Response Im.ListRsp)
 imList token = unResponseJSON <$>
   imList_ (mkAuthenticateReq token authenticateReq)
 
@@ -319,7 +332,7 @@ imList_
 imHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM (Common.Response Common.HistoryRsp)
+  -> ClientM (Response Common.HistoryRsp)
 imHistory token = fmap unResponseJSON .
   imHistory_ (mkAuthenticateReq token authenticateReq)
 
@@ -336,7 +349,7 @@ imHistory_
 
 mpimList
   :: Text
-  -> ClientM (Common.Response Group.ListRsp)
+  -> ClientM (Response Group.ListRsp)
 mpimList token = unResponseJSON <$>
   mpimList_ (mkAuthenticateReq token authenticateReq)
 
@@ -354,7 +367,7 @@ mpimList_
 mpimHistory
   :: Text
   -> Common.HistoryReq
-  -> ClientM (Common.Response Common.HistoryRsp)
+  -> ClientM (Response Common.HistoryRsp)
 mpimHistory token = fmap unResponseJSON .
   mpimHistory_ (mkAuthenticateReq token authenticateReq)
 
@@ -372,7 +385,7 @@ mpimHistory_
 
 usersList
   :: Text
-  -> ClientM (Common.Response User.ListRsp)
+  -> ClientM (Response User.ListRsp)
 usersList token = unResponseJSON <$>
   usersList_ (mkAuthenticateReq token authenticateReq)
 
@@ -391,9 +404,9 @@ usersList_
 -- function until all the data is fetched or until a call
 -- fails, merging the messages obtained from each call.
 historyFetchAll
-  :: Text -> (Text -> Common.HistoryReq -> ClientM (Common.Response Common.HistoryRsp))
+  :: Text -> (Text -> Common.HistoryReq -> ClientM (Response Common.HistoryRsp))
   -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
-  -> ClientM (Common.Response Common.HistoryRsp)
+  -> ClientM (Response Common.HistoryRsp)
 historyFetchAll token makeReq channel count oldest latest = do
     -- From slack apidoc: If there are more than 100 messages between
     -- the two timestamps then the messages returned are the ones closest to latest.
@@ -403,8 +416,8 @@ historyFetchAll token makeReq channel count oldest latest = do
     -- for reference (does not apply here) => If oldest is provided but not
     -- latest then the messages returned are those closest to oldest,
     -- allowing you to page forward through history if desired.
-    rsp <- makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
-    case rsp of
+    rsp <- unResponse <$> makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
+    Response <$> case rsp of
       Left _ -> return rsp
       Right (Common.HistoryRsp msgs hasMore) -> do
           let oldestReceived = Common.messageTs <$> lastZ msgs
@@ -415,10 +428,10 @@ historyFetchAll token makeReq channel count oldest latest = do
 
 mergeResponses
   :: [Common.Message]
-  -> Common.Response Common.HistoryRsp
-  -> Common.Response Common.HistoryRsp
-mergeResponses _ err@(Left _) = err
-mergeResponses msgs (Right rsp) =
+  -> Response Common.HistoryRsp
+  -> Either ResponseSlackError Common.HistoryRsp
+mergeResponses _ err@(Response (Left _)) = unResponse err
+mergeResponses msgs (Response (Right rsp)) =
     Right (rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp })
 
 apiTest_
@@ -465,7 +478,7 @@ authenticateReq token =
 run
   :: MonadIO m
   => Manager
-  -> ClientM (Common.Response a)
+  -> ClientM (Response a)
   -> m (Either Common.SlackClientError a)
 run manager =
   let
@@ -475,9 +488,9 @@ run manager =
   in
     fmap unnestErrors . liftIO . flip runClientM (ClientEnv manager baseUrl)
 
-unnestErrors :: Either ServantError (Common.Response a) -> Either Common.SlackClientError a
-unnestErrors (Right (Right a)) = Right a
-unnestErrors (Right (Left serv)) = Left (Common.SlackCallError serv)
+unnestErrors :: Either ServantError (Response a) -> Either Common.SlackClientError a
+unnestErrors (Right (Response (Right a))) = Right a
+unnestErrors (Right (Response (Left (ResponseSlackError serv)))) = Left (Common.SlackError serv)
 unnestErrors (Left slackErr) = Left (Common.ServantError slackErr)
 
 
