@@ -51,6 +51,7 @@ library
     , servant-client >= 0.9 && < 0.11
     , text >= 1.2 && < 1.3
     , transformers
+    , mtl
     , time
     , errors
   default-language:

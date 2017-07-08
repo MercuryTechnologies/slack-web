@@ -24,8 +24,7 @@ module Web.Slack.Common
     , Message(..)
     , Color(unColor)
     , UserId(unUserId)
-    , SlackError(..)
-    , Response
+    , SlackClientError(..)
     )
     where
 
@@ -43,6 +42,9 @@ import Control.Error (hush)
 -- http-api-data
 import Web.FormUrlEncoded
 import Web.HttpApiData
+
+-- servant-client
+import Servant.Common.Req
 
 -- slack-web
 import Web.Slack.Util
@@ -170,14 +172,10 @@ data HistoryRsp =
 $(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
 -- |
---
---
-data SlackError = SlackError { slackErrorError :: Text }
+-- Errors that can be triggered by a slack request.
+data SlackClientError
+    = ServantError ServantError
+    -- ^ errors from the network connection
+    | SlackError Text
+    -- ^ errors returned by the slack API
   deriving (Eq, Generic, Show)
-
-$(deriveFromJSON (jsonOpts "slackError") ''SlackError)
-
--- |
---
---
-type Response a = Either SlackError a
