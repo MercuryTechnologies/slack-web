@@ -39,6 +39,7 @@ library
       Web.Slack.Group
       Web.Slack.Im
       Web.Slack.User
+      Web.Slack.MessageParser
   other-modules:
       Web.Slack.Util
   build-depends:
@@ -54,6 +55,7 @@ library
     , mtl
     , time
     , errors
+    , megaparsec
   default-language:
       Haskell2010
   ghc-options:
