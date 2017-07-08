@@ -27,17 +27,24 @@
 ```
 
 ```
-> manager <- Slack.mkManager
-```
-
-```
-> Slack.run manager (Slack.apiTest Api.mkTestReq)
-Right ...
+> import Control.Monad.Reader
 ```
 
 ```
 > :set -XOverloadedStrings
-> Slack.run manager (Slack.apiTest Api.mkTestReq { Api.testReqFoo = Just "bar" })
+```
+
+```
+> slackConfig <- Slack.mkSlackConfig token
+```
+
+```
+> flip runReaderT slackConfig (Slack.apiTest Api.mkTestReq)
+Right ...
+```
+
+```
+> flip runReaderT slackConfig (Slack.apiTest Api.mkTestReq { Api.testReqFoo = Just "bar" })
 Right ...
 ```
 
