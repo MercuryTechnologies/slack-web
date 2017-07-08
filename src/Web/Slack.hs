@@ -13,8 +13,8 @@
 ----------------------------------------------------------------------
 
 module Web.Slack
-  ( run
-  , mkManager
+  ( SlackConfig(..)
+  , mkSlackConfig
   , apiTest
   , authTest
   , chatPostMessage
@@ -30,7 +30,7 @@ module Web.Slack
   , mpimHistory
   , usersList
   , authenticateReq
-  , Response -- blackbox for users of the library
+  , Response
   )
   where
 
@@ -49,6 +49,9 @@ import Network.HTTP.Client (Manager, newManager)
 
 -- http-client-tls
 import Network.HTTP.Client.TLS (tlsManagerSettings)
+
+-- mtl
+import Control.Monad.Reader
 
 -- servant
 import Servant.API
@@ -70,8 +73,23 @@ import qualified Web.Slack.User as User
 -- text
 import Data.Text (Text)
 
--- transformers
-import Control.Monad.IO.Class
+class HasManager a where
+    getManager :: a -> Manager
+
+class HasToken a where
+    getToken :: a -> Text
+
+-- | Implements the `HasManager` and `HasToken` typeclasses.
+data SlackConfig
+  = SlackConfig
+  { slackConfigManager :: Manager
+  , slackConfigToken :: Text
+  }
+
+instance HasManager SlackConfig where
+    getManager = slackConfigManager
+instance HasToken SlackConfig where
+    getToken = slackConfigToken
 
 -- contains errors that can be returned by the slack API.
 -- constrast with 'SlackClientError' which additionally
@@ -79,20 +97,17 @@ import Control.Monad.IO.Class
 data ResponseSlackError = ResponseSlackError Text
   deriving (Eq, Show)
 
--- |
---
--- type is opaque to library users (that's why a newtype won't do)
-newtype Response a = Response { unResponse :: Either ResponseSlackError a }
+type Response a =  Either Common.SlackClientError a
 
 -- |
 -- Internal type!
 --
-newtype ResponseJSON a = ResponseJSON { unResponseJSON :: Response a }
+newtype ResponseJSON a = ResponseJSON (Either ResponseSlackError a)
 
 instance FromJSON a => FromJSON (ResponseJSON a) where
     parseJSON = withObject "Response" $ \o -> do
         ok <- o .: "ok"
-        ResponseJSON . Response <$> if ok
+        ResponseJSON <$> if ok
            then Right <$> parseJSON (Object o)
            else Left . ResponseSlackError <$> o .: "error"
 
@@ -169,9 +184,10 @@ type Api =
 -- <https://api.slack.com/methods/api.test>
 
 apiTest
-  :: Api.TestReq
-  -> ClientM (Response Api.TestRsp)
-apiTest req = unResponseJSON <$> apiTest_ req
+  :: (MonadReader env m, HasManager env, MonadIO m)
+  => Api.TestReq
+  -> m (Response Api.TestRsp)
+apiTest req = run (apiTest_ req)
 
 apiTest_
   :: Api.TestReq
@@ -184,10 +200,11 @@ apiTest_
 -- <https://api.slack.com/methods/auth.test>
 
 authTest
-  :: Text
-  -> ClientM (Response Auth.TestRsp)
-authTest token = unResponseJSON <$>
-  authTest_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response Auth.TestRsp)
+authTest = do
+  authR <- mkSlackAuthenticateReq
+  run (authTest_ authR)
 
 authTest_
   :: AuthenticateReq (AuthProtect "token")
@@ -201,11 +218,12 @@ authTest_
 -- <https://api.slack.com/methods/channels.create>
 
 channelsCreate
-  :: Text
-  -> Channel.CreateReq
-  -> ClientM (Response Channel.CreateRsp)
-channelsCreate token = fmap unResponseJSON .
-  channelsCreate_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Channel.CreateReq
+  -> m (Response Channel.CreateRsp)
+channelsCreate createReq = do
+  authR <- mkSlackAuthenticateReq
+  run (channelsCreate_ authR createReq)
 
 channelsCreate_
   :: AuthenticateReq (AuthProtect "token")
@@ -219,11 +237,12 @@ channelsCreate_
 -- <https://api.slack.com/methods/channels.list>
 
 channelsList
-  :: Text
-  -> Channel.ListReq
-  -> ClientM (Response Channel.ListRsp)
-channelsList token = fmap unResponseJSON .
-  channelsList_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Channel.ListReq
+  -> m (Response Channel.ListRsp)
+channelsList listReq = do
+  authR <- mkSlackAuthenticateReq
+  run (channelsList_ authR listReq)
 
 channelsList_
   :: AuthenticateReq (AuthProtect "token")
@@ -238,11 +257,12 @@ channelsList_
 -- <https://api.slack.com/methods/channels.history>
 
 channelsHistory
-  :: Text
-  -> Common.HistoryReq
-  -> ClientM (Response Common.HistoryRsp)
-channelsHistory token = fmap unResponseJSON .
-  channelsHistory_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Common.HistoryReq
+  -> m (Response Common.HistoryRsp)
+channelsHistory histReq = do
+  authR <- mkSlackAuthenticateReq
+  run (channelsHistory_ authR histReq)
 
 channelsHistory_
   :: AuthenticateReq (AuthProtect "token")
@@ -256,11 +276,12 @@ channelsHistory_
 -- <https://api.slack.com/methods/chat.postMessage>
 
 chatPostMessage
-  :: Text
-  -> Chat.PostMsgReq
-  -> ClientM (Response Chat.PostMsgRsp)
-chatPostMessage token = fmap unResponseJSON .
-  chatPostMessage_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Chat.PostMsgReq
+  -> m (Response Chat.PostMsgRsp)
+chatPostMessage postReq = do
+  authR <- mkSlackAuthenticateReq
+  run (chatPostMessage_ authR postReq)
 
 chatPostMessage_
   :: AuthenticateReq (AuthProtect "token")
@@ -276,10 +297,11 @@ chatPostMessage_
 -- <https://api.slack.com/methods/groups.list>
 
 groupsList
-  :: Text
-  -> ClientM (Response Group.ListRsp)
-groupsList token = unResponseJSON <$>
-  groupsList_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response Group.ListRsp)
+groupsList = do
+  authR <- mkSlackAuthenticateReq
+  run (groupsList_ authR)
 
 groupsList_
   :: AuthenticateReq (AuthProtect "token")
@@ -295,11 +317,12 @@ groupsList_
 -- <https://api.slack.com/methods/groups.history>
 
 groupsHistory
-  :: Text
-  -> Common.HistoryReq
-  -> ClientM (Response Common.HistoryRsp)
-groupsHistory token = fmap unResponseJSON .
-  groupsHistory_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Common.HistoryReq
+  -> m (Response Common.HistoryRsp)
+groupsHistory hisReq = do
+  authR <- mkSlackAuthenticateReq
+  run (groupsHistory_ authR hisReq)
 
 groupsHistory_
   :: AuthenticateReq (AuthProtect "token")
@@ -313,10 +336,11 @@ groupsHistory_
 -- <https://api.slack.com/methods/im.list>
 
 imList
-  :: Text
-  -> ClientM (Response Im.ListRsp)
-imList token = unResponseJSON <$>
-  imList_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response Im.ListRsp)
+imList = do
+  authR <- mkSlackAuthenticateReq
+  run (imList_ authR)
 
 imList_
   :: AuthenticateReq (AuthProtect "token")
@@ -330,11 +354,12 @@ imList_
 -- <https://api.slack.com/methods/im.history>
 
 imHistory
-  :: Text
-  -> Common.HistoryReq
-  -> ClientM (Response Common.HistoryRsp)
-imHistory token = fmap unResponseJSON .
-  imHistory_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Common.HistoryReq
+  -> m (Response Common.HistoryRsp)
+imHistory histReq = do
+  authR <- mkSlackAuthenticateReq
+  run (imHistory_ authR histReq)
 
 imHistory_
   :: AuthenticateReq (AuthProtect "token")
@@ -348,10 +373,11 @@ imHistory_
 -- <https://api.slack.com/methods/mpim.list>
 
 mpimList
-  :: Text
-  -> ClientM (Response Group.ListRsp)
-mpimList token = unResponseJSON <$>
-  mpimList_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response Group.ListRsp)
+mpimList = do
+  authR <- mkSlackAuthenticateReq
+  run (mpimList_ authR)
 
 mpimList_
   :: AuthenticateReq (AuthProtect "token")
@@ -365,11 +391,12 @@ mpimList_
 -- <https://api.slack.com/methods/mpim.history>
 
 mpimHistory
-  :: Text
-  -> Common.HistoryReq
-  -> ClientM (Response Common.HistoryRsp)
-mpimHistory token = fmap unResponseJSON .
-  mpimHistory_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Common.HistoryReq
+  -> m (Response Common.HistoryRsp)
+mpimHistory histReq = do
+  authR <- mkSlackAuthenticateReq
+  run (mpimHistory_ authR histReq)
 
 mpimHistory_
   :: AuthenticateReq (AuthProtect "token")
@@ -384,10 +411,11 @@ mpimHistory_
 -- <https://api.slack.com/methods/users.list>
 
 usersList
-  :: Text
-  -> ClientM (Response User.ListRsp)
-usersList token = unResponseJSON <$>
-  usersList_ (mkAuthenticateReq token authenticateReq)
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response User.ListRsp)
+usersList = do
+  authR <- mkSlackAuthenticateReq
+  run (usersList_ authR)
 
 usersList_
   :: AuthenticateReq (AuthProtect "token")
@@ -404,10 +432,11 @@ usersList_
 -- function until all the data is fetched or until a call
 -- fails, merging the messages obtained from each call.
 historyFetchAll
-  :: Text -> (Text -> Common.HistoryReq -> ClientM (Response Common.HistoryRsp))
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => (Common.HistoryReq -> m (Response Common.HistoryRsp))
   -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
-  -> ClientM (Response Common.HistoryRsp)
-historyFetchAll token makeReq channel count oldest latest = do
+  -> m (Response Common.HistoryRsp)
+historyFetchAll makeReq channel count oldest latest = do
     -- From slack apidoc: If there are more than 100 messages between
     -- the two timestamps then the messages returned are the ones closest to latest.
     -- In most cases an application will want the most recent messages
@@ -416,22 +445,22 @@ historyFetchAll token makeReq channel count oldest latest = do
     -- for reference (does not apply here) => If oldest is provided but not
     -- latest then the messages returned are those closest to oldest,
     -- allowing you to page forward through history if desired.
-    rsp <- unResponse <$> makeReq token (Common.HistoryReq channel count (Just latest) (Just oldest) False)
-    Response <$> case rsp of
+    rsp <- makeReq $ Common.HistoryReq channel count (Just latest) (Just oldest) False
+    case rsp of
       Left _ -> return rsp
       Right (Common.HistoryRsp msgs hasMore) -> do
           let oldestReceived = Common.messageTs <$> lastZ msgs
           if not hasMore || isNothing oldestReceived
               then return rsp
               else mergeResponses msgs <$>
-                   historyFetchAll token makeReq channel count oldest (fromJust oldestReceived)
+                   historyFetchAll makeReq channel count oldest (fromJust oldestReceived)
 
 mergeResponses
   :: [Common.Message]
   -> Response Common.HistoryRsp
-  -> Either ResponseSlackError Common.HistoryRsp
-mergeResponses _ err@(Response (Left _)) = unResponse err
-mergeResponses msgs (Response (Right rsp)) =
+  -> Response Common.HistoryRsp
+mergeResponses _ err@(Left _) = err
+mergeResponses msgs (Right rsp) =
     Right (rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp })
 
 apiTest_
@@ -476,28 +505,27 @@ authenticateReq token =
 --
 
 run
-  :: MonadIO m
-  => Manager
-  -> ClientM (Response a)
-  -> m (Either Common.SlackClientError a)
-run manager =
-  let
-    baseUrl =
-      BaseUrl Https "slack.com" 443 "/api"
+  :: (MonadReader env m, HasManager env, MonadIO m)
+  => ClientM (ResponseJSON a)
+  -> m (Response a)
+run clientAction = do
+  env <- ask
+  let baseUrl = BaseUrl Https "slack.com" 443 "/api"
+  unnestErrors <$> liftIO (runClientM clientAction $ ClientEnv (getManager env) baseUrl)
 
-  in
-    fmap unnestErrors . liftIO . flip runClientM (ClientEnv manager baseUrl)
+mkSlackAuthenticateReq :: (MonadReader env m, HasToken env)
+  => m (AuthenticateReq (AuthProtect "token"))
+mkSlackAuthenticateReq = flip mkAuthenticateReq authenticateReq . getToken <$> ask
 
-unnestErrors :: Either ServantError (Response a) -> Either Common.SlackClientError a
-unnestErrors (Right (Response (Right a))) = Right a
-unnestErrors (Right (Response (Left (ResponseSlackError serv)))) = Left (Common.SlackError serv)
+unnestErrors :: Either ServantError (ResponseJSON a) -> Response a
+unnestErrors (Right (ResponseJSON (Right a))) = Right a
+unnestErrors (Right (ResponseJSON (Left (ResponseSlackError serv))))
+    = Left (Common.SlackError serv)
 unnestErrors (Left slackErr) = Left (Common.ServantError slackErr)
 
 
--- |
+-- | Prepare a SlackConfig from a slack token.
+-- You can then call the other functions providing this in a reader context.
 --
---
-
-mkManager :: IO Manager
-mkManager =
-  newManager tlsManagerSettings
+mkSlackConfig :: Text -> IO SlackConfig
+mkSlackConfig token = SlackConfig <$> newManager tlsManagerSettings <*> pure token
