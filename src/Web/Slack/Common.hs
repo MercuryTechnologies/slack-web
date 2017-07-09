@@ -166,7 +166,7 @@ instance FromJSON Message where
   parseJSON = withObject "Message" $ \o -> do
     Message
         <$> o .: "type"
-        <*> o .: "user"
+        <*> o .:? "user"
         <*> o .: "text"
         <*> (messageToHtml <$> o .: "text")
         <*> o .: "ts"
