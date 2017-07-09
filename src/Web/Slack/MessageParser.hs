@@ -90,7 +90,7 @@ parseLink = do
   linkWithDesc <|> linkWithoutDesc
 
 parseCode :: SlackParser SlackMsgItem
-parseCode = SlackMsgItemInlineCodeSection . T.pack <$>
+parseCode = SlackMsgItemCodeSection . T.pack <$>
   (string "```" >> manyTill anyChar (string "```"))
 
 parseInlineCode :: SlackParser SlackMsgItem
@@ -99,7 +99,7 @@ parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
 
 parseBlockQuote :: SlackParser SlackMsgItem
 parseBlockQuote = SlackMsgItemQuoted <$>
-  (char '>' *> optional (char ' ') *> some parseMessageItem)
+  (string "&gt;" *> optional (char ' ') *> some parseMessageItem)
 
 messageToHtml :: Text -> Text
 messageToHtml = messageToHtml' . parseMessage
