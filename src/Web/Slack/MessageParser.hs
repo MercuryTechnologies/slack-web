@@ -55,9 +55,9 @@ parseMessageItem
 
 parsePlainText :: SlackParser SlackMsgItem
 parsePlainText = SlackMsgItemPlainText . T.pack <$>
-    someTill (noneOf stopChars) (void (lookAhead $ oneOf stopChars)
-                                   <|> lookAhead boldEndSymbol
-                                   <|> lookAhead italicsEndSymbol
+    someTill (noneOf stopChars) (void (lookAhead $ try $ oneOf stopChars)
+                                   <|> lookAhead (try boldEndSymbol)
+                                   <|> lookAhead (try italicsEndSymbol)
                                    <|> lookAhead eof)
     where stopChars = [' ', '\n']
 

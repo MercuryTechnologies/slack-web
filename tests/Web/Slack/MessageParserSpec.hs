@@ -31,3 +31,8 @@ spec =
       messageToHtml "look at this:\n&gt; test *wow*" `shouldBe` "look at this:\n<blockquote>test <b>wow</b></blockquote>"
     it "parses code blocks properly" $
       messageToHtml "look at this:\n```test *wow*```" `shouldBe` "look at this:\n<pre>test *wow*</pre>"
+    it "handles non-italics underscores in text well" $
+      -- need to put other HTML symbols, otherwise if the parsing fails
+      -- i won't find out since we default to returning the input on
+      -- parsing failure
+      messageToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:\n<blockquote>b.\n:slightly_smiling_face:</blockquote>"
