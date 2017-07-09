@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 
 -- | See https://api.slack.com/docs/message-formatting
 --
@@ -52,8 +53,10 @@ parseMessage input = fromMaybe [SlackMsgItemPlainText False False input] $
 parseMessageItem :: SlackParser SlackMsgItem
 parseMessageItem
   = parsePlainText
-  <|> (char '*' >> modify (\st -> st { slackParserStateBoldText = not (slackParserStateBoldText st) }) >> pure (SlackMsgItemSymbol "*"))
-  <|> (char '_' >> modify (\st -> st { slackParserStateItalicsText = not (slackParserStateItalicsText st) }) >> pure (SlackMsgItemSymbol "_"))
+  <|> parseBoldSymbol
+  <|> parseItalicsSymbol
+  <|> parseCode
+  <|> parseInlineCode
   <|> parseLink
 
 parsePlainText :: SlackParser SlackMsgItem
@@ -63,13 +66,33 @@ parsePlainText = do
     (slackParserStateBoldText st) (slackParserStateItalicsText st) . T.pack <$>
     some (noneOf ['<', '`', '*', '_'])
 
+parseBoldSymbol :: SlackParser SlackMsgItem
+parseBoldSymbol = do
+  void (char '*')
+  modify (\st -> st {slackParserStateBoldText = not (slackParserStateBoldText st)})
+  return (SlackMsgItemSymbol "*")
+
+parseItalicsSymbol :: SlackParser SlackMsgItem
+parseItalicsSymbol = do
+  void (char '_')
+  modify (\st -> st {slackParserStateItalicsText = not (slackParserStateItalicsText st)})
+  return (SlackMsgItemSymbol "_")
+
 parseLink :: SlackParser SlackMsgItem
 parseLink = do
-    void (char '<')
-    url <- SlackUrl . T.pack <$> some (noneOf ['|', '>'])
-    let linkWithoutDesc = char '>' >> pure (SlackMsgItemLink (unSlackUrl url) url)
-    let linkWithDesc = char '|' >> SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
-    linkWithDesc <|> linkWithoutDesc
+  void (char '<')
+  url <- SlackUrl . T.pack <$> some (noneOf ['|', '>'])
+  let linkWithoutDesc = char '>' >> pure (SlackMsgItemLink (unSlackUrl url) url)
+  let linkWithDesc = char '|' >> SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
+  linkWithDesc <|> linkWithoutDesc
+
+parseCode :: SlackParser SlackMsgItem
+parseCode = SlackMsgItemInlineCodeSection . T.pack <$>
+  (string "```" >> manyTill anyChar (string "```"))
+
+parseInlineCode :: SlackParser SlackMsgItem
+parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
+  (char '`' *> some (noneOf ['`']) <* char '`')
 
 messageToHtml :: Text -> Text
 messageToHtml = messageToHtml' . parseMessage
@@ -78,12 +101,13 @@ messageToHtml' :: [SlackMsgItem] -> Text
 messageToHtml' = foldr ((<>) . msgItemToHtml) ""
 
 msgItemToHtml :: SlackMsgItem -> Text
-msgItemToHtml (SlackMsgItemPlainText True True txt) = "<b><i>" <> txt <> "</i></b>"
-msgItemToHtml (SlackMsgItemPlainText True False txt) = "<b>" <> txt <> "</b>"
-msgItemToHtml (SlackMsgItemPlainText False True txt) = "<i>" <> txt <> "</i>"
-msgItemToHtml (SlackMsgItemPlainText False False txt) = txt
-msgItemToHtml (SlackMsgItemLink txt url) = "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
-msgItemToHtml (SlackMsgItemInlineCodeSection code) = "<pre>" <> code <> "</code>"
-msgItemToHtml (SlackMsgItemCodeSection code) = "<pre>" <> code <> "</code>"
-msgItemToHtml (SlackMsgItemQuoted items) = "<blockquote>" <> messageToHtml' items <> "</blockquote>"
-msgItemToHtml (SlackMsgItemSymbol _) = ""
+msgItemToHtml = \case
+  SlackMsgItemPlainText True True txt -> "<b><i>" <> txt <> "</i></b>"
+  SlackMsgItemPlainText True False txt -> "<b>" <> txt <> "</b>"
+  SlackMsgItemPlainText False True txt -> "<i>" <> txt <> "</i>"
+  SlackMsgItemPlainText False False txt -> txt
+  SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
+  SlackMsgItemInlineCodeSection code -> "<pre>" <> code <> "</pre>"
+  SlackMsgItemCodeSection code -> "<pre>" <> code <> "</pre>"
+  SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' items <> "</blockquote>"
+  SlackMsgItemSymbol _ -> ""

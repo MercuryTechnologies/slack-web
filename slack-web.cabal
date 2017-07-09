@@ -61,6 +61,23 @@ library
   ghc-options:
       -Wall
 
+test-suite tests
+  main-is:
+      Spec.hs
+  hs-source-dirs:
+       tests
+  type:
+       exitcode-stdio-1.0
+  other-modules:
+       Web.Slack.MessageParserSpec
+  build-depends:
+      base >= 4.9 && < 4.10
+    , hspec
+    , slack-web
+  default-language:
+    Haskell2010
+  ghc-options:
+       -Wall
 
 source-repository head
   type: git
