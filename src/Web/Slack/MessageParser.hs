@@ -49,13 +49,17 @@ parseMessageItem
   <|> parseCode
   <|> parseInlineCode
   <|> parseLink
+  <|> parseBlockQuote
   <|> parsePlainText
   <|> parseWhitespace
 
 parsePlainText :: SlackParser SlackMsgItem
 parsePlainText = SlackMsgItemPlainText . T.pack <$>
-    manyTill (noneOf [' ', '\n']) (lookAhead boldEndSymbol
-                                   <|> lookAhead italicsEndSymbol)
+    someTill (noneOf stopChars) (void (lookAhead $ oneOf stopChars)
+                                   <|> lookAhead boldEndSymbol
+                                   <|> lookAhead italicsEndSymbol
+                                   <|> lookAhead eof)
+    where stopChars = [' ', '\n']
 
 -- slack accepts bold/italics modifiers
 -- only at word boundary. for instance 'my_word'
@@ -92,6 +96,10 @@ parseCode = SlackMsgItemInlineCodeSection . T.pack <$>
 parseInlineCode :: SlackParser SlackMsgItem
 parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
   (char '`' *> some (noneOf ['`']) <* char '`')
+
+parseBlockQuote :: SlackParser SlackMsgItem
+parseBlockQuote = SlackMsgItemQuoted <$>
+  (char '>' *> optional (char ' ') *> some parseMessageItem)
 
 messageToHtml :: Text -> Text
 messageToHtml = messageToHtml' . parseMessage
