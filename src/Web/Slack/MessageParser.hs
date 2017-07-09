@@ -11,14 +11,21 @@ module Web.Slack.MessageParser
   )
   where
 
+-- base
 import Control.Monad
-import Data.Text (Text)
-import qualified Data.Text as T
 import Data.Maybe
 import Data.Monoid
-import Data.Functor.Identity
+
+-- megaparsec
 import Text.Megaparsec
+
+-- mtl
+import Data.Functor.Identity
 import Control.Monad.Trans.State
+
+-- text
+import Data.Text (Text)
+import qualified Data.Text as T
 
 newtype SlackUrl = SlackUrl { unSlackUrl :: Text }
   deriving (Show, Eq)

@@ -48,6 +48,7 @@ import Servant.Common.Req
 
 -- slack-web
 import Web.Slack.Util
+import Web.Slack.MessageParser
 
 -- text
 import Data.Text (Text)
@@ -154,13 +155,21 @@ instance FromJSON MessageType where
 data Message =
   Message
     { messageType :: MessageType
-    , messageUser :: Maybe UserId -- not present for bot messages at least
+    , messageUser :: Maybe UserId -- ^ not present for bot messages at least
     , messageText :: Text
+    , messageAsHtml :: Text -- ^ not provided by slack REST api, slack-web does the conversion
     , messageTs :: SlackTimestamp
     }
   deriving (Eq, Generic, Show)
 
-$(deriveFromJSON (jsonOpts "message") ''Message)
+instance FromJSON Message where
+  parseJSON = withObject "Message" $ \o -> do
+    Message
+        <$> o .: "type"
+        <*> o .: "user"
+        <*> o .: "text"
+        <*> (messageToHtml <$> o .: "text")
+        <*> o .: "ts"
 
 data HistoryRsp =
   HistoryRsp
