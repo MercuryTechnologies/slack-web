@@ -68,10 +68,12 @@ parseWhitespace :: SlackParser SlackMsgItem
 parseWhitespace = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
 
 boldEndSymbol :: SlackParser ()
-boldEndSymbol = void $ char '*' >> lookAhead (void (oneOf [' ', '\n', '_']) <|> eof)
+boldEndSymbol = void $ char '*' >>
+    lookAhead (void (oneOf [' ', '\n', '_']) <|> eof)
 
 italicsEndSymbol :: SlackParser ()
-italicsEndSymbol = void $ char '_' >> lookAhead (void (oneOf [' ', '\n', '*']) <|> eof)
+italicsEndSymbol = void $ char '_' >>
+    lookAhead (void (oneOf [' ', '\n', '*']) <|> eof)
 
 parseBoldSection :: SlackParser SlackMsgItem
 parseBoldSection = fmap SlackMsgItemBoldSection $
@@ -85,8 +87,10 @@ parseLink :: SlackParser SlackMsgItem
 parseLink = do
   void (char '<')
   url <- SlackUrl . T.pack <$> some (noneOf ['|', '>'])
-  let linkWithoutDesc = char '>' >> pure (SlackMsgItemLink (unSlackUrl url) url)
-  let linkWithDesc = char '|' >> SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
+  let linkWithoutDesc = char '>' >>
+          pure (SlackMsgItemLink (unSlackUrl url) url)
+  let linkWithDesc = char '|' >>
+          SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
   linkWithDesc <|> linkWithoutDesc
 
 parseCode :: SlackParser SlackMsgItem
