@@ -113,6 +113,6 @@ msgItemToHtml = \case
   SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' cts <> "</b>"
   SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' cts <> "</i>"
   SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
-  SlackMsgItemInlineCodeSection code -> "<pre>" <> code <> "</pre>"
+  SlackMsgItemInlineCodeSection code -> "<code>" <> code <> "</code>"
   SlackMsgItemCodeSection code -> "<pre>" <> code <> "</pre>"
   SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' items <> "</blockquote>"
