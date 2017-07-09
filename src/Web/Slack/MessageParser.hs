@@ -4,10 +4,7 @@
 -- | See https://api.slack.com/docs/message-formatting
 --
 module Web.Slack.MessageParser
-  ( parseMessage
-  , SlackMsgItem(..)
-  , SlackUrl(..)
-  , messageToHtml
+  ( messageToHtml
   )
   where
 
@@ -21,7 +18,6 @@ import Text.Megaparsec
 
 -- mtl
 import Data.Functor.Identity
-import Control.Monad.Trans.State
 
 -- text
 import Data.Text (Text)
@@ -31,59 +27,55 @@ newtype SlackUrl = SlackUrl { unSlackUrl :: Text }
   deriving (Show, Eq)
 
 data SlackMsgItem
-  = SlackMsgItemPlainText
-     { slackPlainTextBold :: Bool
-     , slackPlainTextItalics :: Bool
-     , slackPlainTextText :: Text
-     }
+  = SlackMsgItemPlainText Text
+  | SlackMsgItemBoldSection [SlackMsgItem]
+  | SlackMsgItemItalicsSection [SlackMsgItem]
   | SlackMsgItemLink Text SlackUrl
   | SlackMsgItemInlineCodeSection Text
   | SlackMsgItemCodeSection Text
   | SlackMsgItemQuoted [SlackMsgItem]
-  | SlackMsgItemSymbol Text
   deriving (Show, Eq)
 
-data SlackParserState = SlackParserState
-  { slackParserStateBoldText :: Bool
-  , slackParserStateItalicsText :: Bool
-  }
-
-initialSlackParserState :: SlackParserState
-initialSlackParserState = SlackParserState False False
-
-type SlackParser a = StateT SlackParserState (ParsecT Dec T.Text Identity) a
+type SlackParser a = ParsecT Dec T.Text Identity a
 
 parseMessage :: Text -> [SlackMsgItem]
-parseMessage input = fromMaybe [SlackMsgItemPlainText False False input] $
-  fst <$> parseMaybe (runStateT (many parseMessageItem) initialSlackParserState) input
+parseMessage input = fromMaybe [SlackMsgItemPlainText input] $
+  parseMaybe (some parseMessageItem) input
 
 parseMessageItem :: SlackParser SlackMsgItem
 parseMessageItem
-  = parsePlainText
-  <|> parseBoldSymbol
-  <|> parseItalicsSymbol
+  = parseBoldSection
+  <|> parseItalicsSection
   <|> parseCode
   <|> parseInlineCode
   <|> parseLink
+  <|> parsePlainText
+  <|> parseWhitespace
 
 parsePlainText :: SlackParser SlackMsgItem
-parsePlainText = do
-  st <- get
-  SlackMsgItemPlainText
-    (slackParserStateBoldText st) (slackParserStateItalicsText st) . T.pack <$>
-    some (noneOf ['<', '`', '*', '_'])
+parsePlainText = SlackMsgItemPlainText . T.pack <$>
+    manyTill (noneOf [' ', '\n']) (lookAhead boldEndSymbol
+                                   <|> lookAhead italicsEndSymbol)
 
-parseBoldSymbol :: SlackParser SlackMsgItem
-parseBoldSymbol = do
-  void (char '*')
-  modify (\st -> st {slackParserStateBoldText = not (slackParserStateBoldText st)})
-  return (SlackMsgItemSymbol "*")
+-- slack accepts bold/italics modifiers
+-- only at word boundary. for instance 'my_word'
+-- doesn't trigger an italics section.
+parseWhitespace :: SlackParser SlackMsgItem
+parseWhitespace = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
 
-parseItalicsSymbol :: SlackParser SlackMsgItem
-parseItalicsSymbol = do
-  void (char '_')
-  modify (\st -> st {slackParserStateItalicsText = not (slackParserStateItalicsText st)})
-  return (SlackMsgItemSymbol "_")
+boldEndSymbol :: SlackParser ()
+boldEndSymbol = void $ char '*' >> lookAhead (void (oneOf [' ', '\n', '_']) <|> eof)
+
+italicsEndSymbol :: SlackParser ()
+italicsEndSymbol = void $ char '_' >> lookAhead (void (oneOf [' ', '\n', '*']) <|> eof)
+
+parseBoldSection :: SlackParser SlackMsgItem
+parseBoldSection = fmap SlackMsgItemBoldSection $
+  char '*' *> someTill parseMessageItem boldEndSymbol
+
+parseItalicsSection :: SlackParser SlackMsgItem
+parseItalicsSection = fmap SlackMsgItemItalicsSection $
+  char '_' *> someTill parseMessageItem italicsEndSymbol
 
 parseLink :: SlackParser SlackMsgItem
 parseLink = do
@@ -109,12 +101,10 @@ messageToHtml' = foldr ((<>) . msgItemToHtml) ""
 
 msgItemToHtml :: SlackMsgItem -> Text
 msgItemToHtml = \case
-  SlackMsgItemPlainText True True txt -> "<b><i>" <> txt <> "</i></b>"
-  SlackMsgItemPlainText True False txt -> "<b>" <> txt <> "</b>"
-  SlackMsgItemPlainText False True txt -> "<i>" <> txt <> "</i>"
-  SlackMsgItemPlainText False False txt -> txt
+  SlackMsgItemPlainText txt -> txt
+  SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' cts <> "</b>"
+  SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' cts <> "</i>"
   SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
   SlackMsgItemInlineCodeSection code -> "<pre>" <> code <> "</pre>"
   SlackMsgItemCodeSection code -> "<pre>" <> code <> "</pre>"
   SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' items <> "</blockquote>"
-  SlackMsgItemSymbol _ -> ""
