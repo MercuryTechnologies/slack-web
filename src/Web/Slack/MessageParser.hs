@@ -70,12 +70,13 @@ parseWhitespace True = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'
 parseWhitespace False = SlackMsgItemPlainText . T.pack <$> some (oneOf [' '])
 
 boldEndSymbol :: SlackParser ()
-boldEndSymbol = void $ char '*' >>
-    lookAhead (void (oneOf [' ', '\n', '_']) <|> eof)
+boldEndSymbol = void $ char '*' >> lookAhead wordBoundary
 
 italicsEndSymbol :: SlackParser ()
-italicsEndSymbol = void $ char '_' >>
-    lookAhead (void (oneOf [' ', '\n', '*']) <|> eof)
+italicsEndSymbol = void $ char '_' >> lookAhead wordBoundary
+
+wordBoundary :: SlackParser ()
+wordBoundary = void (oneOf [' ', '\n', '*', '_', ',', '`', '?', '!', ':', ';']) <|> eof
 
 parseBoldSection :: SlackParser SlackMsgItem
 parseBoldSection = fmap SlackMsgItemBoldSection $
