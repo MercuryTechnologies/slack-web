@@ -39,8 +39,8 @@ library
       Web.Slack.Group
       Web.Slack.Im
       Web.Slack.User
-      Web.Slack.MessageParser
   other-modules:
+      Web.Slack.MessageParser
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.2
@@ -61,19 +61,24 @@ library
   ghc-options:
       -Wall
 
+-- the test suite doesn't depend on slack-web
+-- but rather has the src as an extra source directory.
+-- that allows us to refer to non exported modules from tests.
 test-suite tests
   main-is:
       Spec.hs
   hs-source-dirs:
-       tests
+       src, tests
   type:
        exitcode-stdio-1.0
   other-modules:
+       Web.Slack.MessageParser
        Web.Slack.MessageParserSpec
   build-depends:
       base >= 4.9 && < 4.10
     , hspec
-    , slack-web
+    , text
+    , megaparsec
   default-language:
     Haskell2010
   ghc-options:
