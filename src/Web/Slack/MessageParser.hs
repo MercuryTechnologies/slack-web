@@ -10,6 +10,7 @@ module Web.Slack.MessageParser
 
 -- base
 import Control.Monad
+import Data.List
 import Data.Maybe
 import Data.Monoid
 
@@ -40,10 +41,10 @@ type SlackParser a = ParsecT Dec T.Text Identity a
 
 parseMessage :: Text -> [SlackMsgItem]
 parseMessage input = fromMaybe [SlackMsgItemPlainText input] $
-  parseMaybe (some parseMessageItem) input
+  parseMaybe (some $ parseMessageItem True) input
 
-parseMessageItem :: SlackParser SlackMsgItem
-parseMessageItem
+parseMessageItem :: Bool -> SlackParser SlackMsgItem
+parseMessageItem acceptNewlines
   = parseBoldSection
   <|> parseItalicsSection
   <|> parseCode
@@ -51,7 +52,7 @@ parseMessageItem
   <|> parseLink
   <|> parseBlockQuote
   <|> parsePlainText
-  <|> parseWhitespace
+  <|> parseWhitespace acceptNewlines
 
 parsePlainText :: SlackParser SlackMsgItem
 parsePlainText = SlackMsgItemPlainText . T.pack <$>
@@ -64,8 +65,9 @@ parsePlainText = SlackMsgItemPlainText . T.pack <$>
 -- slack accepts bold/italics modifiers
 -- only at word boundary. for instance 'my_word'
 -- doesn't trigger an italics section.
-parseWhitespace :: SlackParser SlackMsgItem
-parseWhitespace = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
+parseWhitespace :: Bool -> SlackParser SlackMsgItem
+parseWhitespace True = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
+parseWhitespace False = SlackMsgItemPlainText . T.pack <$> some (oneOf [' '])
 
 boldEndSymbol :: SlackParser ()
 boldEndSymbol = void $ char '*' >>
@@ -77,11 +79,11 @@ italicsEndSymbol = void $ char '_' >>
 
 parseBoldSection :: SlackParser SlackMsgItem
 parseBoldSection = fmap SlackMsgItemBoldSection $
-  char '*' *> someTill parseMessageItem boldEndSymbol
+  char '*' *> someTill (parseMessageItem False) boldEndSymbol
 
 parseItalicsSection :: SlackParser SlackMsgItem
 parseItalicsSection = fmap SlackMsgItemItalicsSection $
-  char '_' *> someTill parseMessageItem italicsEndSymbol
+  char '_' *> someTill (parseMessageItem False) italicsEndSymbol
 
 parseLink :: SlackParser SlackMsgItem
 parseLink = do
@@ -102,8 +104,11 @@ parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
   (char '`' *> some (noneOf ['`']) <* char '`')
 
 parseBlockQuote :: SlackParser SlackMsgItem
-parseBlockQuote = SlackMsgItemQuoted <$>
-  (string "&gt;" *> optional (char ' ') *> some parseMessageItem)
+parseBlockQuote = SlackMsgItemQuoted . intercalate [SlackMsgItemPlainText "<br/>"] <$> some blockQuoteLine
+
+blockQuoteLine :: SlackParser [SlackMsgItem]
+blockQuoteLine = string "&gt;" *> optional (char ' ') *>
+    manyTill (parseMessageItem False) (eof <|> void newline)
 
 messageToHtml :: Text -> Text
 messageToHtml = messageToHtml' . parseMessage

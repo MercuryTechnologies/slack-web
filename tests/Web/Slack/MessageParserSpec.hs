@@ -35,4 +35,8 @@ spec =
       -- need to put other HTML symbols, otherwise if the parsing fails
       -- i won't find out since we default to returning the input on
       -- parsing failure
-      messageToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:\n<blockquote>b.\n:slightly_smiling_face:</blockquote>"
+      messageToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:\n<blockquote>b.</blockquote>:slightly_smiling_face:"
+    it "properly parses multiline blockquotes" $
+      messageToHtml "&gt; first row\n&gt; second row\nthird row\n&gt; fourth row"
+        `shouldBe`
+        "<blockquote>first row<br/>second row</blockquote>third row\n<blockquote>fourth row</blockquote>"
