@@ -28,9 +28,12 @@ module Web.Slack
   , imList
   , mpimList
   , mpimHistory
+  , getUserDesc
   , usersList
   , authenticateReq
   , Response
+  , HasManager
+  , HasToken
   )
   where
 
@@ -38,8 +41,12 @@ module Web.Slack
 import Data.Aeson
 
 -- base
+import Control.Arrow ((&&&))
 import Data.Maybe
 import Data.Proxy (Proxy(..))
+
+-- containers
+import qualified Data.Map as Map
 
 -- error
 import Control.Error (lastZ, isNothing)
@@ -79,7 +86,7 @@ class HasManager a where
 class HasToken a where
     getToken :: a -> Text
 
--- | Implements the `HasManager` and `HasToken` typeclasses.
+-- | Implements the 'HasManager' and 'HasToken' typeclasses.
 data SlackConfig
   = SlackConfig
   { slackConfigManager :: Manager
@@ -421,11 +428,25 @@ usersList_
   :: AuthenticateReq (AuthProtect "token")
   -> ClientM (ResponseJSON User.ListRsp)
 
+-- | Returns a function to get a username from a 'Common.UserId'.
+-- Comes in handy to use 'Web.Slack.MessageParser.messageToHtml'
+getUserDesc
+  :: (Common.UserId -> Text)
+  -- ^ A function to give a default username in case the username is unknown
+  -> User.ListRsp
+  -- ^ List of users as known by the slack server. See 'usersList'.
+  -> (Common.UserId -> Text)
+  -- ^ A function from 'Common.UserId' to username.
+getUserDesc unknownUserFn users =
+  let userMap = Map.fromList $ (User.userId &&& User.userName) <$> User.listRspMembers users
+  in
+    \userId -> fromMaybe (unknownUserFn userId) $ Map.lookup userId userMap
+
 -- |
 -- Fetch all history items between two dates. The basic calls
 -- 'channelsHistory', 'groupsHistory', 'imHistory' and so on
 -- may not return exhaustive results if there were too many
--- records. You need to use 'historyRspHasMore' to find out
+-- records. You need to use 'Web.Slack.Common.historyRspHasMore' to find out
 -- whether you got all the data.
 --
 -- This function will repeatedly call the underlying history
@@ -434,8 +455,18 @@ usersList_
 historyFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => (Common.HistoryReq -> m (Response Common.HistoryRsp))
-  -> Text -> Int -> Common.SlackTimestamp -> Common.SlackTimestamp
+  -- ^ The request to make. Can be for instance 'mpimHistory', 'channelsHistory'...
+  -> Text
+  -- ^ The channel name to query
+  -> Int
+  -- ^ The number of entries to fetch at once.
+  -> Common.SlackTimestamp
+  -- ^ The oldest timestamp to fetch records from
+  -> Common.SlackTimestamp
+  -- ^ The newest timestamp to fetch records to
   -> m (Response Common.HistoryRsp)
+  -- ^ A list merging all the history records that were fetched
+  -- through the individual queries.
 historyFetchAll makeReq channel count oldest latest = do
     -- From slack apidoc: If there are more than 100 messages between
     -- the two timestamps then the messages returned are the ones closest to latest.

@@ -38,13 +38,15 @@ library
       Web.Slack.Common
       Web.Slack.Group
       Web.Slack.Im
+      Web.Slack.MessageParser
       Web.Slack.User
   other-modules:
-      Web.Slack.MessageParser
+      Web.Slack.Types
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.2
     , base >= 4.9 && < 4.10
+    , containers
     , http-api-data >= 0.3 && < 0.4
     , http-client >= 0.5 && < 0.6
     , http-client-tls >= 0.3 && < 0.4
@@ -68,16 +70,22 @@ test-suite tests
   main-is:
       Spec.hs
   hs-source-dirs:
-       src, tests
+      src, tests
   type:
-       exitcode-stdio-1.0
+      exitcode-stdio-1.0
   other-modules:
-       Web.Slack.MessageParser
-       Web.Slack.MessageParserSpec
+      Web.Slack.MessageParser
+      Web.Slack.MessageParserSpec
+      Web.Slack.Types
   build-depends:
       base >= 4.9 && < 4.10
+    , containers
+    , aeson
+    , errors
     , hspec
+    , http-api-data
     , text
+    , time
     , megaparsec
   default-language:
     Haskell2010
