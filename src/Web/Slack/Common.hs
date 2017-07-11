@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedLists #-}
@@ -16,17 +15,19 @@
 ----------------------------------------------------------------------
 
 module Web.Slack.Common
-    ( HistoryReq(..)
-    , SlackTimestamp(..)
-    , mkSlackTimestamp
-    , mkHistoryReq
-    , HistoryRsp(..)
-    , Message(..)
-    , Color(unColor)
-    , UserId(unUserId)
-    , SlackClientError(..)
-    )
-    where
+  ( Color(unColor)
+  , UserId(unUserId)
+  , SlackTimestamp(..)
+  , mkSlackTimestamp
+  , HistoryReq(..)
+  , mkHistoryReq
+  , HistoryRsp(..)
+  , Message(..)
+  , MessageType(..)
+  , SlackClientError(..)
+  , SlackMessageText(..)
+  )
+  where
 
 -- aeson
 import Data.Aeson
@@ -34,63 +35,21 @@ import Data.Aeson.TH
 
 -- base
 import GHC.Generics (Generic)
-import Data.Monoid
-
--- errors
-import Control.Error (hush)
 
 -- http-api-data
-import Web.FormUrlEncoded
 import Web.HttpApiData
-
+import Web.FormUrlEncoded
+  
 -- servant-client
 import Servant.Common.Req
 
 -- slack-web
+import Web.Slack.Types
 import Web.Slack.Util
-import Web.Slack.MessageParser
 
 -- text
 import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Text.Read (decimal)
 
--- time
-import Data.Time.Clock
-import Data.Time.Clock.POSIX
-
-newtype Color = Color { unColor :: Text }
-  deriving (Eq, Ord, Generic, Show, FromJSON)
-
-newtype UserId = UserId { unUserId :: Text }
-  deriving (Eq, Ord, Generic, Show, FromJSON)
-
-data SlackTimestamp =
-  SlackTimestamp
-    { slackTimestampTs :: Text
-    , slackTimestampTime :: UTCTime
-    }
-  deriving (Eq, Show)
-
-instance Ord SlackTimestamp where
-    compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b
-
-mkSlackTimestamp :: UTCTime -> SlackTimestamp
-mkSlackTimestamp utctime = SlackTimestamp (T.pack (show @Integer unixts) <> ".000000") utctime
-  where unixts = floor $ toRational $ utcTimeToPOSIXSeconds utctime
-
-instance ToHttpApiData SlackTimestamp where
-  toQueryParam (SlackTimestamp contents _) = contents
-
-instance FromJSON SlackTimestamp where
-  parseJSON = withText "Slack ts" $ \contents ->
-    maybe (fail "Invalid slack ts")
-          (pure . SlackTimestamp contents)
-          (slackTimestampToTime contents)
-
-slackTimestampToTime :: Text -> Maybe UTCTime
-slackTimestampToTime txt =
-  posixSecondsToUTCTime . realToFrac @Integer . fst <$> hush (decimal txt)
 
 -- |
 --
@@ -156,20 +115,14 @@ data Message =
   Message
     { messageType :: MessageType
     , messageUser :: Maybe UserId -- ^ not present for bot messages at least
-    , messageText :: Text
-    , messageAsHtml :: Text -- ^ not provided by slack REST api, slack-web does the conversion
+    , messageText :: SlackMessageText
+    -- ^ the message text is in a markdown-like slack-specific format.
+    -- Use 'Web.Slack.MessageParser.messageToHtml' to convert it to HTML.
     , messageTs :: SlackTimestamp
     }
   deriving (Eq, Generic, Show)
 
-instance FromJSON Message where
-  parseJSON = withObject "Message" $ \o -> do
-    Message
-        <$> o .: "type"
-        <*> o .:? "user"
-        <*> o .: "text"
-        <*> (messageToHtml <$> o .: "text")
-        <*> o .: "ts"
+$(deriveFromJSON (jsonOpts "message") ''Message)
 
 data HistoryRsp =
   HistoryRsp

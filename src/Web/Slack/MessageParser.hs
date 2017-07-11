@@ -20,6 +20,9 @@ import Text.Megaparsec
 -- mtl
 import Data.Functor.Identity
 
+-- slack-web
+import Web.Slack.Types
+
 -- text
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -32,6 +35,7 @@ data SlackMsgItem
   | SlackMsgItemBoldSection [SlackMsgItem]
   | SlackMsgItemItalicsSection [SlackMsgItem]
   | SlackMsgItemLink Text SlackUrl
+  | SlackMsgUserLink UserId (Maybe Text)
   | SlackMsgItemInlineCodeSection Text
   | SlackMsgItemCodeSection Text
   | SlackMsgItemQuoted [SlackMsgItem]
@@ -49,6 +53,7 @@ parseMessageItem acceptNewlines
   <|> parseItalicsSection
   <|> parseCode
   <|> parseInlineCode
+  <|> parseUserLink
   <|> parseLink
   <|> parseBlockQuote
   <|> parsePlainText
@@ -86,6 +91,16 @@ parseItalicsSection :: SlackParser SlackMsgItem
 parseItalicsSection = fmap SlackMsgItemItalicsSection $
   char '_' *> someTill (parseMessageItem False) italicsEndSymbol
 
+parseUserLink :: SlackParser SlackMsgItem
+parseUserLink = do
+  void (string "<@")
+  userId <- UserId . T.pack <$> some (noneOf ['|', '>'])
+  let linkWithoutDesc = char '>' >>
+          pure (SlackMsgUserLink userId Nothing)
+  let linkWithDesc = char '|' >>
+          SlackMsgUserLink <$> pure userId <*> (Just <$> ((T.pack <$> some (noneOf ['>'])) <* char '>'))
+  linkWithDesc <|> linkWithoutDesc
+
 parseLink :: SlackParser SlackMsgItem
 parseLink = do
   void (char '<')
@@ -111,18 +126,28 @@ blockQuoteLine :: SlackParser [SlackMsgItem]
 blockQuoteLine = string "&gt;" *> optional (char ' ') *>
     manyTill (parseMessageItem False) (eof <|> void newline)
 
-messageToHtml :: Text -> Text
-messageToHtml = messageToHtml' . parseMessage
+-- |
+-- Convert the slack format for messages (markdown like, see
+-- https://api.slack.com/docs/message-formatting ) to HTML.
+messageToHtml
+  :: (UserId -> Text)
+  -- ^ A function giving a user name for a user id. You can use 'Web.Slack.getUserDesc'
+  -> SlackMessageText
+  -- ^ A slack message to convert to HTML
+  -> Text
+  -- ^ The HTML-formatted slack message
+messageToHtml getUserDesc = messageToHtml' getUserDesc . parseMessage . unSlackMessageText
 
-messageToHtml' :: [SlackMsgItem] -> Text
-messageToHtml' = foldr ((<>) . msgItemToHtml) ""
+messageToHtml' :: (UserId -> Text) -> [SlackMsgItem] -> Text
+messageToHtml' getUserDesc = foldr ((<>) . msgItemToHtml getUserDesc) ""
 
-msgItemToHtml :: SlackMsgItem -> Text
-msgItemToHtml = \case
+msgItemToHtml :: (UserId -> Text) -> SlackMsgItem -> Text
+msgItemToHtml getUserDesc = \case
   SlackMsgItemPlainText txt -> txt
-  SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' cts <> "</b>"
-  SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' cts <> "</i>"
+  SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' getUserDesc cts <> "</b>"
+  SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' getUserDesc cts <> "</i>"
   SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
+  SlackMsgUserLink userId mTxt -> "@" <> fromMaybe (getUserDesc userId) mTxt
   SlackMsgItemInlineCodeSection code -> "<code>" <> code <> "</code>"
   SlackMsgItemCodeSection code -> "<pre>" <> code <> "</pre>"
-  SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' items <> "</blockquote>"
+  SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' getUserDesc items <> "</blockquote>"
