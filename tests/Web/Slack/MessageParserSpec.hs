@@ -2,6 +2,9 @@
 
 module Web.Slack.MessageParserSpec (spec) where
 
+-- base
+import Data.Monoid
+
 -- hspec
 import Test.Hspec
 
@@ -16,8 +19,13 @@ testGetUserDesc :: UserId -> Text
 testGetUserDesc (UserId "USER1") = "user_one"
 testGetUserDesc x = unUserId x
 
+testHtmlRenderers :: HtmlRenderers
+testHtmlRenderers = HtmlRenderers
+  { emoticonRenderer = \x -> ":>" <> x <> "<:"
+  }
+
 msgToHtml :: Text -> Text
-msgToHtml = messageToHtml testGetUserDesc . SlackMessageText
+msgToHtml = messageToHtml testHtmlRenderers testGetUserDesc . SlackMessageText
 
 spec :: Spec
 spec =
@@ -46,7 +54,7 @@ spec =
       -- need to put other HTML symbols, otherwise if the parsing fails
       -- i won't find out since we default to returning the input on
       -- parsing failure
-      msgToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:<br/><blockquote>b.</blockquote>:slightly_smiling_face:"
+      msgToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:<br/><blockquote>b.</blockquote>:>slightly_smiling_face<:"
     it "properly parses multiline blockquotes" $
       msgToHtml "&gt; first row\n&gt; second row\nthird row\n&gt; fourth row"
         `shouldBe`

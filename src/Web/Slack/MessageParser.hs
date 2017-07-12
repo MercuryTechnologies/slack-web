@@ -1,10 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- | See https://api.slack.com/docs/message-formatting
 --
 module Web.Slack.MessageParser
   ( messageToHtml
+  , HtmlRenderers(..)
+  , defaultHtmlRenderers
   )
   where
 
@@ -35,10 +38,11 @@ data SlackMsgItem
   | SlackMsgItemBoldSection [SlackMsgItem]
   | SlackMsgItemItalicsSection [SlackMsgItem]
   | SlackMsgItemLink Text SlackUrl
-  | SlackMsgUserLink UserId (Maybe Text)
+  | SlackMsgItemUserLink UserId (Maybe Text)
   | SlackMsgItemInlineCodeSection Text
   | SlackMsgItemCodeSection Text
   | SlackMsgItemQuoted [SlackMsgItem]
+  | SlackMsgItemEmoticon Text
   deriving (Show, Eq)
 
 type SlackParser a = ParsecT Dec T.Text Identity a
@@ -51,6 +55,7 @@ parseMessageItem :: Bool -> SlackParser SlackMsgItem
 parseMessageItem acceptNewlines
   = parseBoldSection
   <|> parseItalicsSection
+  <|> try parseEmoticon
   <|> parseCode
   <|> parseInlineCode
   <|> parseUserLink
@@ -64,6 +69,7 @@ parsePlainText = SlackMsgItemPlainText . T.pack <$>
     someTill (noneOf stopChars) (void (lookAhead $ try $ oneOf stopChars)
                                    <|> lookAhead (try boldEndSymbol)
                                    <|> lookAhead (try italicsEndSymbol)
+                                   <|> lookAhead (try emoticonEndSymbol)
                                    <|> lookAhead eof)
     where stopChars = [' ', '\n']
 
@@ -81,6 +87,9 @@ boldEndSymbol = void $ char '*' >> lookAhead wordBoundary
 italicsEndSymbol :: SlackParser ()
 italicsEndSymbol = void $ char '_' >> lookAhead wordBoundary
 
+emoticonEndSymbol :: SlackParser ()
+emoticonEndSymbol = void $ char ':' >> lookAhead wordBoundary
+
 wordBoundary :: SlackParser ()
 wordBoundary = void (oneOf [' ', '\n', '*', '_', ',', '`', '?', '!', ':', ';', '.']) <|> eof
 
@@ -92,14 +101,18 @@ parseItalicsSection :: SlackParser SlackMsgItem
 parseItalicsSection = fmap SlackMsgItemItalicsSection $
   char '_' *> someTill (parseMessageItem False) italicsEndSymbol
 
+parseEmoticon :: SlackParser SlackMsgItem
+parseEmoticon = fmap (SlackMsgItemEmoticon . T.pack) $
+  char ':' *> someTill (alphaNumChar <|> char '_' <|> char '+') emoticonEndSymbol
+
 parseUserLink :: SlackParser SlackMsgItem
 parseUserLink = do
   void (string "<@")
   userId <- UserId . T.pack <$> some (noneOf ['|', '>'])
   let linkWithoutDesc = char '>' >>
-          pure (SlackMsgUserLink userId Nothing)
+          pure (SlackMsgItemUserLink userId Nothing)
   let linkWithDesc = char '|' >>
-          SlackMsgUserLink <$> pure userId <*> (Just <$> ((T.pack <$> some (noneOf ['>'])) <* char '>'))
+          SlackMsgItemUserLink <$> pure userId <*> (Just <$> ((T.pack <$> some (noneOf ['>'])) <* char '>'))
   linkWithDesc <|> linkWithoutDesc
 
 parseLink :: SlackParser SlackMsgItem
@@ -131,24 +144,43 @@ blockQuoteLine = string "&gt;" *> optional (char ' ') *>
 -- Convert the slack format for messages (markdown like, see
 -- https://api.slack.com/docs/message-formatting ) to HTML.
 messageToHtml
-  :: (UserId -> Text)
+  :: HtmlRenderers
+  -- ^ Renderers allow you to customize the message rendering.
+  -- Give 'defaultHtmlRenderers' for a default implementation.
+  -> (UserId -> Text)
   -- ^ A function giving a user name for a user id. You can use 'Web.Slack.getUserDesc'
   -> SlackMessageText
   -- ^ A slack message to convert to HTML
   -> Text
   -- ^ The HTML-formatted slack message
-messageToHtml getUserDesc = messageToHtml' getUserDesc . parseMessage . unSlackMessageText
+messageToHtml htmlRenderers getUserDesc =
+  messageToHtml' htmlRenderers getUserDesc . parseMessage . unSlackMessageText
 
-messageToHtml' :: (UserId -> Text) -> [SlackMsgItem] -> Text
-messageToHtml' getUserDesc = foldr ((<>) . msgItemToHtml getUserDesc) ""
+messageToHtml' :: HtmlRenderers -> (UserId -> Text) -> [SlackMsgItem] -> Text
+messageToHtml' htmlRenderers getUserDesc = foldr ((<>) . msgItemToHtml htmlRenderers getUserDesc) ""
 
-msgItemToHtml :: (UserId -> Text) -> SlackMsgItem -> Text
-msgItemToHtml getUserDesc = \case
+data HtmlRenderers
+  = HtmlRenderers
+  { emoticonRenderer :: Text -> Text
+  }
+
+defaultHtmlRenderers :: HtmlRenderers
+defaultHtmlRenderers = HtmlRenderers
+  { emoticonRenderer = \code -> ":" <> code <> ":"
+  }
+  
+msgItemToHtml :: HtmlRenderers -> (UserId -> Text) -> SlackMsgItem -> Text
+msgItemToHtml htmlRenderers@HtmlRenderers{..} getUserDesc = \case
   SlackMsgItemPlainText txt -> T.replace "\n" "<br/>" txt
-  SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' getUserDesc cts <> "</b>"
-  SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' getUserDesc cts <> "</i>"
-  SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
-  SlackMsgUserLink userId mTxt -> "@" <> fromMaybe (getUserDesc userId) mTxt
+  SlackMsgItemBoldSection cts ->
+    "<b>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</b>"
+  SlackMsgItemItalicsSection cts ->
+    "<i>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</i>"
+  SlackMsgItemLink txt url ->
+    "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
+  SlackMsgItemUserLink userId mTxt -> "@" <> fromMaybe (getUserDesc userId) mTxt
+  SlackMsgItemEmoticon code -> emoticonRenderer code
   SlackMsgItemInlineCodeSection code -> "<code>" <> code <> "</code>"
   SlackMsgItemCodeSection code -> "<pre>" <> code <> "</pre>"
-  SlackMsgItemQuoted items -> "<blockquote>" <> messageToHtml' getUserDesc items <> "</blockquote>"
+  SlackMsgItemQuoted items ->
+    "<blockquote>" <> messageToHtml' htmlRenderers getUserDesc items <> "</blockquote>"
