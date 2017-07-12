@@ -55,3 +55,5 @@ spec =
       msgToHtml "<@USER1> should be converted, <@USER1|default> stay default"
         `shouldBe`
         "@user_one should be converted, @default stay default"
+    it "handles full stops as punctuation" $
+      msgToHtml "*b*." `shouldBe` "<b>b</b>."
