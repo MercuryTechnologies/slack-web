@@ -39,21 +39,23 @@ spec =
     it "aborts nicely on interspersed bold & italics" $
       msgToHtml "inter *sper_ *sed_" `shouldBe` "inter *sper_ *sed_"
     it "parses blockquotes properly" $
-      msgToHtml "look at this:\n&gt; test *wow*" `shouldBe` "look at this:\n<blockquote>test <b>wow</b></blockquote>"
+      msgToHtml "look at this:\n&gt; test *wow*" `shouldBe` "look at this:<br/><blockquote>test <b>wow</b></blockquote>"
     it "parses code blocks properly" $
-      msgToHtml "look at this:\n```test *wow*```" `shouldBe` "look at this:\n<pre>test *wow*</pre>"
+      msgToHtml "look at this:\n```test *wow*```" `shouldBe` "look at this:<br/><pre>test *wow*</pre>"
     it "handles non-italics underscores in text well" $
       -- need to put other HTML symbols, otherwise if the parsing fails
       -- i won't find out since we default to returning the input on
       -- parsing failure
-      msgToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:\n<blockquote>b.</blockquote>:slightly_smiling_face:"
+      msgToHtml "a:\n&gt;b.\n:slightly_smiling_face:" `shouldBe` "a:<br/><blockquote>b.</blockquote>:slightly_smiling_face:"
     it "properly parses multiline blockquotes" $
       msgToHtml "&gt; first row\n&gt; second row\nthird row\n&gt; fourth row"
         `shouldBe`
-        "<blockquote>first row<br/>second row</blockquote>third row\n<blockquote>fourth row</blockquote>"
+        "<blockquote>first row<br/>second row</blockquote>third row<br/><blockquote>fourth row</blockquote>"
     it "converts usernames" $
       msgToHtml "<@USER1> should be converted, <@USER1|default> stay default"
         `shouldBe`
         "@user_one should be converted, @default stay default"
+    it "converts carriage returns" $
+      msgToHtml "a\nb" `shouldBe` "a<br/>b"
     it "handles full stops as punctuation" $
       msgToHtml "*b*." `shouldBe` "<b>b</b>."
