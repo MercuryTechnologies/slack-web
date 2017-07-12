@@ -81,7 +81,7 @@ italicsEndSymbol :: SlackParser ()
 italicsEndSymbol = void $ char '_' >> lookAhead wordBoundary
 
 wordBoundary :: SlackParser ()
-wordBoundary = void (oneOf [' ', '\n', '*', '_', ',', '`', '?', '!', ':', ';']) <|> eof
+wordBoundary = void (oneOf [' ', '\n', '*', '_', ',', '`', '?', '!', ':', ';', '.']) <|> eof
 
 parseBoldSection :: SlackParser SlackMsgItem
 parseBoldSection = fmap SlackMsgItemBoldSection $
