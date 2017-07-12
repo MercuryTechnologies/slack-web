@@ -71,7 +71,8 @@ parsePlainText = SlackMsgItemPlainText . T.pack <$>
 -- only at word boundary. for instance 'my_word'
 -- doesn't trigger an italics section.
 parseWhitespace :: Bool -> SlackParser SlackMsgItem
-parseWhitespace True = SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
+parseWhitespace True =
+  SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
 parseWhitespace False = SlackMsgItemPlainText . T.pack <$> some (oneOf [' '])
 
 boldEndSymbol :: SlackParser ()
@@ -143,7 +144,7 @@ messageToHtml' getUserDesc = foldr ((<>) . msgItemToHtml getUserDesc) ""
 
 msgItemToHtml :: (UserId -> Text) -> SlackMsgItem -> Text
 msgItemToHtml getUserDesc = \case
-  SlackMsgItemPlainText txt -> txt
+  SlackMsgItemPlainText txt -> T.replace "\n" "<br/>" txt
   SlackMsgItemBoldSection cts -> "<b>" <> messageToHtml' getUserDesc cts <> "</b>"
   SlackMsgItemItalicsSection cts -> "<i>" <> messageToHtml' getUserDesc cts <> "</i>"
   SlackMsgItemLink txt url -> "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
