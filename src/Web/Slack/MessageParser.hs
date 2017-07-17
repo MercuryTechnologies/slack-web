@@ -37,6 +37,7 @@ data SlackMsgItem
   = SlackMsgItemPlainText Text
   | SlackMsgItemBoldSection [SlackMsgItem]
   | SlackMsgItemItalicsSection [SlackMsgItem]
+  | SlackMsgItemStrikethroughSection [SlackMsgItem]
   | SlackMsgItemLink Text SlackUrl
   | SlackMsgItemUserLink UserId (Maybe Text)
   | SlackMsgItemInlineCodeSection Text
@@ -55,6 +56,7 @@ parseMessageItem :: Bool -> SlackParser SlackMsgItem
 parseMessageItem acceptNewlines
   = parseBoldSection
   <|> parseItalicsSection
+  <|> parseStrikethroughSection
   <|> try parseEmoticon
   <|> parseCode
   <|> parseInlineCode
@@ -67,9 +69,7 @@ parseMessageItem acceptNewlines
 parsePlainText :: SlackParser SlackMsgItem
 parsePlainText = SlackMsgItemPlainText . T.pack <$>
     someTill (noneOf stopChars) (void (lookAhead $ try $ oneOf stopChars)
-                                   <|> lookAhead (try boldEndSymbol)
-                                   <|> lookAhead (try italicsEndSymbol)
-                                   <|> lookAhead (try emoticonEndSymbol)
+                                   <|> lookAhead (try $ choice $ sectionEndSymbol <$> ['*', '_', ':', '~'])
                                    <|> lookAhead eof)
     where stopChars = [' ', '\n']
 
@@ -81,29 +81,31 @@ parseWhitespace True =
   SlackMsgItemPlainText . T.pack <$> some (oneOf [' ', '\n'])
 parseWhitespace False = SlackMsgItemPlainText . T.pack <$> some (oneOf [' '])
 
-boldEndSymbol :: SlackParser ()
-boldEndSymbol = void $ char '*' >> lookAhead wordBoundary
+sectionEndSymbol :: Char -> SlackParser ()
+sectionEndSymbol chr = void $ char chr >> lookAhead wordBoundary
 
-italicsEndSymbol :: SlackParser ()
-italicsEndSymbol = void $ char '_' >> lookAhead wordBoundary
-
-emoticonEndSymbol :: SlackParser ()
-emoticonEndSymbol = void $ char ':' >> lookAhead wordBoundary
+parseCharDelimitedSection :: Char -> SlackParser [SlackMsgItem]
+parseCharDelimitedSection chr = 
+  char chr *> someTill (parseMessageItem False) (sectionEndSymbol chr)
 
 wordBoundary :: SlackParser ()
 wordBoundary = void (oneOf [' ', '\n', '*', '_', ',', '`', '?', '!', ':', ';', '.']) <|> eof
 
 parseBoldSection :: SlackParser SlackMsgItem
-parseBoldSection = fmap SlackMsgItemBoldSection $
-  char '*' *> someTill (parseMessageItem False) boldEndSymbol
+parseBoldSection =
+  fmap SlackMsgItemBoldSection (parseCharDelimitedSection '*')
 
 parseItalicsSection :: SlackParser SlackMsgItem
-parseItalicsSection = fmap SlackMsgItemItalicsSection $
-  char '_' *> someTill (parseMessageItem False) italicsEndSymbol
+parseItalicsSection =
+  fmap SlackMsgItemItalicsSection (parseCharDelimitedSection '_')
+
+parseStrikethroughSection :: SlackParser SlackMsgItem
+parseStrikethroughSection =
+  fmap SlackMsgItemStrikethroughSection (parseCharDelimitedSection '~')
 
 parseEmoticon :: SlackParser SlackMsgItem
 parseEmoticon = fmap (SlackMsgItemEmoticon . T.pack) $
-  char ':' *> someTill (alphaNumChar <|> char '_' <|> char '+') emoticonEndSymbol
+  char ':' *> someTill (alphaNumChar <|> char '_' <|> char '+') (sectionEndSymbol ':')
 
 parseUserLink :: SlackParser SlackMsgItem
 parseUserLink = do
@@ -176,6 +178,8 @@ msgItemToHtml htmlRenderers@HtmlRenderers{..} getUserDesc = \case
     "<b>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</b>"
   SlackMsgItemItalicsSection cts ->
     "<i>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</i>"
+  SlackMsgItemStrikethroughSection cts ->
+    "<strike>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</strike>"
   SlackMsgItemLink txt url ->
     "<a href='" <> unSlackUrl url <> "'>" <> txt <> "</a>"
   SlackMsgItemUserLink userId mTxt -> "@" <> fromMaybe (getUserDesc userId) mTxt
