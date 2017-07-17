@@ -42,8 +42,8 @@ spec =
         "link not closed <bad"
     it "creates italics sections only at word boundaries" $
       msgToHtml "false_positive" `shouldBe` "false_positive"
-    it "handles bold & italics simultaneously" $
-      msgToHtml "*_both_*" `shouldBe` "<b><i>both</i></b>"
+    it "handles bold, strikethrough & italics simultaneously" $
+      msgToHtml "*_~both~_*" `shouldBe` "<b><i><strike>both</strike></i></b>"
     it "aborts nicely on interspersed bold & italics" $
       msgToHtml "inter *sper_ *sed_" `shouldBe` "inter *sper_ *sed_"
     it "parses blockquotes properly" $
