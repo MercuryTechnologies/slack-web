@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE CPP #-}
 
 -- | See https://api.slack.com/docs/message-formatting
 --
@@ -16,9 +17,11 @@ import Control.Monad
 import Data.List
 import Data.Maybe
 import Data.Monoid
+import Data.Void
 
 -- megaparsec
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 -- mtl
 import Data.Functor.Identity
@@ -46,7 +49,13 @@ data SlackMsgItem
   | SlackMsgItemEmoticon Text
   deriving (Show, Eq)
 
-type SlackParser a = ParsecT Dec T.Text Identity a
+#if MIN_VERSION_megaparsec(6,0,0)
+type MegaparsecError = Void
+#else
+type MegaparsecError = Dec
+#endif
+
+type SlackParser a = ParsecT MegaparsecError T.Text Identity a
 
 parseMessage :: Text -> [SlackMsgItem]
 parseMessage input = fromMaybe [SlackMsgItemPlainText input] $
