@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -64,8 +65,14 @@ import Control.Monad.Reader
 import Servant.API
 
 -- servant-client
-import Servant.Client
+import Servant.Client (ClientM, BaseUrl(..), Scheme(..), ClientEnv(ClientEnv), runClientM, client)
+#if MIN_VERSION_servant_client(0,12,0)
+import Servant.Client.Core (Request, appendToQueryString, ServantError)
+import Servant.Client.Core.Internal.Auth
+#else
 import Servant.Common.Req (Req, appendToQueryString)
+type Request = Req
+#endif
 
 -- slack-web
 import qualified Web.Slack.Api as Api
@@ -214,7 +221,7 @@ authTest = do
   run (authTest_ authR)
 
 authTest_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Auth.TestRsp)
 
 
@@ -233,7 +240,7 @@ channelsCreate createReq = do
   run (channelsCreate_ authR createReq)
 
 channelsCreate_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Channel.CreateReq
   -> ClientM (ResponseJSON Channel.CreateRsp)
 
@@ -252,7 +259,7 @@ channelsList listReq = do
   run (channelsList_ authR listReq)
 
 channelsList_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Channel.ListReq
   -> ClientM (ResponseJSON Channel.ListRsp)
 
@@ -272,7 +279,7 @@ channelsHistory histReq = do
   run (channelsHistory_ authR histReq)
 
 channelsHistory_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
   -> ClientM (ResponseJSON Common.HistoryRsp)
 
@@ -291,7 +298,7 @@ chatPostMessage postReq = do
   run (chatPostMessage_ authR postReq)
 
 chatPostMessage_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Chat.PostMsgReq
   -> ClientM (ResponseJSON Chat.PostMsgRsp)
 
@@ -311,7 +318,7 @@ groupsList = do
   run (groupsList_ authR)
 
 groupsList_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Group.ListRsp)
 
 -- |
@@ -332,7 +339,7 @@ groupsHistory hisReq = do
   run (groupsHistory_ authR hisReq)
 
 groupsHistory_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
   -> ClientM (ResponseJSON Common.HistoryRsp)
 
@@ -350,7 +357,7 @@ imList = do
   run (imList_ authR)
 
 imList_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Im.ListRsp)
 
 -- |
@@ -369,7 +376,7 @@ imHistory histReq = do
   run (imHistory_ authR histReq)
 
 imHistory_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
   -> ClientM (ResponseJSON Common.HistoryRsp)
 
@@ -387,7 +394,7 @@ mpimList = do
   run (mpimList_ authR)
 
 mpimList_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Group.ListRsp)
 
 -- |
@@ -406,7 +413,7 @@ mpimHistory histReq = do
   run (mpimHistory_ authR histReq)
 
 mpimHistory_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
   -> ClientM (ResponseJSON Common.HistoryRsp)
 
@@ -425,7 +432,7 @@ usersList = do
   run (usersList_ authR)
 
 usersList_
-  :: AuthenticateReq (AuthProtect "token")
+  :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON User.ListRsp)
 
 -- | Returns a function to get a username from a 'Common.UserId'.
@@ -525,8 +532,8 @@ type instance AuthClientData (AuthProtect "token") =
 
 authenticateReq
   :: Text
-  -> Req
-  -> Req
+  -> Request
+  -> Request
 authenticateReq token =
   appendToQueryString "token" (Just token)
 
@@ -545,8 +552,8 @@ run clientAction = do
   unnestErrors <$> liftIO (runClientM clientAction $ ClientEnv (getManager env) baseUrl)
 
 mkSlackAuthenticateReq :: (MonadReader env m, HasToken env)
-  => m (AuthenticateReq (AuthProtect "token"))
-mkSlackAuthenticateReq = flip mkAuthenticateReq authenticateReq . getToken <$> ask
+  => m (AuthenticatedRequest (AuthProtect "token"))
+mkSlackAuthenticateReq = flip mkAuthenticatedRequest authenticateReq . getToken <$> ask
 
 unnestErrors :: Either ServantError (ResponseJSON a) -> Response a
 unnestErrors (Right (ResponseJSON (Right a))) = Right a

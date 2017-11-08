@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -41,7 +42,11 @@ import Web.HttpApiData
 import Web.FormUrlEncoded
   
 -- servant-client
+#if MIN_VERSION_servant_client(0,12,0)
+import Servant.Client
+#else
 import Servant.Common.Req
+#endif
 
 -- slack-web
 import Web.Slack.Types
