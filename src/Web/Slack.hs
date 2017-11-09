@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -65,14 +64,9 @@ import Control.Monad.Reader
 import Servant.API
 
 -- servant-client
-import Servant.Client (ClientM, BaseUrl(..), Scheme(..), ClientEnv(ClientEnv), runClientM, client)
-#if MIN_VERSION_servant_client(0,12,0)
+import Servant.Client hiding (Response, baseUrl)
 import Servant.Client.Core (Request, appendToQueryString, ServantError)
 import Servant.Client.Core.Internal.Auth
-#else
-import Servant.Common.Req (Req, appendToQueryString)
-type Request = Req
-#endif
 
 -- slack-web
 import qualified Web.Slack.Api as Api

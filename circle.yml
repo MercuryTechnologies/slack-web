@@ -9,12 +9,10 @@ dependencies:
 
   override:
     - stack setup
-    - stack build --only-dependencies
-    - stack build --only-dependencies --resolver lts-8.3 --install-ghc
+    - stack build --only-dependencies --install-ghc
 
 test:
 
   override:
     - stack build
-    - stack build --resolver lts-8.3
     - stack test
