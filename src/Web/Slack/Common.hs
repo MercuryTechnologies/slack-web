@@ -39,9 +39,9 @@ import GHC.Generics (Generic)
 -- http-api-data
 import Web.HttpApiData
 import Web.FormUrlEncoded
-  
+
 -- servant-client
-import Servant.Common.Req
+import Servant.Client
 
 -- slack-web
 import Web.Slack.Types
