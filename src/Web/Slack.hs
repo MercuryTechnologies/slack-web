@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE CPP #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -80,6 +81,11 @@ import qualified Web.Slack.User as User
 
 -- text
 import Data.Text (Text)
+
+#if !MIN_VERSION_servant(0,13,0)
+mkClientEnv :: Manager -> BaseUrl -> ClientEnv
+mkClientEnv = ClientEnv
+#endif
 
 class HasManager a where
     getManager :: a -> Manager
@@ -543,7 +549,7 @@ run
 run clientAction = do
   env <- ask
   let baseUrl = BaseUrl Https "slack.com" 443 "/api"
-  unnestErrors <$> liftIO (runClientM clientAction $ ClientEnv (getManager env) baseUrl)
+  unnestErrors <$> liftIO (runClientM clientAction $ mkClientEnv (getManager env) baseUrl)
 
 mkSlackAuthenticateReq :: (MonadReader env m, HasToken env)
   => m (AuthenticatedRequest (AuthProtect "token"))
