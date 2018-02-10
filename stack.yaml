@@ -1,5 +1,6 @@
-resolver: nightly-2017-08-12
+resolver: nightly-2018-02-09
 extra-deps:
-- servant-0.12
-- servant-client-0.12
-- servant-client-core-0.12
+- servant-0.13
+- servant-client-0.13
+- servant-client-core-0.13
+- http-types-0.12.1
