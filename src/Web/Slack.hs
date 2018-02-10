@@ -32,8 +32,8 @@ module Web.Slack
   , usersList
   , authenticateReq
   , Response
-  , HasManager
-  , HasToken
+  , HasManager(..)
+  , HasToken(..)
   )
   where
 
