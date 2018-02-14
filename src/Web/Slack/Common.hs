@@ -34,6 +34,8 @@ import Data.Aeson
 import Data.Aeson.TH
 
 -- base
+import Control.Exception
+import Data.Typeable
 import GHC.Generics (Generic)
 
 -- http-api-data
@@ -140,4 +142,6 @@ data SlackClientError
     -- ^ errors from the network connection
     | SlackError Text
     -- ^ errors returned by the slack API
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Generic, Show, Typeable)
+
+instance Exception SlackClientError
