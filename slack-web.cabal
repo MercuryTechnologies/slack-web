@@ -1,5 +1,5 @@
 name: slack-web
-version: 0.2.0.2
+version: 0.2.0.3
 
 build-type: Simple
 cabal-version: >= 1.21
