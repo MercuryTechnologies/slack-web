@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build-lts:
+    docker:
+      - image: fpco/stack-build:lts-11.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "slack-web.cabal" }}
+            - v1-.stack-{{ checksum "stack.yaml" }}
+            - v1-.stack-
+      - run: stack build --test --only-dependencies
+      - save_cache:
+          key: v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "slack-web.cabal" }}
+          paths:
+            - ~/.stack/
+      - run: stack build
+      - run: stack build --test
+
+  build-nightly:
+    docker:
+      - image: fpco/stack-build:lts-11.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-.stack-{{ checksum "stack-nightly.yaml" }}-{{ checksum "slack-web.cabal" }}
+            - v1-.stack-{{ checksum "stack-nightly.yaml" }}-{{ checksum "slack-web.cabal" }}
+            - v1-.stack-
+      - run: stack build --test --only-dependencies --stack-yaml stack-nightly.yaml
+      - save_cache:
+          key: v1-.stack-{{ checksum "stack-nightly.yaml" }}-{{ checksum "slack-web.cabal" }}
+          paths:
+            - ~/.stack/
+      - run: stack build --stack-yaml stack-nightly.yaml
+      - run: stack build --test --stack-yaml stack-nightly.yaml
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-lts
+      - build-nightly
