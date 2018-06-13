@@ -1,5 +1,5 @@
 name: slack-web
-version: 0.2.0.4
+version: 0.2.0.5
 
 build-type: Simple
 cabal-version: >= 1.21
@@ -44,7 +44,7 @@ library
       Web.Slack.Types
       Web.Slack.Util
   build-depends:
-      aeson >= 1.0 && < 1.4
+      aeson >= 1.0 && < 1.5
     , base >= 4.9 && < 4.12
     , containers
     , http-api-data >= 0.3 && < 0.4
