@@ -16,7 +16,6 @@ module Web.Slack.MessageParser
 import Control.Monad
 import Data.List
 import Data.Maybe
-import Data.Monoid
 import Data.Void
 
 -- megaparsec

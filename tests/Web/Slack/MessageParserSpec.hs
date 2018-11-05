@@ -2,9 +2,6 @@
 
 module Web.Slack.MessageParserSpec (spec) where
 
--- base
-import Data.Monoid
-
 -- hspec
 import Test.Hspec
 
