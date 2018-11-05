@@ -55,6 +55,11 @@ type MegaparsecError = Void
 type MegaparsecError = Dec
 #endif
 
+#if MIN_VERSION_megaparsec(7,0,0)
+#else
+anySingle = anyChar
+#endif
+
 type SlackParser a = ParsecT MegaparsecError T.Text Identity a
 
 parseMessage :: Text -> [SlackMsgItem]
@@ -138,7 +143,7 @@ parseLink = do
 
 parseCode :: SlackParser SlackMsgItem
 parseCode = SlackMsgItemCodeSection . T.pack <$>
-  (string "```" >> manyTill anyChar (string "```"))
+  (string "```" >> manyTill anySingle (string "```"))
 
 parseInlineCode :: SlackParser SlackMsgItem
 parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
