@@ -25,7 +25,6 @@ module Web.Slack.Types
 import Data.Aeson
 
 -- base
-import Data.Monoid
 import GHC.Generics (Generic)
 
 -- errors
