@@ -41,18 +41,20 @@ jobs:
       - image: fpco/stack-build:lts-7.20
     steps:
       - checkout
+      - run: stack upgrade
+      - run: ~/.local/bin/stack setup --stack-yaml stack-7.20.yaml
       - restore_cache:
           keys:
             - v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
             - v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
             - v1-.stack-
-      - run: stack build --test --only-dependencies --stack-yaml stack-7.20.yaml
+      - run: ~/.local/bin/stack build --test --only-dependencies --stack-yaml stack-7.20.yaml
       - save_cache:
           key: v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
           paths:
             - ~/.stack/
-      - run: stack build --stack-yaml stack-7.20.yaml
-      - run: stack build --test --stack-yaml stack-7.20.yaml
+      - run: ~/.local/bin/stack build --stack-yaml stack-7.20.yaml
+      - run: ~/.local/bin/stack build --test --stack-yaml stack-7.20.yaml
 
 workflows:
   version: 2
