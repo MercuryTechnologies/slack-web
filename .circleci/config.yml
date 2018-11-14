@@ -36,9 +36,28 @@ jobs:
       - run: stack build --stack-yaml stack-nightly.yaml
       - run: stack build --test --stack-yaml stack-nightly.yaml
 
+  build-base-4.9.0:
+    docker:
+      - image: fpco/stack-build:lts-7.20
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
+            - v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
+            - v1-.stack-
+      - run: stack build --test --only-dependencies --stack-yaml stack-7.20.yaml
+      - save_cache:
+          key: v1-.stack-{{ checksum "stack-7.20.yaml" }}-{{ checksum "slack-web.cabal" }}
+          paths:
+            - ~/.stack/
+      - run: stack build --stack-yaml stack-7.20.yaml
+      - run: stack build --test --stack-yaml stack-7.20.yaml
+
 workflows:
   version: 2
   build:
     jobs:
       - build-lts
       - build-nightly
+      - build-base-4.9.0
