@@ -56,6 +56,7 @@ type MegaparsecError = Dec
 
 #if MIN_VERSION_megaparsec(7,0,0)
 #else
+anySingle :: ParsecT MegaparsecError Text Identity (Token Text)
 anySingle = anyChar
 #endif
 
