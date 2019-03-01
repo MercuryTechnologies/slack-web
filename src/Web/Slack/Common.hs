@@ -4,6 +4,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE CPP #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -52,6 +53,9 @@ import Web.Slack.Util
 -- text
 import Data.Text (Text)
 
+#if !MIN_VERSION_servant(0,16,0)
+type ClientError = ServantError
+#endif
 
 -- |
 --
@@ -138,7 +142,7 @@ $(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
 -- |
 -- Errors that can be triggered by a slack request.
 data SlackClientError
-    = ServantError ServantError
+    = ServantError ClientError
     -- ^ errors from the network connection
     | SlackError Text
     -- ^ errors returned by the slack API

@@ -66,8 +66,7 @@ import Servant.API
 
 -- servant-client
 import Servant.Client hiding (Response, baseUrl)
-import Servant.Client.Core (Request, appendToQueryString, ServantError)
-import Servant.Client.Core.Internal.Auth
+import Servant.Client.Core (Request, appendToQueryString)
 
 -- slack-web
 import qualified Web.Slack.Api as Api
@@ -85,6 +84,14 @@ import Data.Text (Text)
 #if !MIN_VERSION_servant(0,13,0)
 mkClientEnv :: Manager -> BaseUrl -> ClientEnv
 mkClientEnv = ClientEnv
+#endif
+
+#if MIN_VERSION_servant(0,16,0)
+import Servant.Client.Core (AuthenticatedRequest, AuthClientData, mkAuthenticatedRequest, ClientError)
+#else
+import Servant.Client.Core.Internal.Auth
+import Servant.Client.Core (ServantError)
+type ClientError = ServantError
 #endif
 
 class HasManager a where
@@ -555,7 +562,7 @@ mkSlackAuthenticateReq :: (MonadReader env m, HasToken env)
   => m (AuthenticatedRequest (AuthProtect "token"))
 mkSlackAuthenticateReq = flip mkAuthenticatedRequest authenticateReq . getToken <$> ask
 
-unnestErrors :: Either ServantError (ResponseJSON a) -> Response a
+unnestErrors :: Either ClientError (ResponseJSON a) -> Response a
 unnestErrors (Right (ResponseJSON (Right a))) = Right a
 unnestErrors (Right (ResponseJSON (Left (ResponseSlackError serv))))
     = Left (Common.SlackError serv)
