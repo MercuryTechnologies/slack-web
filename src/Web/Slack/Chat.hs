@@ -41,7 +41,6 @@ data PostMsg =
     , postMsgParse :: Maybe Text
     , postMsgLinkNames :: Maybe Bool
     , postMsgAttachments :: Maybe Text
-    , postMsgBlocks :: Maybe Text
     , postMsgUnfurlLinks :: Maybe Bool
     , postMsgUnfurlMedia :: Maybe Bool
     , postMsgUsername :: Maybe Text
