@@ -71,6 +71,7 @@ data PostMsgReq =
     , postMsgReqParse :: Maybe Text
     , postMsgReqLinkNames :: Maybe Bool
     , postMsgReqAttachments :: Maybe Text
+    , postMsgReqBlocks :: Maybe Text
     , postMsgReqUnfurlLinks :: Maybe Bool
     , postMsgReqUnfurlMedia :: Maybe Bool
     , postMsgReqUsername :: Maybe Text
@@ -114,6 +115,7 @@ mkPostMsgReq channel text =
     , postMsgReqParse = Nothing
     , postMsgReqLinkNames = Nothing
     , postMsgReqAttachments = Nothing
+    , postMsgReqBlocks = Nothing
     , postMsgReqUnfurlLinks = Nothing
     , postMsgReqUnfurlMedia = Nothing
     , postMsgReqUsername = Nothing
