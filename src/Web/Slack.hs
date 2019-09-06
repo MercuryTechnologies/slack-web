@@ -31,6 +31,7 @@ module Web.Slack
   , mpimHistory
   , getUserDesc
   , usersList
+  , userLookupByEmail
   , authenticateReq
   , Response
   , HasManager(..)
@@ -196,6 +197,11 @@ type Api =
     "users.list"
       :> AuthProtect "token"
       :> Post '[JSON] (ResponseJSON User.ListRsp)
+  :<|>
+    "users.lookupByEmail"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] User.Email
+      :> Post '[JSON] (ResponseJSON User.User)
 
 
 -- |
@@ -442,6 +448,27 @@ usersList_
   :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON User.ListRsp)
 
+-- |
+--
+-- This method returns a list of all users in the team.
+-- This includes deleted/deactivated users.
+--
+-- <https://api.slack.com/methods/users.lookupByEmail>
+
+userLookupByEmail
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => User.Email 
+  -> m (Response User.User)
+userLookupByEmail email = do
+  authR <- mkSlackAuthenticateReq
+  run (userLookupByEmail_ authR email)
+
+userLookupByEmail_
+  :: AuthenticatedRequest (AuthProtect "token")
+  -> User.Email
+  -> ClientM (ResponseJSON User.User)
+
+
 -- | Returns a function to get a username from a 'Common.UserId'.
 -- Comes in handy to use 'Web.Slack.MessageParser.messageToHtml'
 getUserDesc
@@ -521,6 +548,7 @@ apiTest_
   :<|> mpimList_
   :<|> mpimHistory_
   :<|> usersList_
+  :<|> userLookupByEmail_
   =
   client (Proxy :: Proxy Api)
 
