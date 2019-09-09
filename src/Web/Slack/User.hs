@@ -17,6 +17,7 @@ module Web.Slack.User
   , User(..)
   , ListRsp(..)
   , Email(..)
+  , UserRsp(..)
   )
   where
 
@@ -89,6 +90,15 @@ data ListRsp =
   deriving (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+
+
+data UserRsp =
+  UserRsp
+    { userRspUser :: User
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveFromJSON (jsonOpts "UserRsp") ''UserRsp)
 
 newtype Email = Email Text deriving (Eq, Generic, Show)
 instance ToForm Email where 

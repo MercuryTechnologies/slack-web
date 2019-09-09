@@ -201,7 +201,7 @@ type Api =
     "users.lookupByEmail"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] User.Email
-      :> Post '[JSON] (ResponseJSON User.User)
+      :> Post '[JSON] (ResponseJSON User.UserRsp)
 
 
 -- |
@@ -458,7 +458,7 @@ usersList_
 userLookupByEmail
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => User.Email 
-  -> m (Response User.User)
+  -> m (Response User.UserRsp)
 userLookupByEmail email = do
   authR <- mkSlackAuthenticateReq
   run (userLookupByEmail_ authR email)
@@ -466,7 +466,7 @@ userLookupByEmail email = do
 userLookupByEmail_
   :: AuthenticatedRequest (AuthProtect "token")
   -> User.Email
-  -> ClientM (ResponseJSON User.User)
+  -> ClientM (ResponseJSON User.UserRsp)
 
 
 -- | Returns a function to get a username from a 'Common.UserId'.
