@@ -53,12 +53,12 @@ data Profile =
     , profileRealNameNormalized :: Maybe Text 
     , profileDisplayNameNormalized :: Maybe Text 
     , profileEmail :: Maybe Text 
-    , profileImage24 :: Text 
-    , profileImage32 :: Text 
-    , profileImage48 :: Text 
-    , profileImage72 :: Text 
-    , profileImage192 :: Text 
-    , profileImage512 :: Text 
+    , profileImage_24 :: Text 
+    , profileImage_32 :: Text 
+    , profileImage_48 :: Text 
+    , profileImage_72 :: Text 
+    , profileImage_192 :: Text 
+    , profileImage_512 :: Text 
     , profileTeam :: Maybe Text 
     }
   deriving (Eq, Generic, Show)
