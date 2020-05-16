@@ -45,7 +45,7 @@ library
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.5
-    , base >= 4.11 && < 4.14
+    , base >= 4.11 && < 4.15
     , containers
     , http-api-data >= 0.3 && < 0.5
     , http-client >= 0.5 && < 0.7
