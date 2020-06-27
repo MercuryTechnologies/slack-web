@@ -20,6 +20,8 @@ module Web.Slack
   , authTest
   , chatPostMessage
   , channelsCreate
+  , conversationsList
+  , conversationsHistory
   , channelsList
   , channelsHistory
   , groupsHistory
@@ -72,6 +74,7 @@ import Servant.Client.Core (Request, appendToQueryString)
 -- slack-web
 import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
+import qualified Web.Slack.Conversation as Conversation
 import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 import qualified Web.Slack.Common as Common
@@ -146,6 +149,16 @@ type Api =
     "auth.test"
       :> AuthProtect "token"
       :> Post '[JSON] (ResponseJSON Auth.TestRsp)
+  :<|>
+    "conversations.list"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Conversation.ListReq
+      :> Post '[JSON] (ResponseJSON Conversation.ListRsp)
+  :<|>
+    "conversations.history"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] (ResponseJSON Conversation.HistoryRsp)
   :<|>
     "channels.create"
       :> AuthProtect "token"
@@ -236,6 +249,49 @@ authTest = do
 authTest_
   :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Auth.TestRsp)
+
+-- |
+--
+-- Retrieve conversations list.
+--
+-- <https://api.slack.com/methods/conversations.list>
+
+conversationsList
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Conversation.ListReq
+  -> m (Response Conversation.ListRsp)
+conversationsList listReq = do
+  authR <- mkSlackAuthenticateReq
+  run (conversationsList_ authR listReq)
+
+conversationsList_
+  :: AuthenticatedRequest (AuthProtect "token")
+  -> Conversation.ListReq
+  -> ClientM (ResponseJSON Conversation.ListRsp)
+
+
+-- |
+--
+-- Retrieve ceonversation history.
+-- Consider using 'historyFetchAll' in combination with this function.
+--
+-- _NOTE_: the return type 'Conversation.HistoryRsp' is a different type
+--         from 'Common.HistoryRsp' of 'Web.Slack.Common'.
+--
+-- <https://api.slack.com/methods/conversations.history>
+
+conversationsHistory
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Common.HistoryReq
+  -> m (Response Conversation.HistoryRsp)
+conversationsHistory histReq = do
+  authR <- mkSlackAuthenticateReq
+  run (conversationsHistory_ authR histReq)
+
+conversationsHistory_
+  :: AuthenticatedRequest (AuthProtect "token")
+  -> Common.HistoryReq
+  -> ClientM (ResponseJSON Conversation.HistoryRsp)
 
 
 -- |
@@ -537,6 +593,8 @@ mergeResponses msgs (Right rsp) =
 
 apiTest_
   :<|> authTest_
+  :<|> conversationsList_
+  :<|> conversationsHistory_
   :<|> channelsCreate_
   :<|> channelsHistory_
   :<|> channelsList_
