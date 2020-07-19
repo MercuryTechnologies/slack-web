@@ -1,1 +1,4 @@
 resolver: lts-15.6
+flags:
+  slack-web:
+    cli: true

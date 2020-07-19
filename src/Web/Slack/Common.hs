@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -76,7 +77,7 @@ data HistoryReq =
 --
 --
 
-$(deriveFromJSON (jsonOpts "historyReq") ''HistoryReq)
+$(deriveJSON (jsonOpts "historyReq") ''HistoryReq)
 
 
 -- |
@@ -117,6 +118,9 @@ instance FromJSON MessageType where
   parseJSON "message" = pure MessageTypeMessage
   parseJSON _ = fail "Invalid MessageType"
 
+instance ToJSON MessageType where
+  toJSON _ = String "message"
+
 data Message =
   Message
     { messageType :: MessageType
@@ -128,7 +132,7 @@ data Message =
     }
   deriving (Eq, Generic, Show)
 
-$(deriveFromJSON (jsonOpts "message") ''Message)
+$(deriveJSON (jsonOpts "message") ''Message)
 
 data HistoryRsp =
   HistoryRsp
@@ -137,7 +141,7 @@ data HistoryRsp =
     }
   deriving (Eq, Generic, Show)
 
-$(deriveFromJSON (jsonOpts "historyRsp") ''HistoryRsp)
+$(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
 -- |
 -- Errors that can be triggered by a slack request.

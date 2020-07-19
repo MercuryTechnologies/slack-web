@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeApplications #-}
@@ -15,6 +16,8 @@
 module Web.Slack.Types
   ( Color(..)
   , UserId(..)
+  , ConversationId(..)
+  , TeamId(..)
   , SlackTimestamp(..)
   , mkSlackTimestamp
   , SlackMessageText(..)
@@ -44,17 +47,32 @@ import Data.Time.Clock.POSIX
 
 -- Ord to allow it to be a key of a Map
 newtype Color = Color { unColor :: Text }
-  deriving (Eq, Ord, Generic, Show, FromJSON)
+  deriving stock (Eq, Ord, Generic, Show)
+  deriving newtype (FromJSON, ToJSON)
 
 -- Ord to allow it to be a key of a Map
 newtype UserId = UserId { unUserId :: Text }
-  deriving (Eq, Ord, Generic, Show, FromJSON)
+  deriving stock (Eq, Ord, Generic, Show)
+  deriving newtype (FromJSON, ToJSON)
+
+-- | Common identifier for every type of 'Conversation'.
+--   Unique to the team which the conversation belongs to.
+-- Ord to allow it to be a key of a Map
+newtype ConversationId = ConversationId { unConversationId :: Text }
+  deriving stock (Eq, Ord, Generic, Show)
+  deriving newtype (FromJSON, ToJSON)
+
+-- Ord to allow it to be a key of a Map
+newtype TeamId = TeamId { unTeamId :: Text }
+  deriving stock (Eq, Ord, Generic, Show)
+  deriving newtype (FromJSON, ToJSON)
 
 -- | Message text in the format returned by Slack,
 -- see https://api.slack.com/docs/message-formatting
 -- Consider using 'messageToHtml' for displaying.
 newtype SlackMessageText = SlackMessageText { unSlackMessageText :: Text}
-  deriving (Eq, Generic, Show, FromJSON)
+  deriving stock (Eq, Ord, Generic, Show)
+  deriving newtype (FromJSON, ToJSON)
 
 data SlackTimestamp =
   SlackTimestamp
@@ -78,6 +96,9 @@ instance FromJSON SlackTimestamp where
     maybe (fail "Invalid slack ts")
           (pure . SlackTimestamp contents)
           (slackTimestampToTime contents)
+
+instance ToJSON SlackTimestamp where
+  toJSON = String . slackTimestampTs
 
 slackTimestampToTime :: Text -> Maybe UTCTime
 slackTimestampToTime txt =
