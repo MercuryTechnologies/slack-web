@@ -1,4 +1,5 @@
 resolver: nightly-2020-07-19
+allow-newer: true
 flags:
   slack-web:
     cli: true
