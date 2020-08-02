@@ -60,12 +60,12 @@ newtype UserId = UserId { unUserId :: Text }
 -- Ord to allow it to be a key of a Map
 newtype ConversationId = ConversationId { unConversationId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (FromJSON, ToJSON, ToHttpApiData)
 
 -- Ord to allow it to be a key of a Map
 newtype TeamId = TeamId { unTeamId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (FromJSON, ToJSON, ToHttpApiData)
 
 -- | Message text in the format returned by Slack,
 -- see https://api.slack.com/docs/message-formatting
