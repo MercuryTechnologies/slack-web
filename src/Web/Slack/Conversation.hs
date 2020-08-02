@@ -26,7 +26,6 @@ module Web.Slack.Conversation
   , ListReq(..)
   , mkListReq
   , ListRsp(..)
-  , HistoryRsp(..)
   ) where
 
 -- aeson
@@ -47,7 +46,7 @@ import Web.FormUrlEncoded
 import Web.HttpApiData
 
 -- slack-web
-import Web.Slack.Common hiding (HistoryRsp)
+import Web.Slack.Common
 import Web.Slack.Types
 import Web.Slack.Util
 
@@ -324,17 +323,3 @@ newtype ListRsp =
   deriving (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
-
-
--- |
---
-
-data HistoryRsp =
-  HistoryRsp
-    { historyRspMessages :: [Message]
-    , historyRspHasMore :: Bool
-    , historyRspPinCount :: Integer
-    }
-  deriving (Eq, Generic, Show)
-
-$(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
