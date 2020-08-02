@@ -158,7 +158,7 @@ type Api =
     "conversations.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Conversation.HistoryRsp)
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "channels.create"
       :> AuthProtect "token"
@@ -275,15 +275,12 @@ conversationsList_
 -- Retrieve ceonversation history.
 -- Consider using 'historyFetchAll' in combination with this function.
 --
--- _NOTE_: the return type 'Conversation.HistoryRsp' is a different type
---         from 'Common.HistoryRsp' of 'Web.Slack.Common'.
---
 -- <https://api.slack.com/methods/conversations.history>
 
 conversationsHistory
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => Common.HistoryReq
-  -> m (Response Conversation.HistoryRsp)
+  -> m (Response Common.HistoryRsp)
 conversationsHistory histReq = do
   authR <- mkSlackAuthenticateReq
   run (conversationsHistory_ authR histReq)
@@ -291,7 +288,7 @@ conversationsHistory histReq = do
 conversationsHistory_
   :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
-  -> ClientM (ResponseJSON Conversation.HistoryRsp)
+  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 
 -- |
