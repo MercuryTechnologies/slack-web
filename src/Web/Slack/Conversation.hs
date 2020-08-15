@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -26,6 +27,8 @@ module Web.Slack.Conversation
   , ListReq(..)
   , mkListReq
   , ListRsp(..)
+  , RepliesReq (..)
+  , mkRepliesReq
   ) where
 
 -- aeson
@@ -47,7 +50,6 @@ import Web.HttpApiData
 
 -- slack-web
 import Web.Slack.Common
-import Web.Slack.Types
 import Web.Slack.Util
 
 -- scientific
@@ -323,3 +325,47 @@ newtype ListRsp =
   deriving (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+
+
+data RepliesReq =
+  RepliesReq
+    { repliesReqTs :: SlackTimestamp
+    , repliesReqChannel :: ConversationId
+    , repliesReqLimit :: Int
+    , repliesReqLatest :: Maybe SlackTimestamp
+    , repliesReqOldest :: Maybe SlackTimestamp
+    , repliesReqInclusive :: Bool
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveJSON (jsonOpts "repliesReq") ''RepliesReq)
+
+instance ToForm RepliesReq where
+  -- can't use genericToForm because slack expects booleans as 0/1
+  toForm RepliesReq {..} =
+      [ ("channel", toQueryParam repliesReqChannel)
+      , ("ts", toQueryParam repliesReqTs)
+      , ("limit", toQueryParam repliesReqLimit)
+      , ("latest", toQueryParam repliesReqLatest)
+      , ("oldest", toQueryParam repliesReqOldest)
+      , ("inclusive", toQueryParam (if repliesReqInclusive then 1 :: Int else 0))
+      ]
+
+
+-- |
+--
+--
+
+mkRepliesReq
+  :: ConversationId
+  -> SlackTimestamp
+  -> RepliesReq
+mkRepliesReq channel ts =
+  RepliesReq
+    { repliesReqChannel = channel
+    , repliesReqTs = ts
+    , repliesReqLimit = 100
+    , repliesReqLatest = Nothing
+    , repliesReqOldest = Nothing
+    , repliesReqInclusive = True
+    }

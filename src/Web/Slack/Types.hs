@@ -20,6 +20,7 @@ module Web.Slack.Types
   , TeamId(..)
   , SlackTimestamp(..)
   , mkSlackTimestamp
+  , timestampFromText
   , SlackMessageText(..)
   )
   where
@@ -30,16 +31,13 @@ import Data.Aeson
 -- base
 import GHC.Generics (Generic)
 
--- errors
-import Control.Error (hush)
-
 -- http-api-data
 import Web.HttpApiData
 
 -- text
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Text.Read (decimal)
+import Data.Text.Read (rational)
 
 -- time
 import Data.Time.Clock
@@ -82,24 +80,26 @@ data SlackTimestamp =
   deriving (Eq, Show)
 
 instance Ord SlackTimestamp where
-    compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b
+  compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b
+
+-- | Convert timestamp texts e.g. "1595719220.011100" into 'SlackTimestamp'
+timestampFromText :: Text -> Either String SlackTimestamp
+timestampFromText t = f =<< rational t
+ where
+  f (posixTime, "") = Right . SlackTimestamp t $ posixSecondsToUTCTime posixTime
+  f (_, _left) = Left "Unexpected text left after timestamp"
 
 mkSlackTimestamp :: UTCTime -> SlackTimestamp
-mkSlackTimestamp utctime = SlackTimestamp (T.pack (show @Integer unixts) <> ".000000") utctime
-  where unixts = floor $ toRational $ utcTimeToPOSIXSeconds utctime
+mkSlackTimestamp utctime = SlackTimestamp (T.pack (show unixts)) utctime
+  where unixts = nominalDiffTimeToSeconds $ utcTimeToPOSIXSeconds utctime
 
 instance ToHttpApiData SlackTimestamp where
   toQueryParam (SlackTimestamp contents _) = contents
 
 instance FromJSON SlackTimestamp where
-  parseJSON = withText "Slack ts" $ \contents ->
-    maybe (fail "Invalid slack ts")
-          (pure . SlackTimestamp contents)
-          (slackTimestampToTime contents)
+  parseJSON = withText "Slack ts"
+    $ either (fail . ("Invalid Slack ts: " ++)) pure
+    . timestampFromText
 
 instance ToJSON SlackTimestamp where
   toJSON = String . slackTimestampTs
-
-slackTimestampToTime :: Text -> Maybe UTCTime
-slackTimestampToTime txt =
-  posixSecondsToUTCTime . realToFrac @Integer . fst <$> hush (decimal txt)
