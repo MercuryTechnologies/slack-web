@@ -22,11 +22,13 @@ module Web.Slack
   , channelsCreate
   , conversationsList
   , conversationsHistory
+  , conversationsReplies
   , channelsList
   , channelsHistory
   , groupsHistory
   , groupsList
   , historyFetchAll
+  , replicesFetchAll
   , imHistory
   , imList
   , mpimList
@@ -53,7 +55,7 @@ import Data.Proxy (Proxy(..))
 import qualified Data.Map as Map
 
 -- error
-import Control.Error (lastZ, isNothing)
+import Control.Error (lastZ)
 
 -- http-client
 import Network.HTTP.Client (Manager, newManager)
@@ -158,6 +160,11 @@ type Api =
     "conversations.history"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Common.HistoryReq
+      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
+  :<|>
+    "conversations.replies"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Conversation.RepliesReq
       :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "channels.create"
@@ -288,6 +295,28 @@ conversationsHistory histReq = do
 conversationsHistory_
   :: AuthenticatedRequest (AuthProtect "token")
   -> Common.HistoryReq
+  -> ClientM (ResponseJSON Common.HistoryRsp)
+
+
+-- |
+--
+-- Retrieve replies of a conversation.
+-- Consider using 'replicesFetchAll' if you want to get entire replies
+-- of a conversation.
+--
+-- <https://api.slack.com/methods/conversations.replies>
+
+conversationsReplies
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Conversation.RepliesReq
+  -> m (Response Common.HistoryRsp)
+conversationsReplies repliesReq = do
+  authR <- mkSlackAuthenticateReq
+  run (conversationsReplies_ authR repliesReq)
+
+conversationsReplies_
+  :: AuthenticatedRequest (AuthProtect "token")
+  -> Conversation.RepliesReq
   -> ClientM (ResponseJSON Common.HistoryRsp)
 
 
@@ -549,7 +578,7 @@ getUserDesc unknownUserFn users =
 historyFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => (Common.HistoryReq -> m (Response Common.HistoryRsp))
-  -- ^ The request to make. Can be for instance 'mpimHistory', 'channelsHistory'...
+  -- ^ The request to make. Can be for instance 'conversationsHistory'...
   -> Text
   -- ^ The channel name to query
   -> Int
@@ -561,24 +590,54 @@ historyFetchAll
   -> m (Response Common.HistoryRsp)
   -- ^ A list merging all the history records that were fetched
   -- through the individual queries.
-historyFetchAll makeReq channel count oldest latest = do
-    -- From slack apidoc: If there are more than 100 messages between
-    -- the two timestamps then the messages returned are the ones closest to latest.
-    -- In most cases an application will want the most recent messages
-    -- and will page backward from there.
-    --
-    -- for reference (does not apply here) => If oldest is provided but not
-    -- latest then the messages returned are those closest to oldest,
-    -- allowing you to page forward through history if desired.
-    rsp <- makeReq $ Common.HistoryReq channel count (Just latest) (Just oldest) False
-    case rsp of
-      Left _ -> return rsp
-      Right (Common.HistoryRsp msgs hasMore) -> do
-          let oldestReceived = Common.messageTs <$> lastZ msgs
-          if not hasMore || isNothing oldestReceived
-              then return rsp
-              else mergeResponses msgs <$>
-                   historyFetchAll makeReq channel count oldest (fromJust oldestReceived)
+historyFetchAll makeReq channel count =
+  commonHistoryFetchAll $ \ latest oldest ->
+    makeReq . Common.HistoryReq channel count latest oldest
+
+replicesFetchAll
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => Text
+  -- ^ The channel name to query
+  -> Common.SlackTimestamp
+  -- ^ Unique identifier of a thread's parent message.
+  -> Int
+  -- ^ The number of entries to fetch at once.
+  -> Common.SlackTimestamp
+  -- ^ The oldest timestamp to fetch records from
+  -> Common.SlackTimestamp
+  -- ^ The newest timestamp to fetch records to
+  -> m (Response Common.HistoryRsp)
+  -- ^ A list merging all the history records that were fetched
+  -- through the individual queries.
+replicesFetchAll channel ts limit = commonHistoryFetchAll makeReq
+ where
+  makeReq latest oldest =
+    conversationsReplies . (Conversation.RepliesReq ts (Common.ConversationId channel) limit) latest oldest
+
+commonHistoryFetchAll
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => (Maybe Common.SlackTimestamp -> Maybe Common.SlackTimestamp -> Bool -> m (Response Common.HistoryRsp))
+  -> Common.SlackTimestamp
+  -> Common.SlackTimestamp
+  -> m (Response Common.HistoryRsp)
+commonHistoryFetchAll makeReq oldest latest = do
+  -- From slack apidoc: If there are more than 100 messages between
+  -- the two timestamps then the messages returned are the ones closest to latest.
+  -- In most cases an application will want the most recent messages
+  -- and will page backward from there.
+  --
+  -- for reference (does not apply here) => If oldest is provided but not
+  -- latest then the messages returned are those closest to oldest,
+  -- allowing you to page forward through history if desired.
+  rsp <- makeReq (Just latest) (Just oldest) False
+  case rsp of
+    Left _ -> return rsp
+    Right (Common.HistoryRsp msgs hasMore) -> do
+        let oldestReceived = Common.messageTs <$> lastZ msgs
+        if not hasMore || isNothing oldestReceived
+            then return rsp
+            else mergeResponses msgs <$>
+                 commonHistoryFetchAll makeReq oldest (fromJust oldestReceived)
 
 mergeResponses
   :: [Common.Message]
@@ -592,6 +651,7 @@ apiTest_
   :<|> authTest_
   :<|> conversationsList_
   :<|> conversationsHistory_
+  :<|> conversationsReplies_
   :<|> channelsCreate_
   :<|> channelsHistory_
   :<|> channelsList_
