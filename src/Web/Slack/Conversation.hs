@@ -343,13 +343,13 @@ $(deriveJSON (jsonOpts "repliesReq") ''RepliesReq)
 instance ToForm RepliesReq where
   -- can't use genericToForm because slack expects booleans as 0/1
   toForm RepliesReq {..} =
-      [ ("channel", toQueryParam repliesReqChannel)
-      , ("ts", toQueryParam repliesReqTs)
-      , ("limit", toQueryParam repliesReqLimit)
-      , ("latest", toQueryParam repliesReqLatest)
-      , ("oldest", toQueryParam repliesReqOldest)
-      , ("inclusive", toQueryParam (if repliesReqInclusive then 1 :: Int else 0))
-      ]
+    [ ("channel", toQueryParam repliesReqChannel)
+    , ("ts", toQueryParam repliesReqTs)
+    , ("limit", toQueryParam repliesReqLimit)
+    ]
+      <> toQueryParamIfJust "latest" repliesReqLatest
+      <> toQueryParamIfJust "oldest" repliesReqOldest
+      <> [("inclusive", toQueryParam (if repliesReqInclusive then 1 :: Int else 0))]
 
 
 -- |

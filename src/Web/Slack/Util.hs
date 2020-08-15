@@ -10,6 +10,7 @@
 module Web.Slack.Util
   ( formOpts
   , jsonOpts
+  , toQueryParamIfJust
   )
   where
 
@@ -19,9 +20,12 @@ import Data.Aeson.Types
 
 -- base
 import Data.Char
+import Data.Maybe (maybeToList)
+import GHC.Exts (fromList)
 
 -- http-api-data
-import Web.FormUrlEncoded (FormOptions(FormOptions))
+import Web.HttpApiData (toQueryParam, ToHttpApiData)
+import Web.FormUrlEncoded (Form, FormOptions(FormOptions))
 
 -- text
 import Data.Text (Text)
@@ -75,3 +79,8 @@ addUnderscores
   -> String
 addUnderscores =
   camelTo2 '_'
+
+
+toQueryParamIfJust :: ToHttpApiData a => Text -> Maybe a -> Form
+toQueryParamIfJust key =
+  fromList . maybeToList . fmap (\justVal -> (key, toQueryParam justVal))
