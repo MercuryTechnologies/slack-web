@@ -71,8 +71,6 @@ main = do
             histReq = Slack.HistoryReq
               { Slack.historyReqChannel = conversationId
               , Slack.historyReqCount = 5
-              -- NOTE: It seems that slack returns error when either `latest` or `oldest` is omitted,
-              --       while the document says both of them are optional!
               , Slack.historyReqLatest = Just now
               , Slack.historyReqOldest = Just thirtyDaysAgo
               , Slack.historyReqInclusive = True
