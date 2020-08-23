@@ -99,7 +99,7 @@ main = do
         nowUtc <- getCurrentTime
         let now = Slack.mkSlackTimestamp nowUtc
             thirtyDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 30) nowUtc
-        Slack.replicesFetchAll conversationId threadTimeStamp pageSize thirtyDaysAgo now
+        Slack.repliesFetchAll conversationId threadTimeStamp pageSize thirtyDaysAgo now
           `runReaderT` apiConfig >>= \case
             Right rsp -> do
               pPrint rsp

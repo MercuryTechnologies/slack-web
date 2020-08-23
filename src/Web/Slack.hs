@@ -28,7 +28,7 @@ module Web.Slack
   , groupsHistory
   , groupsList
   , historyFetchAll
-  , replicesFetchAll
+  , repliesFetchAll
   , imHistory
   , imList
   , mpimList
@@ -301,7 +301,7 @@ conversationsHistory_
 -- |
 --
 -- Retrieve replies of a conversation.
--- Consider using 'replicesFetchAll' if you want to get entire replies
+-- Consider using 'repliesFetchAll' if you want to get entire replies
 -- of a conversation.
 --
 -- <https://api.slack.com/methods/conversations.replies>
@@ -591,10 +591,10 @@ historyFetchAll
   -- ^ A list merging all the history records that were fetched
   -- through the individual queries.
 historyFetchAll makeReq channel count =
-  commonHistoryFetchAll $ \ latest oldest ->
+  commonHistoryFetchAll $ \latest oldest ->
     makeReq . Common.HistoryReq channel count latest oldest
 
-replicesFetchAll
+repliesFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => Text
   -- ^ The channel name to query
@@ -609,7 +609,7 @@ replicesFetchAll
   -> m (Response Common.HistoryRsp)
   -- ^ A list merging all the history records that were fetched
   -- through the individual queries.
-replicesFetchAll channel ts limit = commonHistoryFetchAll makeReq
+repliesFetchAll channel ts limit = commonHistoryFetchAll makeReq
  where
   makeReq latest oldest =
     conversationsReplies . (Conversation.RepliesReq ts (Common.ConversationId channel) limit) latest oldest
