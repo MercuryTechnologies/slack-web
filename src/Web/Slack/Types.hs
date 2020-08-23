@@ -29,6 +29,7 @@ module Web.Slack.Types
 import Data.Aeson
 
 -- base
+import Data.Bifunctor (second)
 import GHC.Generics (Generic)
 
 -- http-api-data
@@ -86,12 +87,15 @@ instance Ord SlackTimestamp where
 timestampFromText :: Text -> Either String SlackTimestamp
 timestampFromText t = f =<< rational t
  where
-  f (posixTime, "") = Right . SlackTimestamp t $ posixSecondsToUTCTime posixTime
+  f (posixTime, "") =
+    Right . SlackTimestamp t $ posixSecondsToUTCTime posixTime
   f (_, _left) = Left "Unexpected text left after timestamp"
 
 mkSlackTimestamp :: UTCTime -> SlackTimestamp
-mkSlackTimestamp utctime = SlackTimestamp (T.pack (show unixts)) utctime
-  where unixts = nominalDiffTimeToSeconds $ utcTimeToPOSIXSeconds utctime
+mkSlackTimestamp utctime = SlackTimestamp (take6DigitsAfterPoint $ T.pack (show unixts)) utctime
+ where
+  unixts = nominalDiffTimeToSeconds $ utcTimeToPOSIXSeconds utctime
+  take6DigitsAfterPoint = uncurry (<>) . second (T.take 7) . T.break (== '.')
 
 instance ToHttpApiData SlackTimestamp where
   toQueryParam (SlackTimestamp contents _) = contents
