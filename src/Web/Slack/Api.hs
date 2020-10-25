@@ -25,6 +25,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- http-api-data
 import Web.FormUrlEncoded
 
@@ -45,6 +48,8 @@ data TestReq =
     , testReqFoo :: Maybe Text
     }
   deriving (Eq, Generic, Show)
+
+instance NFData TestReq
 
 
 -- |
@@ -84,6 +89,8 @@ data TestRsp =
     { testRspArgs :: Maybe TestReq
     }
   deriving (Eq, Generic, Show)
+
+instance NFData TestRsp
 
 -- |
 --

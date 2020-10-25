@@ -49,6 +49,9 @@ import qualified Data.HashMap.Strict as HM
 import Control.Applicative (empty, (<|>))
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- http-api-data
 import Web.FormUrlEncoded
 import Web.HttpApiData
@@ -74,7 +77,9 @@ data Topic =
     , topicCreator :: Text
     , topicLastSet :: Integer
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData Topic
 
 $(deriveJSON (jsonOpts "topic") ''Topic)
 
@@ -88,7 +93,9 @@ data Purpose =
     , purposeCreator :: Text
     , purposeLastSet :: Integer
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData Purpose
 
 $(deriveJSON (jsonOpts "purpose") ''Purpose)
 
@@ -131,7 +138,9 @@ data ChannelConversation =
     , channelPreviousNames :: [Text]
     , channelNumMembers :: Integer
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ChannelConversation
 
 $(deriveJSON (jsonOpts "channel") ''ChannelConversation)
 
@@ -179,7 +188,9 @@ data GroupConversation =
     , groupPurpose :: Purpose
     , groupPriority :: Scientific
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData GroupConversation
 
 $(deriveJSON (jsonOpts "group") ''GroupConversation)
 
@@ -196,7 +207,9 @@ data ImConversation =
     , imIsUserDeleted :: Bool
     , imPriority :: Scientific
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ImConversation
 
 $(deriveJSON (jsonOpts "im") ''ImConversation)
 
@@ -208,7 +221,9 @@ data Conversation =
       Channel ChannelConversation
     | Group GroupConversation
     | Im ImConversation
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData Conversation
 
 
 instance FromJSON Conversation where
@@ -253,7 +268,9 @@ data ConversationType =
   | PrivateChannelType
   | MpimType
   | ImType
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ConversationType
 
 instance ToHttpApiData ConversationType where
   toUrlPiece PublicChannelType = "public_channel"
@@ -282,7 +299,9 @@ data ListReq =
     { listReqExcludeArchived :: Maybe Bool
     , listReqTypes :: [ConversationType]
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ListReq
 
 
 -- |
@@ -327,7 +346,9 @@ newtype ListRsp =
   ListRsp
     { listRspChannels :: [Conversation]
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ListRsp
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
 
@@ -344,7 +365,9 @@ data HistoryReq =
     , historyReqOldest :: Maybe SlackTimestamp
     , historyReqInclusive :: Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData HistoryReq
 
 -- |
 --
@@ -389,7 +412,9 @@ instance ToForm HistoryReq where
 --
 --
 newtype ResponseMetadata = ResponseMetadata { responseMetadataNextCursor :: Maybe Cursor }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ResponseMetadata
 
 $(deriveJSON (jsonOpts "responseMetadata") ''ResponseMetadata)
 
@@ -403,7 +428,9 @@ data HistoryRsp =
     { historyRspMessages :: [Message]
     , historyRspResponseMetadata :: Maybe ResponseMetadata
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData HistoryRsp
 
 $(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
@@ -417,7 +444,9 @@ data RepliesReq =
     , repliesReqOldest :: Maybe SlackTimestamp
     , repliesReqInclusive :: Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData RepliesReq
 
 $(deriveJSON (jsonOpts "repliesReq") ''RepliesReq)
 

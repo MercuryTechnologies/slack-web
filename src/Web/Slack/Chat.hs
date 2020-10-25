@@ -25,6 +25,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- http-api-data
 import Web.FormUrlEncoded
 
@@ -51,6 +54,8 @@ data PostMsg =
     , postMsgReplyBroadcast :: Maybe Bool
     }
   deriving (Eq, Generic, Show)
+
+instance NFData PostMsg
 
 
 -- |
@@ -82,6 +87,8 @@ data PostMsgReq =
     , postMsgReqReplyBroadcast :: Maybe Bool
     }
   deriving (Eq, Generic, Show)
+
+instance NFData PostMsgReq
 
 
 -- |
@@ -137,5 +144,7 @@ data PostMsgRsp =
     , postMsgRspMessage :: PostMsg
     }
   deriving (Eq, Generic, Show)
+
+instance NFData PostMsgRsp
 
 $(deriveFromJSON (jsonOpts "postMsgRsp") ''PostMsgRsp)

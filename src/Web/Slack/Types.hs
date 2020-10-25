@@ -33,6 +33,12 @@ import Data.Aeson
 import Data.Bifunctor (second)
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
+-- hashable
+import Data.Hashable (Hashable)
+
 -- http-api-data
 import Web.HttpApiData
 
@@ -48,35 +54,35 @@ import Data.Time.Clock.POSIX
 -- Ord to allow it to be a key of a Map
 newtype Color = Color { unColor :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON)
 
 -- Ord to allow it to be a key of a Map
 newtype UserId = UserId { unUserId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
 
 -- | Common identifier for every type of 'Conversation'.
 --   Unique to the team which the conversation belongs to.
 -- Ord to allow it to be a key of a Map
 newtype ConversationId = ConversationId { unConversationId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON, ToHttpApiData)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
 
 -- Ord to allow it to be a key of a Map
 newtype TeamId = TeamId { unTeamId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (NFData, FromJSON, ToJSON, ToHttpApiData)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
 
 newtype Cursor = Cursor { unCursor :: Text }
   deriving stock (Eq, Generic, Show)
-  deriving newtype (NFData, FromJSON, ToJSON, ToHttpApiData)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
 
 -- | Message text in the format returned by Slack,
 -- see https://api.slack.com/docs/message-formatting
 -- Consider using 'messageToHtml' for displaying.
 newtype SlackMessageText = SlackMessageText { unSlackMessageText :: Text}
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (NFData, Hashable, FromJSON, ToJSON)
 
 data SlackTimestamp =
   SlackTimestamp
@@ -84,6 +90,8 @@ data SlackTimestamp =
     , slackTimestampTime :: UTCTime
     }
   deriving stock (Eq, Show, Generic)
+
+instance NFData SlackTimestamp
 
 instance Ord SlackTimestamp where
   compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b
