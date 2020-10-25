@@ -21,6 +21,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- slack-web
 import Web.Slack.Util
 
@@ -42,6 +45,8 @@ data TestRsp =
     , testRspEnterpriseId :: Maybe Text
     }
   deriving (Eq, Generic, Show)
+
+instance NFData TestRsp
 
 
 $(deriveJSON (jsonOpts "testRsp") ''TestRsp)

@@ -4,6 +4,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE CPP #-}
 
@@ -41,8 +42,10 @@ import Data.Aeson.TH
 
 -- base
 import Control.Exception
-import Data.Typeable
 import GHC.Generics (Generic)
+
+-- deepseq
+import Control.DeepSeq (NFData)
 
 -- http-api-data
 import Web.HttpApiData
@@ -74,7 +77,9 @@ data HistoryReq =
     , historyReqOldest :: Maybe SlackTimestamp
     , historyReqInclusive :: Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData HistoryReq
 
 
 -- |
@@ -118,6 +123,8 @@ mkHistoryReq channel =
 data MessageType = MessageTypeMessage
   deriving (Eq, Show, Generic)
 
+instance NFData MessageType
+
 instance FromJSON MessageType where
   parseJSON "message" = pure MessageTypeMessage
   parseJSON _ = fail "Invalid MessageType"
@@ -136,6 +143,8 @@ data Message =
     }
   deriving (Eq, Generic, Show)
 
+instance NFData Message
+
 $(deriveJSON (jsonOpts "message") ''Message)
 
 data HistoryRsp =
@@ -144,6 +153,8 @@ data HistoryRsp =
     , historyRspHasMore :: Bool
     }
   deriving (Eq, Generic, Show)
+
+instance NFData HistoryRsp
 
 $(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
@@ -154,6 +165,8 @@ data SlackClientError
     -- ^ errors from the network connection
     | SlackError Text
     -- ^ errors returned by the slack API
-  deriving (Eq, Generic, Show, Typeable)
+  deriving (Eq, Generic, Show)
+
+instance NFData SlackClientError
 
 instance Exception SlackClientError

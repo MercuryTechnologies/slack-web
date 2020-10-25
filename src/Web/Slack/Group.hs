@@ -23,6 +23,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- slack-web
 import Web.Slack.Common
 import Web.Slack.Util
@@ -45,6 +48,8 @@ data Group =
     }
   deriving (Eq, Generic, Show)
 
+instance NFData Group
+
 $(deriveFromJSON (jsonOpts "group") ''Group)
 
 data ListRsp =
@@ -52,5 +57,7 @@ data ListRsp =
     { listRspGroups :: [Group]
     }
   deriving (Eq, Generic, Show)
+
+instance NFData ListRsp
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

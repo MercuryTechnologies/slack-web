@@ -24,6 +24,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- slack-web
 import Web.Slack.Util
 import Web.Slack.Common
@@ -42,7 +45,9 @@ data Im =
     , imCreated :: POSIXTime
     , imIsUserDeleted :: Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData Im
 
 $(deriveFromJSON (jsonOpts "im") ''Im)
 
@@ -50,6 +55,8 @@ data ListRsp =
   ListRsp
     { listRspIms :: [Im]
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show, Generic)
+
+instance NFData ListRsp
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

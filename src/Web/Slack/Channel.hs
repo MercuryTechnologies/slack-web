@@ -30,6 +30,9 @@ import Data.Aeson.TH
 -- base
 import GHC.Generics (Generic)
 
+-- deepseq
+import Control.DeepSeq (NFData)
+
 -- http-api-data
 import Web.FormUrlEncoded
 
@@ -64,6 +67,8 @@ data Channel =
     }
   deriving (Eq, Generic, Show)
 
+instance NFData Channel
+
 
 -- |
 --
@@ -77,6 +82,8 @@ data Purpose =
     }
   deriving (Eq, Generic, Show)
 
+instance NFData Purpose
+
 
 -- |
 --
@@ -89,6 +96,8 @@ data Topic =
     , topicLastSet :: Integer
     }
   deriving (Eq, Generic, Show)
+
+instance NFData Topic
 
 
 -- |
@@ -122,6 +131,8 @@ data CreateReq =
     , createReqValidate :: Maybe Bool
     }
   deriving (Eq, Generic, Show)
+
+instance NFData CreateReq
 
 
 -- |
@@ -164,6 +175,8 @@ data CreateRsp =
     }
   deriving (Eq, Generic, Show)
 
+instance NFData CreateRsp
+
 
 -- |
 --
@@ -176,6 +189,8 @@ data ListReq =
     , listReqExcludeMembers :: Maybe Bool
     }
   deriving (Eq, Generic, Show)
+
+instance NFData ListReq
 
 
 -- |
@@ -216,5 +231,7 @@ data ListRsp =
     { listRspChannels :: [Channel]
     }
   deriving (Eq, Generic, Show)
+
+instance NFData ListRsp
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)

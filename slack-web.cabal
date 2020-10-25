@@ -50,7 +50,9 @@ library
     , base >= 4.11 && < 4.15
     , scientific
     , containers
+    , deepseq
     , unordered-containers
+    , hashable
     , http-api-data >= 0.3 && < 0.5
     , http-client >= 0.5 && < 0.7
     , http-client-tls >= 0.3 && < 0.4
