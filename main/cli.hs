@@ -3,6 +3,9 @@
 
 
 -- base
+import Control.Exception (throwIO)
+import Control.Monad.IO.Class (liftIO)
+import Data.Functor (void)
 import System.Environment (getEnv)
 import System.Exit (die)
 import System.IO (hPutStrLn, stderr)
@@ -13,6 +16,9 @@ import UI.Butcher.Monadic
 
 -- bytestring
 import qualified Data.ByteString.Lazy.Char8 as BL
+
+-- monad-loops
+import Control.Monad.Loops (iterateUntil)
 
 -- mtl
 import Control.Monad.Reader (runReaderT)
@@ -63,26 +69,38 @@ main = do
 
     addCmd "conversations.history" $ do
       conversationId <-
-        Text.pack <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
-      addCmdImpl $ do
-        nowUtc <- getCurrentTime
-        let now = Slack.mkSlackTimestamp nowUtc
-            thirtyDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 30) nowUtc
-            histReq = Slack.HistoryReq
-              { Slack.historyReqChannel = conversationId
-              , Slack.historyReqCount = 5
-              , Slack.historyReqLatest = Just now
-              , Slack.historyReqOldest = Just thirtyDaysAgo
-              , Slack.historyReqInclusive = True
-              }
-        Slack.conversationsHistory histReq
-          `runReaderT` apiConfig >>= \case
-            Right rsp -> do
-              pPrint rsp
-            Left err -> do
-              peepInResponseBody err
-              hPutStrLn stderr "Error when fetching the history of conversations:"
-              die . TextLazy.unpack $ pShow err
+        Slack.ConversationId . Text.pack
+          <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
+      getsAll <- addSimpleBoolFlag "A" ["all"] (flagHelpStr "Get all available messages in the channel")
+      addCmdImpl $
+        if getsAll
+          then do
+            (`runReaderT` apiConfig) $ do
+              fetchPage <- Slack.conversationsHistoryAll $ (SlackConversation.mkHistoryReq conversationId) { SlackConversation.historyReqCount = 2 }
+              void . iterateUntil null $ do
+                result <- either (liftIO . throwIO) return =<< fetchPage
+                liftIO $ pPrint result
+                return result
+          else do
+            nowUtc <- getCurrentTime
+            let now = Slack.mkSlackTimestamp nowUtc
+                thirtyDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 30) nowUtc
+                histReq = SlackConversation.HistoryReq
+                  { SlackConversation.historyReqChannel = conversationId
+                  , SlackConversation.historyReqCount = 5
+                  , SlackConversation.historyReqLatest = Just now
+                  , SlackConversation.historyReqOldest = Just thirtyDaysAgo
+                  , SlackConversation.historyReqInclusive = True
+                  , SlackConversation.historyReqCursor = Nothing
+                  }
+            Slack.conversationsHistory histReq
+              `runReaderT` apiConfig >>= \case
+                Right rsp ->
+                  pPrint rsp
+                Left err -> do
+                  peepInResponseBody err
+                  hPutStrLn stderr "Error when fetching the history of conversations:"
+                  die . TextLazy.unpack $ pShow err
 
     addCmd "conversations.replies" $ do
       conversationId <-
