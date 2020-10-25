@@ -22,6 +22,7 @@ module Web.Slack
   , channelsCreate
   , conversationsList
   , conversationsHistory
+  , conversationsHistoryAll
   , conversationsReplies
   , channelsList
   , channelsHistory
@@ -38,6 +39,7 @@ module Web.Slack
   , userLookupByEmail
   , authenticateReq
   , Response
+  , LoadPage
   , HasManager(..)
   , HasToken(..)
   )
@@ -83,6 +85,7 @@ import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
 import qualified Web.Slack.Group as Group
 import qualified Web.Slack.User as User
+import           Web.Slack.Internal
 
 -- text
 import Data.Text (Text)
@@ -124,7 +127,6 @@ instance HasToken SlackConfig where
 data ResponseSlackError = ResponseSlackError Text
   deriving (Eq, Show)
 
-type Response a =  Either Common.SlackClientError a
 
 -- |
 -- Internal type!
@@ -159,8 +161,8 @@ type Api =
   :<|>
     "conversations.history"
       :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
+      :> ReqBody '[FormUrlEncoded] Conversation.HistoryReq
+      :> Post '[JSON] (ResponseJSON Conversation.HistoryRsp)
   :<|>
     "conversations.replies"
       :> AuthProtect "token"
@@ -286,16 +288,16 @@ conversationsList_
 
 conversationsHistory
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Common.HistoryReq
-  -> m (Response Common.HistoryRsp)
+  => Conversation.HistoryReq
+  -> m (Response Conversation.HistoryRsp)
 conversationsHistory histReq = do
   authR <- mkSlackAuthenticateReq
   run (conversationsHistory_ authR histReq)
 
 conversationsHistory_
   :: AuthenticatedRequest (AuthProtect "token")
-  -> Common.HistoryReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
+  -> Conversation.HistoryReq
+  -> ClientM (ResponseJSON Conversation.HistoryRsp)
 
 
 -- |
@@ -593,6 +595,20 @@ historyFetchAll
 historyFetchAll makeReq channel count =
   commonHistoryFetchAll $ \latest oldest ->
     makeReq . Common.HistoryReq channel count latest oldest
+
+
+-- | Returns an action to send a request to get the history of a conversation.
+--
+--   To fetch all messages in the conversation, run the returned 'LoadPage' action
+--   repeatedly until it returns an empty list.
+conversationsHistoryAll
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  =>  Conversation.HistoryReq
+  -- ^ The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
+  -> m (LoadPage m [Common.Message])
+  -- ^ An action which returns a new page of messages every time called. 
+  --   If there are no pages anymore, it returns an empty list.
+conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
 
 repliesFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)

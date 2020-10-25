@@ -18,6 +18,7 @@ module Web.Slack.Types
   , UserId(..)
   , ConversationId(..)
   , TeamId(..)
+  , Cursor(..)
   , SlackTimestamp(..)
   , mkSlackTimestamp
   , timestampFromText
@@ -64,7 +65,11 @@ newtype ConversationId = ConversationId { unConversationId :: Text }
 -- Ord to allow it to be a key of a Map
 newtype TeamId = TeamId { unTeamId :: Text }
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (FromJSON, ToJSON, ToHttpApiData)
+  deriving newtype (NFData, FromJSON, ToJSON, ToHttpApiData)
+
+newtype Cursor = Cursor { unCursor :: Text }
+  deriving stock (Eq, Generic, Show)
+  deriving newtype (NFData, FromJSON, ToJSON, ToHttpApiData)
 
 -- | Message text in the format returned by Slack,
 -- see https://api.slack.com/docs/message-formatting
@@ -78,7 +83,7 @@ data SlackTimestamp =
     { slackTimestampTs :: Text
     , slackTimestampTime :: UTCTime
     }
-  deriving (Eq, Show)
+  deriving stock (Eq, Show, Generic)
 
 instance Ord SlackTimestamp where
   compare (SlackTimestamp _ a) (SlackTimestamp _ b) = compare a b

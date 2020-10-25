@@ -2,6 +2,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -27,8 +28,12 @@ module Web.Slack.Conversation
   , ListReq(..)
   , mkListReq
   , ListRsp(..)
+  , HistoryReq (..)
+  , mkHistoryReq
+  , HistoryRsp (..)
   , RepliesReq (..)
   , mkRepliesReq
+  , ResponseMetadata (..)
   ) where
 
 -- aeson
@@ -49,7 +54,7 @@ import Web.FormUrlEncoded
 import Web.HttpApiData
 
 -- slack-web
-import Web.Slack.Common
+import Web.Slack.Common hiding (HistoryReq, HistoryRsp, mkHistoryReq)
 import Web.Slack.Util
 
 -- scientific
@@ -325,6 +330,82 @@ newtype ListRsp =
   deriving (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+
+-- |
+--
+--
+
+data HistoryReq =
+  HistoryReq
+    { historyReqChannel :: ConversationId
+    , historyReqCursor :: Maybe Cursor
+    , historyReqCount :: Int
+    , historyReqLatest :: Maybe SlackTimestamp
+    , historyReqOldest :: Maybe SlackTimestamp
+    , historyReqInclusive :: Bool
+    }
+  deriving (Eq, Generic, Show)
+
+-- |
+--
+--
+
+$(deriveJSON (jsonOpts "historyReq") ''HistoryReq)
+
+
+-- |
+--
+--
+
+mkHistoryReq
+  :: ConversationId
+  -> HistoryReq
+mkHistoryReq channel =
+  HistoryReq
+    { historyReqChannel = channel
+    , historyReqCursor = Nothing
+    , historyReqCount = 100
+    , historyReqLatest = Nothing
+    , historyReqOldest = Nothing
+    , historyReqInclusive = True
+    }
+
+-- |
+--
+--
+
+instance ToForm HistoryReq where
+  -- can't use genericToForm because slack expects booleans as 0/1
+  toForm HistoryReq{..} =
+    [("channel", toQueryParam historyReqChannel)]
+      <> toQueryParamIfJust "cursor" historyReqCursor
+      <> [("count", toQueryParam historyReqCount)]
+      <> toQueryParamIfJust "latest" historyReqLatest
+      <> toQueryParamIfJust "oldest" historyReqOldest
+      <> [("inclusive", toQueryParam (if historyReqInclusive then 1 :: Int else 0))]
+
+
+-- |
+--
+--
+newtype ResponseMetadata = ResponseMetadata { responseMetadataNextCursor :: Maybe Cursor }
+  deriving (Eq, Generic, Show)
+
+$(deriveJSON (jsonOpts "responseMetadata") ''ResponseMetadata)
+
+
+-- |
+--
+--
+
+data HistoryRsp =
+  HistoryRsp
+    { historyRspMessages :: [Message]
+    , historyRspResponseMetadata :: Maybe ResponseMetadata
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
 
 data RepliesReq =

@@ -21,6 +21,7 @@ module Web.Slack.Common
   , UserId(unUserId)
   , ConversationId (..)
   , TeamId (..)
+  , Cursor (..)
   , SlackTimestamp(..)
   , mkSlackTimestamp
   , timestampFromText
@@ -115,7 +116,7 @@ mkHistoryReq channel =
     }
 
 data MessageType = MessageTypeMessage
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 instance FromJSON MessageType where
   parseJSON "message" = pure MessageTypeMessage
