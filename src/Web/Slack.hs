@@ -615,6 +615,11 @@ conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
 --
 --   To fetch all replies in the conversation, run the returned 'LoadPage' action
 --   repeatedly until it returns an empty list.
+--
+--   *NOTE*: The conversations.replies endpoint always returns the first message
+--           of the thread. So every page returned by the 'LoadPage' action includes
+--           the first message of the thread. You should drop it if you want to
+--           collect messages in a thread without duplicates.
 repliesFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   =>  Conversation.RepliesReq
