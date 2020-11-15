@@ -117,15 +117,18 @@ main = do
           ethreadTimeStamp
         nowUtc <- getCurrentTime
         let now = Slack.mkSlackTimestamp nowUtc
-            thirtyDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 30) nowUtc
-        Slack.repliesFetchAll conversationId threadTimeStamp pageSize thirtyDaysAgo now
-          `runReaderT` apiConfig >>= \case
-            Right rsp -> do
-              pPrint rsp
-            Left err -> do
-              peepInResponseBody err
-              hPutStrLn stderr "Error when fetching the replies of conversations:"
-              die . TextLazy.unpack $ pShow err
+            tenDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 10) nowUtc
+            req = (SlackConversation.mkRepliesReq conversationId threadTimeStamp)
+              { SlackConversation.repliesReqLimit = pageSize
+              , SlackConversation.repliesReqLatest = Just now
+              , SlackConversation.repliesReqOldest = Just tenDaysAgo
+              }
+        (`runReaderT` apiConfig) $ do
+          fetchPage <- Slack.repliesFetchAll req
+          void . iterateUntil null $ do
+            result <- either (liftIO . throwIO) return =<< fetchPage
+            liftIO $ pPrint result
+            return result
 
 
 peepInResponseBody err = do
