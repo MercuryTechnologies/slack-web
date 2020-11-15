@@ -2,3 +2,5 @@ resolver: lts-15.6
 flags:
   slack-web:
     cli: true
+extra-deps:
+- fakepull-0.3.0.2@sha256:2f0591beada549714ca6d4ab442bd9cd5dc2a3153d4d365ad9dc7b493adf3691,1142
