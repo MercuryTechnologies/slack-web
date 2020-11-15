@@ -42,7 +42,7 @@ library
       Web.Slack.MessageParser
       Web.Slack.Types
       Web.Slack.User
-      Web.Slack.Internal
+      Web.Slack.Pager
   other-modules:
       Web.Slack.Util
   build-depends:
@@ -81,7 +81,7 @@ test-suite tests
   type:
       exitcode-stdio-1.0
   other-modules:
-      Web.Slack.InternalSpec
+      Web.Slack.PagerSpec
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
   build-depends:

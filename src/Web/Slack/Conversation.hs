@@ -438,6 +438,7 @@ $(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 data RepliesReq =
   RepliesReq
     { repliesReqTs :: SlackTimestamp
+    , repliesReqCursor :: Maybe Cursor
     , repliesReqChannel :: ConversationId
     , repliesReqLimit :: Int
     , repliesReqLatest :: Maybe SlackTimestamp
@@ -453,10 +454,10 @@ $(deriveJSON (jsonOpts "repliesReq") ''RepliesReq)
 instance ToForm RepliesReq where
   -- can't use genericToForm because slack expects booleans as 0/1
   toForm RepliesReq {..} =
-    [ ("channel", toQueryParam repliesReqChannel)
-    , ("ts", toQueryParam repliesReqTs)
-    , ("limit", toQueryParam repliesReqLimit)
-    ]
+    [("channel", toQueryParam repliesReqChannel)]
+      <> [("ts", toQueryParam repliesReqTs)]
+      <> toQueryParamIfJust "cursor" repliesReqCursor
+      <> [("limit", toQueryParam repliesReqLimit)]
       <> toQueryParamIfJust "latest" repliesReqLatest
       <> toQueryParamIfJust "oldest" repliesReqOldest
       <> [("inclusive", toQueryParam (if repliesReqInclusive then 1 :: Int else 0))]
@@ -473,6 +474,7 @@ mkRepliesReq
 mkRepliesReq channel ts =
   RepliesReq
     { repliesReqChannel = channel
+    , repliesReqCursor = Nothing
     , repliesReqTs = ts
     , repliesReqLimit = 100
     , repliesReqLatest = Nothing
