@@ -15,6 +15,7 @@ module Web.Slack.Pager
 import Control.Monad (join)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.IORef (newIORef, readIORef, writeIORef)
+import Data.Maybe (isNothing)
 
 -- slack-web
 import           Web.Slack.Types (Cursor)
@@ -77,9 +78,9 @@ genericFetchAllBy sendRequest requestFromCursor = do
           { Conversation.historyRspMessages
           , Conversation.historyRspResponseMetadata
           } = do
-        let newCursor = join (fmap Conversation.responseMetadataNextCursor historyRspResponseMetadata)
+        let newCursor = Conversation.responseMetadataNextCursor =<< historyRspResponseMetadata
             -- emptyCursor is used for the marker to show that there are no more pages.
-            cursorToSave = if newCursor == Nothing then emptyCursor else newCursor
+            cursorToSave = if isNothing newCursor then emptyCursor else newCursor
         writeIORef cursorRef cursorToSave
         return historyRspMessages
 
