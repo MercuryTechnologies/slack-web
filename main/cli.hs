@@ -104,7 +104,8 @@ main = do
 
     addCmd "conversations.replies" $ do
       conversationId <-
-        Text.pack <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
+        Slack.ConversationId . Text.pack
+          <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
       threadTimeStampStr <- addParamString "TIMESTAMP" (paramHelpStr "Timestamp of the thread to fetch")
       let ethreadTimeStamp = Slack.timestampFromText $ Text.pack threadTimeStampStr
       pageSize <- addParamRead "PAGE_SIZE" (paramHelpStr "How many messages to get by a request.")
