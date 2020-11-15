@@ -85,7 +85,7 @@ import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
 import qualified Web.Slack.Group as Group
 import qualified Web.Slack.User as User
-import           Web.Slack.Internal
+import           Web.Slack.Pager
 
 -- text
 import Data.Text (Text)
@@ -167,7 +167,7 @@ type Api =
     "conversations.replies"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Conversation.RepliesReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
+      :> Post '[JSON] (ResponseJSON Conversation.HistoryRsp)
   :<|>
     "channels.create"
       :> AuthProtect "token"
@@ -311,7 +311,7 @@ conversationsHistory_
 conversationsReplies
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   => Conversation.RepliesReq
-  -> m (Response Common.HistoryRsp)
+  -> m (Response Conversation.HistoryRsp)
 conversationsReplies repliesReq = do
   authR <- mkSlackAuthenticateReq
   run (conversationsReplies_ authR repliesReq)
@@ -319,7 +319,7 @@ conversationsReplies repliesReq = do
 conversationsReplies_
   :: AuthenticatedRequest (AuthProtect "token")
   -> Conversation.RepliesReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
+  -> ClientM (ResponseJSON Conversation.HistoryRsp)
 
 
 -- |
@@ -606,29 +606,24 @@ conversationsHistoryAll
   =>  Conversation.HistoryReq
   -- ^ The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
   -> m (LoadPage m [Common.Message])
-  -- ^ An action which returns a new page of messages every time called. 
+  -- ^ An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
 conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
 
+
+-- | Returns an action to send a request to get the replies of a conversation.
+--
+--   To fetch all replies in the conversation, run the returned 'LoadPage' action
+--   repeatedly until it returns an empty list.
 repliesFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Text
-  -- ^ The channel name to query
-  -> Common.SlackTimestamp
-  -- ^ Unique identifier of a thread's parent message.
-  -> Int
-  -- ^ The number of entries to fetch at once.
-  -> Common.SlackTimestamp
-  -- ^ The oldest timestamp to fetch records from
-  -> Common.SlackTimestamp
-  -- ^ The newest timestamp to fetch records to
-  -> m (Response Common.HistoryRsp)
-  -- ^ A list merging all the history records that were fetched
-  -- through the individual queries.
-repliesFetchAll channel ts limit = commonHistoryFetchAll makeReq
- where
-  makeReq latest oldest =
-    conversationsReplies . (Conversation.RepliesReq ts (Common.ConversationId channel) limit) latest oldest
+  =>  Conversation.RepliesReq
+  -- ^ The first request to send. _NOTE_: 'Conversation.repliesReqCursor' is silently ignored.
+  -> m (LoadPage m [Common.Message])
+  -- ^ An action which returns a new page of messages every time called.
+  --   If there are no pages anymore, it returns an empty list.
+repliesFetchAll = repliesFetchAllBy conversationsReplies
+
 
 commonHistoryFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
