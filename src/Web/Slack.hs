@@ -605,7 +605,7 @@ conversationsHistoryAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   =>  Conversation.HistoryReq
   -- ^ The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
-  -> m (LoadPage m [Common.Message])
+  -> m (LoadPage m Common.Message)
   -- ^ An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
 conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
@@ -624,7 +624,7 @@ repliesFetchAll
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
   =>  Conversation.RepliesReq
   -- ^ The first request to send. _NOTE_: 'Conversation.repliesReqCursor' is silently ignored.
-  -> m (LoadPage m [Common.Message])
+  -> m (LoadPage m Common.Message)
   -- ^ An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
 repliesFetchAll = repliesFetchAllBy conversationsReplies
