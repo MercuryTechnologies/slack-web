@@ -1,4 +1,4 @@
-resolver: nightly-2020-07-19
+resolver: nightly-2021-01-15
 allow-newer: true
 flags:
   slack-web:
@@ -7,4 +7,3 @@ extra-deps:
 - servant-0.17@sha256:e78734cb6b75c5d1e52e8f5e16bc3f557154a580bbde4932a7e1a6a90da7eb04,5029
 - servant-client-0.17@sha256:433be65dd541b9a387eaaced22715a028ea846d72d141419c40ddf6fd5e3409b,4573
 - servant-client-core-0.17@sha256:d64622d68d8a6934abc821171582d601a99ef0277f3d8b8ba9b483c2617e3df6,3577
-- fakepull-0.3.0.2@sha256:2f0591beada549714ca6d4ab442bd9cd5dc2a3153d4d365ad9dc7b493adf3691,1142
