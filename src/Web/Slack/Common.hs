@@ -18,8 +18,8 @@
 ----------------------------------------------------------------------
 
 module Web.Slack.Common
-  ( Color(unColor)
-  , UserId(unUserId)
+  ( Color(..)
+  , UserId(..)
   , ConversationId (..)
   , TeamId (..)
   , Cursor (..)
