@@ -33,12 +33,9 @@ library
       Web.Slack
       Web.Slack.Api
       Web.Slack.Auth
-      Web.Slack.Channel
       Web.Slack.Chat
       Web.Slack.Common
       Web.Slack.Conversation
-      Web.Slack.Group
-      Web.Slack.Im
       Web.Slack.MessageParser
       Web.Slack.Types
       Web.Slack.User

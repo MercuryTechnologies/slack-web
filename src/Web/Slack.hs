@@ -19,21 +19,11 @@ module Web.Slack
   , apiTest
   , authTest
   , chatPostMessage
-  , channelsCreate
   , conversationsList
   , conversationsHistory
   , conversationsHistoryAll
   , conversationsReplies
-  , channelsList
-  , channelsHistory
-  , groupsHistory
-  , groupsList
-  , historyFetchAll
   , repliesFetchAll
-  , imHistory
-  , imList
-  , mpimList
-  , mpimHistory
   , getUserDesc
   , usersList
   , userLookupByEmail
@@ -56,9 +46,6 @@ import Data.Proxy (Proxy(..))
 -- containers
 import qualified Data.Map as Map
 
--- error
-import Control.Error (lastZ)
-
 -- http-client
 import Network.HTTP.Client (Manager, newManager)
 
@@ -79,11 +66,8 @@ import Servant.Client.Core (Request, appendToQueryString)
 import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Conversation as Conversation
-import qualified Web.Slack.Channel as Channel
 import qualified Web.Slack.Chat as Chat
 import qualified Web.Slack.Common as Common
-import qualified Web.Slack.Im as Im
-import qualified Web.Slack.Group as Group
 import qualified Web.Slack.User as User
 import           Web.Slack.Pager
 
@@ -169,52 +153,10 @@ type Api =
       :> ReqBody '[FormUrlEncoded] Conversation.RepliesReq
       :> Post '[JSON] (ResponseJSON Conversation.HistoryRsp)
   :<|>
-    "channels.create"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Channel.CreateReq
-      :> Post '[JSON] (ResponseJSON Channel.CreateRsp)
-  :<|>
-    "channels.history"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
-  :<|>
-    "channels.list"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Channel.ListReq
-      :> Post '[JSON] (ResponseJSON Channel.ListRsp)
-  :<|>
     "chat.postMessage"
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] (ResponseJSON Chat.PostMsgRsp)
-  :<|>
-    "groups.history"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
-  :<|>
-     "groups.list"
-      :> AuthProtect "token"
-      :> Post '[JSON] (ResponseJSON Group.ListRsp)
-  :<|>
-    "im.history"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
-  :<|>
-    "im.list"
-      :> AuthProtect "token"
-      :> Post '[JSON] (ResponseJSON Im.ListRsp)
-  :<|>
-    "mpim.list"
-      :> AuthProtect "token"
-      :> Post '[JSON] (ResponseJSON Group.ListRsp)
-  :<|>
-    "mpim.history"
-      :> AuthProtect "token"
-      :> ReqBody '[FormUrlEncoded] Common.HistoryReq
-      :> Post '[JSON] (ResponseJSON Common.HistoryRsp)
   :<|>
     "users.list"
       :> AuthProtect "token"
@@ -324,64 +266,6 @@ conversationsReplies_
 
 -- |
 --
--- Create a channel.
---
--- <https://api.slack.com/methods/channels.create>
-
-channelsCreate
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Channel.CreateReq
-  -> m (Response Channel.CreateRsp)
-channelsCreate createReq = do
-  authR <- mkSlackAuthenticateReq
-  run (channelsCreate_ authR createReq)
-
-channelsCreate_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Channel.CreateReq
-  -> ClientM (ResponseJSON Channel.CreateRsp)
-
--- |
---
--- Retrieve channel list.
---
--- <https://api.slack.com/methods/channels.list>
-
-channelsList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Channel.ListReq
-  -> m (Response Channel.ListRsp)
-channelsList listReq = do
-  authR <- mkSlackAuthenticateReq
-  run (channelsList_ authR listReq)
-
-channelsList_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Channel.ListReq
-  -> ClientM (ResponseJSON Channel.ListRsp)
-
--- |
---
--- Retrieve channel history.
--- Consider using 'historyFetchAll' in combination with this function
---
--- <https://api.slack.com/methods/channels.history>
-
-channelsHistory
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Common.HistoryReq
-  -> m (Response Common.HistoryRsp)
-channelsHistory histReq = do
-  authR <- mkSlackAuthenticateReq
-  run (channelsHistory_ authR histReq)
-
-channelsHistory_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Common.HistoryReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
-
--- |
---
 -- Send a message to a channel.
 --
 -- <https://api.slack.com/methods/chat.postMessage>
@@ -399,120 +283,6 @@ chatPostMessage_
   -> Chat.PostMsgReq
   -> ClientM (ResponseJSON Chat.PostMsgRsp)
 
--- |
---
--- This method returns a list of private channels in the team that the caller
--- is in and archived groups that the caller was in. The list of
--- (non-deactivated) members in each private channel is also returned.
---
--- <https://api.slack.com/methods/groups.list>
-
-groupsList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response Group.ListRsp)
-groupsList = do
-  authR <- mkSlackAuthenticateReq
-  run (groupsList_ authR)
-
-groupsList_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> ClientM (ResponseJSON Group.ListRsp)
-
--- |
---
--- This method returns a portion of messages/events from the specified
--- private channel. To read the entire history for a private channel,
--- call the method with no latest or oldest arguments, and then continue paging.
--- Consider using 'historyFetchAll' in combination with this function
---
--- <https://api.slack.com/methods/groups.history>
-
-groupsHistory
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Common.HistoryReq
-  -> m (Response Common.HistoryRsp)
-groupsHistory hisReq = do
-  authR <- mkSlackAuthenticateReq
-  run (groupsHistory_ authR hisReq)
-
-groupsHistory_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Common.HistoryReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
-
--- |
---
--- Returns a list of all direct message channels that the user has
---
--- <https://api.slack.com/methods/im.list>
-
-imList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response Im.ListRsp)
-imList = do
-  authR <- mkSlackAuthenticateReq
-  run (imList_ authR)
-
-imList_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> ClientM (ResponseJSON Im.ListRsp)
-
--- |
---
--- Retrieve direct message channel history.
--- Consider using 'historyFetchAll' in combination with this function
---
--- <https://api.slack.com/methods/im.history>
-
-imHistory
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Common.HistoryReq
-  -> m (Response Common.HistoryRsp)
-imHistory histReq = do
-  authR <- mkSlackAuthenticateReq
-  run (imHistory_ authR histReq)
-
-imHistory_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Common.HistoryReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
-
--- |
---
--- Returns a list of all multiparty direct message channels that the user has
---
--- <https://api.slack.com/methods/mpim.list>
-
-mpimList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response Group.ListRsp)
-mpimList = do
-  authR <- mkSlackAuthenticateReq
-  run (mpimList_ authR)
-
-mpimList_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> ClientM (ResponseJSON Group.ListRsp)
-
--- |
---
--- Retrieve multiparty direct message channel history.
--- Consider using 'historyFetchAll' in combination with this function
---
--- <https://api.slack.com/methods/mpim.history>
-
-mpimHistory
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Common.HistoryReq
-  -> m (Response Common.HistoryRsp)
-mpimHistory histReq = do
-  authR <- mkSlackAuthenticateReq
-  run (mpimHistory_ authR histReq)
-
-mpimHistory_
-  :: AuthenticatedRequest (AuthProtect "token")
-  -> Common.HistoryReq
-  -> ClientM (ResponseJSON Common.HistoryRsp)
 
 -- |
 --
@@ -567,35 +337,6 @@ getUserDesc unknownUserFn users =
   in
     \userId -> fromMaybe (unknownUserFn userId) $ Map.lookup userId userMap
 
--- |
--- Fetch all history items between two dates. The basic calls
--- 'channelsHistory', 'groupsHistory', 'imHistory' and so on
--- may not return exhaustive results if there were too many
--- records. You need to use 'Web.Slack.Common.historyRspHasMore' to find out
--- whether you got all the data.
---
--- This function will repeatedly call the underlying history
--- function until all the data is fetched or until a call
--- fails, merging the messages obtained from each call.
-historyFetchAll
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => (Common.HistoryReq -> m (Response Common.HistoryRsp))
-  -- ^ The request to make. Can be for instance 'conversationsHistory'...
-  -> Text
-  -- ^ The channel name to query
-  -> Int
-  -- ^ The number of entries to fetch at once.
-  -> Common.SlackTimestamp
-  -- ^ The oldest timestamp to fetch records from
-  -> Common.SlackTimestamp
-  -- ^ The newest timestamp to fetch records to
-  -> m (Response Common.HistoryRsp)
-  -- ^ A list merging all the history records that were fetched
-  -- through the individual queries.
-historyFetchAll makeReq channel count =
-  commonHistoryFetchAll $ \latest oldest ->
-    makeReq . Common.HistoryReq channel count latest oldest
-
 
 -- | Returns an action to send a request to get the history of a conversation.
 --
@@ -629,55 +370,12 @@ repliesFetchAll
   --   If there are no pages anymore, it returns an empty list.
 repliesFetchAll = repliesFetchAllBy conversationsReplies
 
-
-commonHistoryFetchAll
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => (Maybe Common.SlackTimestamp -> Maybe Common.SlackTimestamp -> Bool -> m (Response Common.HistoryRsp))
-  -> Common.SlackTimestamp
-  -> Common.SlackTimestamp
-  -> m (Response Common.HistoryRsp)
-commonHistoryFetchAll makeReq oldest latest = do
-  -- From slack apidoc: If there are more than 100 messages between
-  -- the two timestamps then the messages returned are the ones closest to latest.
-  -- In most cases an application will want the most recent messages
-  -- and will page backward from there.
-  --
-  -- for reference (does not apply here) => If oldest is provided but not
-  -- latest then the messages returned are those closest to oldest,
-  -- allowing you to page forward through history if desired.
-  rsp <- makeReq (Just latest) (Just oldest) False
-  case rsp of
-    Left _ -> return rsp
-    Right (Common.HistoryRsp msgs hasMore) -> do
-        let oldestReceived = Common.messageTs <$> lastZ msgs
-        if not hasMore || isNothing oldestReceived
-            then return rsp
-            else mergeResponses msgs <$>
-                 commonHistoryFetchAll makeReq oldest (fromJust oldestReceived)
-
-mergeResponses
-  :: [Common.Message]
-  -> Response Common.HistoryRsp
-  -> Response Common.HistoryRsp
-mergeResponses _ err@(Left _) = err
-mergeResponses msgs (Right rsp) =
-    Right (rsp { Common.historyRspMessages = msgs ++ Common.historyRspMessages rsp })
-
 apiTest_
   :<|> authTest_
   :<|> conversationsList_
   :<|> conversationsHistory_
   :<|> conversationsReplies_
-  :<|> channelsCreate_
-  :<|> channelsHistory_
-  :<|> channelsList_
   :<|> chatPostMessage_
-  :<|> groupsHistory_
-  :<|> groupsList_
-  :<|> imHistory_
-  :<|> imList_
-  :<|> mpimList_
-  :<|> mpimHistory_
   :<|> usersList_
   :<|> userLookupByEmail_
   =

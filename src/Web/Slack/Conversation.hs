@@ -57,7 +57,7 @@ import Web.FormUrlEncoded
 import Web.HttpApiData
 
 -- slack-web
-import Web.Slack.Common hiding (HistoryReq, HistoryRsp, mkHistoryReq)
+import Web.Slack.Common
 import Web.Slack.Util
 
 -- scientific
