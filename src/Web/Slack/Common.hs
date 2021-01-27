@@ -26,9 +26,6 @@ module Web.Slack.Common
   , SlackTimestamp(..)
   , mkSlackTimestamp
   , timestampFromText
-  , HistoryReq(..)
-  , mkHistoryReq
-  , HistoryRsp(..)
   , Message(..)
   , MessageType(..)
   , SlackClientError(..)
@@ -47,9 +44,6 @@ import GHC.Generics (Generic)
 -- deepseq
 import Control.DeepSeq (NFData)
 
--- http-api-data
-import Web.HttpApiData
-import Web.FormUrlEncoded
 
 -- servant-client
 import Servant.Client
@@ -64,61 +58,6 @@ import Data.Text (Text)
 #if !MIN_VERSION_servant(0,16,0)
 type ClientError = ServantError
 #endif
-
--- |
---
---
-
-data HistoryReq =
-  HistoryReq
-    { historyReqChannel :: Text
-    , historyReqCount :: Int
-    , historyReqLatest :: Maybe SlackTimestamp
-    , historyReqOldest :: Maybe SlackTimestamp
-    , historyReqInclusive :: Bool
-    }
-  deriving (Eq, Show, Generic)
-
-instance NFData HistoryReq
-
-
--- |
---
---
-
-$(deriveJSON (jsonOpts "historyReq") ''HistoryReq)
-
-
--- |
---
---
-
-instance ToForm HistoryReq where
-  -- can't use genericToForm because slack expects booleans as 0/1
-  toForm HistoryReq{..} =
-    [ ("channel", toQueryParam historyReqChannel)
-    , ("count", toQueryParam historyReqCount)
-    ]
-      <> toQueryParamIfJust "latest" historyReqLatest
-      <> toQueryParamIfJust "oldest" historyReqOldest
-      <> [("inclusive", toQueryParam (if historyReqInclusive then 1 :: Int else 0))]
-
-
--- |
---
---
-
-mkHistoryReq
-  :: Text
-  -> HistoryReq
-mkHistoryReq channel =
-  HistoryReq
-    { historyReqChannel = channel
-    , historyReqCount = 100
-    , historyReqLatest = Nothing
-    , historyReqOldest = Nothing
-    , historyReqInclusive = True
-    }
 
 data MessageType = MessageTypeMessage
   deriving (Eq, Show, Generic)
@@ -146,17 +85,6 @@ data Message =
 instance NFData Message
 
 $(deriveJSON (jsonOpts "message") ''Message)
-
-data HistoryRsp =
-  HistoryRsp
-    { historyRspMessages :: [Message]
-    , historyRspHasMore :: Bool
-    }
-  deriving (Eq, Generic, Show)
-
-instance NFData HistoryRsp
-
-$(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
 
 -- |
 -- Errors that can be triggered by a slack request.
