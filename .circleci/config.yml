@@ -15,6 +15,7 @@ jobs:
           key: v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "slack-web.cabal" }}
           paths:
             - ~/.stack/
+            - .stack-work/
       - run: stack build
       - run: stack build --test
 
@@ -33,6 +34,7 @@ jobs:
           key: v1-.stack-{{ checksum "stack-nightly.yaml" }}-{{ checksum "slack-web.cabal" }}
           paths:
             - ~/.stack/
+            - .stack-work/
       - run: stack build --stack-yaml stack-nightly.yaml
       - run: stack build --test --stack-yaml stack-nightly.yaml
 
