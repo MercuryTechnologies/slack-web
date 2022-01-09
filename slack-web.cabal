@@ -45,7 +45,7 @@ library
       Web.Slack.Util
   build-depends:
       aeson >= 1.0 && < 1.6
-    , base >= 4.11 && < 4.15
+    , base >= 4.11 && < 4.16
     , scientific
     , containers
     , deepseq
