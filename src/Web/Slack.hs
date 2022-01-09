@@ -1,15 +1,16 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TypeOperators #-}
 
 ----------------------------------------------------------------------
 -- |
 -- Module: Web.Slack
--- Description:
---
---
+-- Description: Provides Slack's Web API functions.
+-- *Since 0.4.0.0*: The API functions is now more intuitive for newbies
+-- than before. If you need compatiblity with the previous version, use
+-- 'Web.Slack.Classy' instead.
 --
 ----------------------------------------------------------------------
 
@@ -30,8 +31,6 @@ module Web.Slack
   , authenticateReq
   , Response
   , LoadPage
-  , HasManager(..)
-  , HasToken(..)
   )
   where
 
@@ -60,7 +59,13 @@ import Servant.API hiding (addHeader)
 
 -- servant-client
 import Servant.Client hiding (Response, baseUrl)
+
+#if MIN_VERSION_servant(0,16,0)
+import Servant.Client.Core (AuthClientData, AuthenticatedRequest, Request, mkAuthenticatedRequest, addHeader)
+#else
+import Servant.Client.Core.Internal.Auth
 import Servant.Client.Core (Request, addHeader)
+#endif
 
 -- slack-web
 import qualified Web.Slack.Api as Api
@@ -79,31 +84,13 @@ mkClientEnv :: Manager -> BaseUrl -> ClientEnv
 mkClientEnv = ClientEnv
 #endif
 
-#if MIN_VERSION_servant(0,16,0)
-import Servant.Client.Core (AuthenticatedRequest, AuthClientData, mkAuthenticatedRequest, ClientError)
-#else
-import Servant.Client.Core.Internal.Auth
-import Servant.Client.Core (ServantError)
-type ClientError = ServantError
-#endif
 
-class HasManager a where
-    getManager :: a -> Manager
-
-class HasToken a where
-    getToken :: a -> Text
-
--- | Implements the 'HasManager' and 'HasToken' typeclasses.
 data SlackConfig
   = SlackConfig
   { slackConfigManager :: Manager
   , slackConfigToken :: Text
   }
 
-instance HasManager SlackConfig where
-    getManager = slackConfigManager
-instance HasToken SlackConfig where
-    getToken = slackConfigToken
 
 -- contains errors that can be returned by the slack API.
 -- constrast with 'SlackClientError' which additionally
@@ -128,7 +115,6 @@ instance FromJSON a => FromJSON (ResponseJSON a) where
 -- |
 --
 --
-
 type Api =
     "api.test"
       :> ReqBody '[FormUrlEncoded] Api.TestReq
@@ -175,14 +161,15 @@ type Api =
 -- <https://api.slack.com/methods/api.test>
 
 apiTest
-  :: (MonadReader env m, HasManager env, MonadIO m)
-  => Api.TestReq
-  -> m (Response Api.TestRsp)
-apiTest req = run (apiTest_ req)
+  :: Manager
+  -> Api.TestReq
+  -> IO (Response Api.TestRsp)
+apiTest mgr req = run (apiTest_ req) mgr
 
 apiTest_
   :: Api.TestReq
   -> ClientM (ResponseJSON Api.TestRsp)
+
 
 -- |
 --
@@ -191,11 +178,11 @@ apiTest_
 -- <https://api.slack.com/methods/auth.test>
 
 authTest
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response Auth.TestRsp)
+  :: SlackConfig
+  -> IO (Response Auth.TestRsp)
 authTest = do
   authR <- mkSlackAuthenticateReq
-  run (authTest_ authR)
+  run (authTest_ authR) . slackConfigManager
 
 authTest_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -208,12 +195,12 @@ authTest_
 -- <https://api.slack.com/methods/conversations.list>
 
 conversationsList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Conversation.ListReq
-  -> m (Response Conversation.ListRsp)
-conversationsList listReq = do
+  :: SlackConfig
+  -> Conversation.ListReq
+  -> IO (Response Conversation.ListRsp)
+conversationsList = flip $ \listReq -> do
   authR <- mkSlackAuthenticateReq
-  run (conversationsList_ authR listReq)
+  run (conversationsList_ authR listReq) . slackConfigManager
 
 conversationsList_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -229,12 +216,12 @@ conversationsList_
 -- <https://api.slack.com/methods/conversations.history>
 
 conversationsHistory
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Conversation.HistoryReq
-  -> m (Response Conversation.HistoryRsp)
-conversationsHistory histReq = do
+  :: SlackConfig
+  -> Conversation.HistoryReq
+  -> IO (Response Conversation.HistoryRsp)
+conversationsHistory = flip $ \histReq -> do
   authR <- mkSlackAuthenticateReq
-  run (conversationsHistory_ authR histReq)
+  run (conversationsHistory_ authR histReq) . slackConfigManager
 
 conversationsHistory_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -251,12 +238,12 @@ conversationsHistory_
 -- <https://api.slack.com/methods/conversations.replies>
 
 conversationsReplies
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Conversation.RepliesReq
-  -> m (Response Conversation.HistoryRsp)
-conversationsReplies repliesReq = do
+  :: SlackConfig
+  -> Conversation.RepliesReq
+  -> IO (Response Conversation.HistoryRsp)
+conversationsReplies = flip $ \repliesReq -> do
   authR <- mkSlackAuthenticateReq
-  run (conversationsReplies_ authR repliesReq)
+  run (conversationsReplies_ authR repliesReq) . slackConfigManager
 
 conversationsReplies_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -271,12 +258,12 @@ conversationsReplies_
 -- <https://api.slack.com/methods/chat.postMessage>
 
 chatPostMessage
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => Chat.PostMsgReq
-  -> m (Response Chat.PostMsgRsp)
-chatPostMessage postReq = do
+  :: SlackConfig
+  -> Chat.PostMsgReq
+  -> IO (Response Chat.PostMsgRsp)
+chatPostMessage = flip $ \postReq -> do
   authR <- mkSlackAuthenticateReq
-  run (chatPostMessage_ authR postReq)
+  run (chatPostMessage_ authR postReq) . slackConfigManager
 
 chatPostMessage_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -292,11 +279,11 @@ chatPostMessage_
 -- <https://api.slack.com/methods/users.list>
 
 usersList
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response User.ListRsp)
+  :: SlackConfig
+  -> IO (Response User.ListRsp)
 usersList = do
   authR <- mkSlackAuthenticateReq
-  run (usersList_ authR)
+  run (usersList_ authR) . slackConfigManager
 
 usersList_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -310,12 +297,12 @@ usersList_
 -- <https://api.slack.com/methods/users.lookupByEmail>
 
 userLookupByEmail
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => User.Email 
-  -> m (Response User.UserRsp)
-userLookupByEmail email = do
+  :: SlackConfig
+  -> User.Email
+  -> IO (Response User.UserRsp)
+userLookupByEmail = flip $ \email -> do
   authR <- mkSlackAuthenticateReq
-  run (userLookupByEmail_ authR email)
+  run (userLookupByEmail_ authR email) . slackConfigManager
 
 userLookupByEmail_
   :: AuthenticatedRequest (AuthProtect "token")
@@ -343,13 +330,13 @@ getUserDesc unknownUserFn users =
 --   To fetch all messages in the conversation, run the returned 'LoadPage' action
 --   repeatedly until it returns an empty list.
 conversationsHistoryAll
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  =>  Conversation.HistoryReq
+  :: SlackConfig
+  -> Conversation.HistoryReq
   -- ^ The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
-  -> m (LoadPage m Common.Message)
+  -> IO (LoadPage IO Common.Message)
   -- ^ An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
-conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
+conversationsHistoryAll = conversationsHistoryAllBy . conversationsHistory
 
 
 -- | Returns an action to send a request to get the replies of a conversation.
@@ -362,13 +349,14 @@ conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
 --           the first message of the thread. You should drop it if you want to
 --           collect messages in a thread without duplicates.
 repliesFetchAll
-  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  =>  Conversation.RepliesReq
+  :: SlackConfig
+  ->  Conversation.RepliesReq
   -- ^ The first request to send. _NOTE_: 'Conversation.repliesReqCursor' is silently ignored.
-  -> m (LoadPage m Common.Message)
+  -> IO (LoadPage IO Common.Message)
   -- ^ An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
-repliesFetchAll = repliesFetchAllBy conversationsReplies
+repliesFetchAll = repliesFetchAllBy . conversationsReplies
+
 
 apiTest_
   :<|> authTest_
@@ -393,7 +381,6 @@ type instance AuthClientData (AuthProtect "token") =
 -- |
 --
 --
-
 authenticateReq
   :: Text
   -> Request
@@ -407,17 +394,17 @@ authenticateReq token =
 --
 
 run
-  :: (MonadReader env m, HasManager env, MonadIO m)
-  => ClientM (ResponseJSON a)
-  -> m (Response a)
-run clientAction = do
-  env <- ask
+  :: ClientM (ResponseJSON a)
+  -> Manager
+  -> IO (Response a)
+run clientAction mgr = do
   let baseUrl = BaseUrl Https "slack.com" 443 "/api"
-  unnestErrors <$> liftIO (runClientM clientAction $ mkClientEnv (getManager env) baseUrl)
+  unnestErrors <$> liftIO (runClientM clientAction $ mkClientEnv mgr baseUrl)
 
-mkSlackAuthenticateReq :: (MonadReader env m, HasToken env)
-  => m (AuthenticatedRequest (AuthProtect "token"))
-mkSlackAuthenticateReq = flip mkAuthenticatedRequest authenticateReq . getToken <$> ask
+
+mkSlackAuthenticateReq :: SlackConfig -> AuthenticatedRequest (AuthProtect "token")
+mkSlackAuthenticateReq = (`mkAuthenticatedRequest` authenticateReq) . slackConfigToken
+
 
 unnestErrors :: Either ClientError (ResponseJSON a) -> Response a
 unnestErrors (Right (ResponseJSON (Right a))) = Right a

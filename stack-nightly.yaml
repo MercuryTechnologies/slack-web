@@ -1,4 +1,4 @@
-resolver: nightly-2021-02-23
+resolver: nightly-2021-12-24
 flags:
   slack-web:
     cli: true
