@@ -1,5 +1,5 @@
 name: slack-web
-version: 0.3.0.1
+version: 0.4.0.0
 
 build-type: Simple
 cabal-version: 1.20
@@ -19,7 +19,7 @@ description: Haskell bindings for the Slack web API.
 
 category: Web
 
-tested-with: GHC == 8.0.2
+tested-with: GHC == 8.10.7
 
 extra-source-files:
   CHANGELOG.md
@@ -34,12 +34,13 @@ library
       Web.Slack.Api
       Web.Slack.Auth
       Web.Slack.Chat
+      Web.Slack.Classy
       Web.Slack.Common
       Web.Slack.Conversation
       Web.Slack.MessageParser
+      Web.Slack.Pager
       Web.Slack.Types
       Web.Slack.User
-      Web.Slack.Pager
   other-modules:
       Web.Slack.Util
   build-depends:

@@ -27,7 +27,7 @@ import Control.Monad.Reader (runReaderT)
 import Text.Pretty.Simple (pPrint, pShow)
 
 -- slack-web
-import qualified Web.Slack as Slack
+import qualified Web.Slack.Classy as Slack
 import qualified Web.Slack.Common as Slack
 import qualified Web.Slack.Conversation as SlackConversation
 
