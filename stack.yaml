@@ -2,5 +2,4 @@ resolver: lts-18.19
 flags:
   slack-web:
     cli: true
-extra-deps:
-- mintty-0.1.2
+extra-deps: []
