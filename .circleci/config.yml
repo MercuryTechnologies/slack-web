@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-lts:
     docker:
-      - image: fpco/stack-build:lts-15.6
+      - image: fpco/stack-build:lts
     steps:
       - checkout
       - restore_cache:
@@ -21,7 +21,7 @@ jobs:
 
   build-nightly:
     docker:
-      - image: fpco/stack-build:lts-15.6
+      - image: fpco/stack-build:lts
     steps:
       - checkout
       - restore_cache:
