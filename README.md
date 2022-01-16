@@ -27,10 +27,6 @@
 ```
 
 ```
-> import Control.Monad.Reader
-```
-
-```
 > :set -XOverloadedStrings
 ```
 
@@ -39,12 +35,12 @@
 ```
 
 ```
-> flip runReaderT slackConfig (Slack.apiTest Api.mkTestReq)
+> Slack.apiTest (Slack.slackConfigManager slackConfig) Api.mkTestReq
 Right ...
 ```
 
 ```
-> flip runReaderT slackConfig (Slack.apiTest Api.mkTestReq { Api.testReqFoo = Just "bar" })
+> Slack.apiTest (Slack.slackConfigManager slackConfig) Api.mkTestReq { Api.testReqFoo = Just "bar" }
 Right ...
 ```
 
