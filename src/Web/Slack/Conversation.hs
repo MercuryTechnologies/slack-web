@@ -38,12 +38,10 @@ module Web.Slack.Conversation
 
 -- aeson
 import Data.Aeson
+import qualified Data.Aeson.KeyMap as KM
 import Data.Aeson.Encoding
 import Data.Aeson.TH
 import Data.Aeson.Types
-
--- unordered-containers
-import qualified Data.HashMap.Strict as HM
 
 -- base
 import Control.Applicative (empty, (<|>))
@@ -246,21 +244,21 @@ instance ToJSON Conversation where
   toJSON (Channel channel) =
     let (Object obj) = toJSON channel
      in Object
-          . HM.insert "is_channel" (Bool True)
-          . HM.insert "is_group" (Bool False)
-          $ HM.insert "is_im" (Bool False) obj
+          . KM.insert "is_channel" (Bool True)
+          . KM.insert "is_group" (Bool False)
+          $ KM.insert "is_im" (Bool False) obj
   toJSON (Group group) =
     let (Object obj) = toJSON group
      in Object
-          . HM.insert "is_channel" (Bool False)
-          . HM.insert "is_group" (Bool True)
-          $ HM.insert "is_im" (Bool False) obj
+          . KM.insert "is_channel" (Bool False)
+          . KM.insert "is_group" (Bool True)
+          $ KM.insert "is_im" (Bool False) obj
   toJSON (Im im) =
     let (Object obj) = toJSON im
      in Object
-          . HM.insert "is_channel" (Bool False)
-          . HM.insert "is_group" (Bool False)
-          $ HM.insert "is_im" (Bool True) obj
+          . KM.insert "is_channel" (Bool False)
+          . KM.insert "is_group" (Bool False)
+          $ KM.insert "is_im" (Bool True) obj
 
 
 data ConversationType =
