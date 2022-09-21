@@ -1,6 +1,3 @@
--- cabal-install version for all jobs
-cabal-install-version: 3.8
-
 -- HI! If you add something in here, make sure to copy it to cabal.project if
 -- needed!
 raw-project
