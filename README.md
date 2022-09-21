@@ -1,12 +1,8 @@
 # Haskell bindings for the Slack web API
 
-[![][1]][0]
-
 [![][3]][2]
 [![][5]][4]
 
-[0]: https://circleci.com/gh/jpvillaisaza/slack-web
-[1]: https://circleci.com/gh/jpvillaisaza/slack-web.svg?style=svg
 [2]: https://www.stackage.org/lts/package/slack-web
 [3]: https://www.stackage.org/package/slack-web/badge/lts
 [4]: https://www.stackage.org/nightly/package/slack-web
