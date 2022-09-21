@@ -5,6 +5,8 @@
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RecordWildCards #-}
+-- FIXME: squashes warnings
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -35,6 +37,9 @@ module Web.Slack.Conversation
   , mkRepliesReq
   , ResponseMetadata (..)
   ) where
+
+-- FIXME: Web.Slack.Prelude
+import Prelude
 
 -- aeson
 import Data.Aeson
@@ -75,7 +80,7 @@ data Topic =
     , topicCreator :: Text
     , topicLastSet :: Integer
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData Topic
 
@@ -91,7 +96,7 @@ data Purpose =
     , purposeCreator :: Text
     , purposeLastSet :: Integer
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData Purpose
 
@@ -136,7 +141,7 @@ data ChannelConversation =
     , channelPreviousNames :: [Text]
     , channelNumMembers :: Integer
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ChannelConversation
 
@@ -186,7 +191,7 @@ data GroupConversation =
     , groupPurpose :: Purpose
     , groupPriority :: Scientific
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData GroupConversation
 
@@ -205,7 +210,7 @@ data ImConversation =
     , imIsUserDeleted :: Bool
     , imPriority :: Scientific
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ImConversation
 
@@ -219,7 +224,7 @@ data Conversation =
       Channel ChannelConversation
     | Group GroupConversation
     | Im ImConversation
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData Conversation
 
@@ -266,7 +271,7 @@ data ConversationType =
   | PrivateChannelType
   | MpimType
   | ImType
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ConversationType
 
@@ -297,7 +302,7 @@ data ListReq =
     { listReqExcludeArchived :: Maybe Bool
     , listReqTypes :: [ConversationType]
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ListReq
 
@@ -344,7 +349,7 @@ newtype ListRsp =
   ListRsp
     { listRspChannels :: [Conversation]
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ListRsp
 
@@ -363,7 +368,7 @@ data HistoryReq =
     , historyReqOldest :: Maybe SlackTimestamp
     , historyReqInclusive :: Bool
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData HistoryReq
 
@@ -410,7 +415,7 @@ instance ToForm HistoryReq where
 --
 --
 newtype ResponseMetadata = ResponseMetadata { responseMetadataNextCursor :: Maybe Cursor }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData ResponseMetadata
 
@@ -426,7 +431,7 @@ data HistoryRsp =
     { historyRspMessages :: [Message]
     , historyRspResponseMetadata :: Maybe ResponseMetadata
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData HistoryRsp
 
@@ -443,7 +448,7 @@ data RepliesReq =
     , repliesReqOldest :: Maybe SlackTimestamp
     , repliesReqInclusive :: Bool
     }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData RepliesReq
 

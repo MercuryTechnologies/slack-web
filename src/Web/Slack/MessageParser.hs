@@ -12,9 +12,12 @@ module Web.Slack.MessageParser
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- base
 import Control.Monad
-import Data.List
+import Data.List ( intercalate )
 import Data.Maybe
 import Data.Void
 
@@ -33,7 +36,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 
 newtype SlackUrl = SlackUrl { unSlackUrl :: Text }
-  deriving (Show, Eq)
+  deriving stock (Show, Eq)
 
 data SlackMsgItem
   = SlackMsgItemPlainText Text
@@ -46,7 +49,7 @@ data SlackMsgItem
   | SlackMsgItemCodeSection Text
   | SlackMsgItemQuoted [SlackMsgItem]
   | SlackMsgItemEmoticon Text
-  deriving (Show, Eq)
+  deriving stock (Show, Eq)
 
 #if MIN_VERSION_megaparsec(6,0,0)
 type MegaparsecError = Void
@@ -99,7 +102,7 @@ sectionEndSymbol :: Char -> SlackParser ()
 sectionEndSymbol chr = void $ char chr >> lookAhead wordBoundary
 
 parseCharDelimitedSection :: Char -> SlackParser [SlackMsgItem]
-parseCharDelimitedSection chr = 
+parseCharDelimitedSection chr =
   char chr *> someTill (parseMessageItem False) (sectionEndSymbol chr)
 
 wordBoundary :: SlackParser ()
@@ -184,7 +187,7 @@ defaultHtmlRenderers :: HtmlRenderers
 defaultHtmlRenderers = HtmlRenderers
   { emoticonRenderer = \code -> ":" <> code <> ":"
   }
-  
+
 msgItemToHtml :: HtmlRenderers -> (UserId -> Text) -> SlackMsgItem -> Text
 msgItemToHtml htmlRenderers@HtmlRenderers{..} getUserDesc = \case
   SlackMsgItemPlainText txt -> T.replace "\n" "<br/>" txt

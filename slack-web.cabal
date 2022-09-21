@@ -25,8 +25,74 @@ extra-source-files:
   CHANGELOG.md
   README.md
 
+common build-opts
+  ghc-options:
+    -Weverything
+    -- missing-exported-signatures turns off the more strict -Wmissing-signatures. See https://ghc.haskell.org/trac/ghc/ticket/14794#ticket
+    -Wno-missing-exported-signatures
+    -- Requires explicit export lists for every module, a pain for large modules
+    -Wno-missing-export-lists
+    -- Requires explicit imports of _every_ function (e.g. '$'); too strict
+    -Wno-missing-import-lists
+    -- When GHC can't specialize a polymorphic function. No big deal and requires fixing underlying libraries to solve.
+    -Wno-missed-specialisations
+    -- See missed-specialisations
+    -Wno-all-missed-specialisations
+    -- Don't use Safe Haskell warnings
+    -Wno-unsafe
+    -- Warning for polymorphic local bindings. Don't think this is an issue
+    -Wno-missing-local-signatures
+    -- Don't warn if the monomorphism restriction is used
+    -Wno-monomorphism-restriction
+    --  Cabal isn’t setting this currently (introduced in GHC 8.10)
+    -Wno-missing-safe-haskell-mode
+    --  Cabal’s generate Path_*.hs doesn’t do this (fixed in https://github.com/haskell/cabal/pull/7352)
+    -Wno-prepositive-qualified-module
+    -- Some tooling gives this error
+    -Wno-unused-packages
+    -- Warns on every single data declaration
+    -Wno-missing-kind-signatures
+
+  default-extensions:
+    AllowAmbiguousTypes
+    ApplicativeDo
+    BlockArguments
+    DataKinds
+    DeriveAnyClass
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveTraversable
+    DerivingVia
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GADTs
+    GeneralizedNewtypeDeriving
+    ImportQualifiedPost
+    InstanceSigs
+    LambdaCase
+    LexicalNegation
+    MonoLocalBinds
+    MultiWayIf
+    NamedFieldPuns
+    NumericUnderscores
+    NoImplicitPrelude
+    OverloadedStrings
+    PatternSynonyms
+    PolyKinds
+    RankNTypes
+    RecordWildCards
+    RecursiveDo
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TypeApplications
+    TypeFamilies
+    ViewPatterns
 
 library
+  import: build-opts
   hs-source-dirs:
       src
   exposed-modules:
@@ -43,6 +109,7 @@ library
       Web.Slack.User
   other-modules:
       Web.Slack.Util
+      Web.Slack.Prelude
   build-depends:
       aeson >= 2.0 && < 2.2
     , base >= 4.11 && < 4.18
@@ -50,7 +117,10 @@ library
     , containers
     , deepseq
     , unordered-containers
+    , mono-traversable
+    , classy-prelude
     , hashable
+    , string-conversions
     , http-api-data >= 0.3 && < 0.6
     , http-client >= 0.5 && < 0.8
     , http-client-tls >= 0.3 && < 0.4

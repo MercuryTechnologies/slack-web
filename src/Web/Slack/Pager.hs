@@ -12,6 +12,9 @@ module Web.Slack.Pager
   , loadingPage
   ) where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- base
 import           Control.Monad.IO.Class (MonadIO, liftIO)
 import           Data.IORef             (newIORef, readIORef, writeIORef)

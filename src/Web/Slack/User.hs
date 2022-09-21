@@ -21,6 +21,9 @@ module Web.Slack.User
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson.TH
 
@@ -43,25 +46,25 @@ import Web.FormUrlEncoded
 
 -- See https://api.slack.com/types/user
 
-data Profile = 
-  Profile 
+data Profile =
+  Profile
     { profileAvatarHash :: Maybe Text
     , profileStatusText :: Maybe Text
-    , profileStatusEmoji :: Maybe Text 
-    , profileRealName :: Maybe Text 
-    , profileDisplayName :: Maybe Text 
-    , profileRealNameNormalized :: Maybe Text 
-    , profileDisplayNameNormalized :: Maybe Text 
-    , profileEmail :: Maybe Text 
-    , profileImage_24 :: Text 
-    , profileImage_32 :: Text 
-    , profileImage_48 :: Text 
-    , profileImage_72 :: Text 
-    , profileImage_192 :: Text 
-    , profileImage_512 :: Text 
-    , profileTeam :: Maybe Text 
+    , profileStatusEmoji :: Maybe Text
+    , profileRealName :: Maybe Text
+    , profileDisplayName :: Maybe Text
+    , profileRealNameNormalized :: Maybe Text
+    , profileDisplayNameNormalized :: Maybe Text
+    , profileEmail :: Maybe Text
+    , profileImage_24 :: Text
+    , profileImage_32 :: Text
+    , profileImage_48 :: Text
+    , profileImage_72 :: Text
+    , profileImage_192 :: Text
+    , profileImage_512 :: Text
+    , profileTeam :: Maybe Text
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "profile") ''Profile)
 
@@ -79,7 +82,7 @@ data User =
     , userIsUltraRestricted :: Maybe Bool
     , userUpdated :: POSIXTime
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "user") ''User)
 
@@ -87,7 +90,7 @@ data ListRsp =
   ListRsp
     { listRspMembers :: [User]
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
 
@@ -96,11 +99,11 @@ data UserRsp =
   UserRsp
     { userRspUser :: User
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "UserRsp") ''UserRsp)
 
-newtype Email = Email Text deriving (Eq, Generic, Show)
-instance ToForm Email where 
+newtype Email = Email Text deriving stock (Eq, Generic, Show)
+instance ToForm Email where
   toForm (Email txt) = [("email", toQueryParam txt)]
 

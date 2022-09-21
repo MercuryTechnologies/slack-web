@@ -34,6 +34,9 @@ module Web.Slack
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson
 
@@ -96,7 +99,7 @@ data SlackConfig
 -- constrast with 'SlackClientError' which additionally
 -- contains errors which occured during the network communication.
 data ResponseSlackError = ResponseSlackError Text
-  deriving (Eq, Show)
+  deriving stock (Eq, Show)
 
 
 -- |

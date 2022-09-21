@@ -33,6 +33,9 @@ module Web.Slack.Common
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson
 import Data.Aeson.TH
@@ -60,7 +63,7 @@ type ClientError = ServantError
 #endif
 
 data MessageType = MessageTypeMessage
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
 
 instance NFData MessageType
 
@@ -80,7 +83,7 @@ data Message =
     -- Use 'Web.Slack.MessageParser.messageToHtml' to convert it to HTML.
     , messageTs :: SlackTimestamp
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData Message
 
@@ -93,7 +96,7 @@ data SlackClientError
     -- ^ errors from the network connection
     | SlackError Text
     -- ^ errors returned by the slack API
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData SlackClientError
 
