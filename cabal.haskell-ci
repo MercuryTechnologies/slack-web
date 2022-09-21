@@ -1,0 +1,30 @@
+-- cabal-install version for all jobs
+cabal-install-version: 3.8
+
+-- HI! If you add something in here, make sure to copy it to cabal.project if
+-- needed!
+raw-project
+  -- for ghc-9.4
+  -- https://github.com/haskell-servant/servant/pull/1592
+  source-repository-package
+    --sha256: sha256-y6fySO8NqtEad+W+F48QJgRR0JYfqXwo/+MCxcrpJpg=
+    type: git
+    location: https://github.com/TeofilC/servant.git
+    tag: a53d69929cf6fe531bb25aec65e7ab6405278459
+    subdir:
+     servant
+     servant-client
+     servant-client-core
+
+  -- https://github.com/nikita-volkov/refined/pull/86
+  -- this was merged, just need to wait for >0.7  to have a release
+  source-repository-package
+    type: git
+    location: https://github.com/nikita-volkov/refined
+    tag: eced2bb0991bde971646e4b3d291870d0aab83a3
+    --sha256: sha256-QvZSFeAmgdBwdyneGRKMCMNGnP+8rD/uTED0icQB+4s=
+
+  allow-newer:
+    -- fixed but not released on hackage yet
+    -- https://github.com/chessai/these-skinny/pull/3
+    these-skinny:base
