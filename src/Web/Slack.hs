@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE TypeOperators #-}
 
 ----------------------------------------------------------------------
@@ -37,9 +36,6 @@ module Web.Slack
 -- FIXME: Web.Slack.Prelude
 import Prelude
 
--- aeson
-import Data.Aeson
-
 -- base
 import Control.Arrow ((&&&))
 import Data.Maybe
@@ -54,23 +50,15 @@ import Network.HTTP.Client (Manager, newManager)
 -- http-client-tls
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 
--- mtl
-import Control.Monad.Reader
-
 -- servant
 import Servant.API hiding (addHeader)
+import Servant.Client.Core (AuthenticatedRequest)
 
 -- servant-client
 import Servant.Client hiding (Response, baseUrl)
 
-#if MIN_VERSION_servant(0,16,0)
-import Servant.Client.Core (AuthClientData, AuthenticatedRequest, Request, mkAuthenticatedRequest, addHeader)
-#else
-import Servant.Client.Core.Internal.Auth
-import Servant.Client.Core (Request, addHeader)
-#endif
-
 -- slack-web
+import Web.Slack.Internal
 import qualified Web.Slack.Api as Api
 import qualified Web.Slack.Auth as Auth
 import qualified Web.Slack.Conversation as Conversation
@@ -81,38 +69,6 @@ import           Web.Slack.Pager
 
 -- text
 import Data.Text (Text)
-
-#if !MIN_VERSION_servant(0,13,0)
-mkClientEnv :: Manager -> BaseUrl -> ClientEnv
-mkClientEnv = ClientEnv
-#endif
-
-
-data SlackConfig
-  = SlackConfig
-  { slackConfigManager :: Manager
-  , slackConfigToken :: Text
-  }
-
-
--- contains errors that can be returned by the slack API.
--- constrast with 'SlackClientError' which additionally
--- contains errors which occured during the network communication.
-data ResponseSlackError = ResponseSlackError Text
-  deriving stock (Eq, Show)
-
-
--- |
--- Internal type!
---
-newtype ResponseJSON a = ResponseJSON (Either ResponseSlackError a)
-
-instance FromJSON a => FromJSON (ResponseJSON a) where
-    parseJSON = withObject "Response" $ \o -> do
-        ok <- o .: "ok"
-        ResponseJSON <$> if ok
-           then Right <$> parseJSON (Object o)
-           else Left . ResponseSlackError <$> o .: "error"
 
 
 -- |
@@ -371,50 +327,6 @@ apiTest_
   :<|> userLookupByEmail_
   =
   client (Proxy :: Proxy Api)
-
-
--- |
---
---
-
-type instance AuthClientData (AuthProtect "token") =
-  Text
-
-
--- |
---
---
-authenticateReq
-  :: Text
-  -> Request
-  -> Request
-authenticateReq token =
-  addHeader "Authorization" $ "Bearer " <> token
-
-
--- |
---
---
-
-run
-  :: ClientM (ResponseJSON a)
-  -> Manager
-  -> IO (Response a)
-run clientAction mgr = do
-  let baseUrl = BaseUrl Https "slack.com" 443 "/api"
-  unnestErrors <$> liftIO (runClientM clientAction $ mkClientEnv mgr baseUrl)
-
-
-mkSlackAuthenticateReq :: SlackConfig -> AuthenticatedRequest (AuthProtect "token")
-mkSlackAuthenticateReq = (`mkAuthenticatedRequest` authenticateReq) . slackConfigToken
-
-
-unnestErrors :: Either ClientError (ResponseJSON a) -> Response a
-unnestErrors (Right (ResponseJSON (Right a))) = Right a
-unnestErrors (Right (ResponseJSON (Left (ResponseSlackError serv))))
-    = Left (Common.SlackError serv)
-unnestErrors (Left slackErr) = Left (Common.ServantError slackErr)
-
 
 -- | Prepare a SlackConfig from a slack token.
 -- You can then call the other functions providing this in a reader context.
