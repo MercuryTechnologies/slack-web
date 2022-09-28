@@ -119,12 +119,13 @@ data ChannelConversation = ChannelConversation
     -- , channelPendingConnectedTeamIds :: [TeamId]
 
     channelIsPendingExtShared :: Bool
-  -- | Absent from @users.conversations@ response
   , channelIsMember :: Maybe Bool
+  -- ^ Absent from @users.conversations@ response
   , channelTopic :: Topic
   , channelPurpose :: Purpose
   , channelPreviousNames :: [Text]
-  , channelNumMembers :: Integer
+  , channelNumMembers :: Maybe Integer
+  -- ^ Absent from @conversations.join@ response
   }
   deriving stock (Eq, Show, Generic)
 
