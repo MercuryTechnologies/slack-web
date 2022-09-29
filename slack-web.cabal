@@ -72,7 +72,6 @@ common build-opts
     ImportQualifiedPost
     InstanceSigs
     LambdaCase
-    LexicalNegation
     MonoLocalBinds
     MultiWayIf
     NamedFieldPuns
