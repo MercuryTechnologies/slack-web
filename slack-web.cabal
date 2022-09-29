@@ -145,6 +145,7 @@ library
       -Wall
 
 test-suite tests
+  import: build-opts
   main-is:
       Spec.hs
   hs-source-dirs:
@@ -178,6 +179,7 @@ flag cli
   manual:      True
 
 executable slack-web-cli
+  import: build-opts
   if flag(cli)
     buildable: True
   else

@@ -1,62 +1,58 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
-{-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 ----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+
 -- |
 -- Module: Web.Slack.Common
 -- Description:
---
---
---
-----------------------------------------------------------------------
-
 module Web.Slack.Common
-  ( Color(..)
-  , UserId(..)
-  , ConversationId (..)
-  , TeamId (..)
-  , Cursor (..)
-  , SlackTimestamp(..)
-  , mkSlackTimestamp
-  , timestampFromText
-  , Message(..)
-  , MessageType(..)
-  , SlackClientError(..)
-  , SlackMessageText(..)
+  ( Color (..),
+    UserId (..),
+    ConversationId (..),
+    TeamId (..),
+    Cursor (..),
+    SlackTimestamp (..),
+    mkSlackTimestamp,
+    timestampFromText,
+    Message (..),
+    MessageType (..),
+    SlackClientError (..),
+    SlackMessageText (..),
   )
-  where
+where
 
 -- FIXME: Web.Slack.Prelude
-import Prelude
 
 -- aeson
-import Data.Aeson
-import Data.Aeson.TH
 
 -- base
-import Control.Exception
-import GHC.Generics (Generic)
 
 -- deepseq
 import Control.DeepSeq (NFData)
-
-
+import Control.Exception
+import Data.Aeson
+import Data.Aeson.TH
 -- servant-client
-import Servant.Client
 
 -- slack-web
-import Web.Slack.Types
-import Web.Slack.Util
 
 -- text
 import Data.Text (Text)
+import GHC.Generics (Generic)
+import Servant.Client
+import Web.Slack.Types
+import Web.Slack.Util
+import Prelude
 
 #if !MIN_VERSION_servant(0,16,0)
 type ClientError = ServantError
@@ -74,15 +70,15 @@ instance FromJSON MessageType where
 instance ToJSON MessageType where
   toJSON _ = String "message"
 
-data Message =
-  Message
-    { messageType :: MessageType
-    , messageUser :: Maybe UserId -- ^ not present for bot messages at least
-    , messageText :: SlackMessageText
-    -- ^ the message text is in a markdown-like slack-specific format.
-    -- Use 'Web.Slack.MessageParser.messageToHtml' to convert it to HTML.
-    , messageTs :: SlackTimestamp
-    }
+data Message = Message
+  { messageType :: MessageType
+  , messageUser :: Maybe UserId
+  -- ^ not present for bot messages at least
+  , messageText :: SlackMessageText
+  -- ^ the message text is in a markdown-like slack-specific format.
+  -- Use 'Web.Slack.MessageParser.messageToHtml' to convert it to HTML.
+  , messageTs :: SlackTimestamp
+  }
   deriving stock (Eq, Generic, Show)
 
 instance NFData Message
@@ -92,10 +88,10 @@ $(deriveJSON (jsonOpts "message") ''Message)
 -- |
 -- Errors that can be triggered by a slack request.
 data SlackClientError
-    = ServantError ClientError
-    -- ^ errors from the network connection
-    | SlackError Text
-    -- ^ errors returned by the slack API
+  = -- | errors from the network connection
+    ServantError ClientError
+  | -- | errors returned by the slack API
+    SlackError Text
   deriving stock (Eq, Generic, Show)
 
 instance NFData SlackClientError

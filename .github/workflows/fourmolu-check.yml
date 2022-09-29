@@ -1,0 +1,14 @@
+name: "Run nix checks"
+on: pull_request
+jobs:
+  check_fourmolu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v17
+        with:
+          extra_nix_config: |
+            extra-experimental-features = nix-command flakes
+      - name: Run nix pre-commit checks
+        run: |
+          nix build ".#checks.x86_64-linux.pre-commit-check"

@@ -1,47 +1,40 @@
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE LambdaCase #-}
-
+{-# LANGUAGE TypeApplications #-}
 
 -- base
 import Control.Exception (throwIO)
 import Control.Monad.IO.Class (liftIO)
-import Data.Functor (void)
-import System.Environment (getEnv)
-import System.Exit (die)
-import System.IO (hPutStrLn, stderr)
-import Text.Read (readMaybe)
-
 -- butcher
-import UI.Butcher.Monadic
 
 -- bytestring
-import qualified Data.ByteString.Lazy.Char8 as BL
 
 -- monad-loops
 import Control.Monad.Loops (iterateUntil)
-
 -- mtl
 import Control.Monad.Reader (runReaderT)
-
+import Data.ByteString.Lazy.Char8 qualified as BL
+import Data.Functor (void)
 -- pretty-simple
-import Text.Pretty.Simple (pPrint, pShow)
 
 -- slack-web
-import qualified Web.Slack.Classy as Slack
-import qualified Web.Slack.Common as Slack
-import qualified Web.Slack.Conversation as SlackConversation
 
 -- text
-import qualified Data.Text as Text
-import qualified Data.Text.Lazy as TextLazy
-
+import Data.Text qualified as Text
+import Data.Text.Lazy qualified as TextLazy
 -- time
-import Data.Time.Clock (getCurrentTime, nominalDay, addUTCTime)
+import Data.Time.Clock (addUTCTime, getCurrentTime, nominalDay)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
-
 -- servant-client-core
-import Servant.Client.Core (ClientError(..), Response, ResponseF(..))
-
+import Servant.Client.Core (ClientError (..), Response, ResponseF (..))
+import System.Environment (getEnv)
+import System.Exit (die)
+import System.IO (hPutStrLn, stderr)
+import Text.Pretty.Simple (pPrint, pShow)
+import Text.Read (readMaybe)
+import UI.Butcher.Monadic
+import Web.Slack.Classy qualified as Slack
+import Web.Slack.Common qualified as Slack
+import Web.Slack.Conversation qualified as SlackConversation
 
 main :: IO ()
 main = do
@@ -49,17 +42,19 @@ main = do
   mainFromCmdParserWithHelpDesc $ \helpDesc -> do
     addHelpCommand helpDesc
     addCmd "conversations.list" . addCmdImpl $ do
-      let listReq = SlackConversation.ListReq
-            { SlackConversation.listReqExcludeArchived = Just True
-            , SlackConversation.listReqTypes =
-              [ SlackConversation.PublicChannelType
-              , SlackConversation.PrivateChannelType
-              , SlackConversation.MpimType
-              , SlackConversation.ImType
-              ]
-            }
+      let listReq =
+            SlackConversation.ListReq
+              { SlackConversation.listReqExcludeArchived = Just True
+              , SlackConversation.listReqTypes =
+                  [ SlackConversation.PublicChannelType
+                  , SlackConversation.PrivateChannelType
+                  , SlackConversation.MpimType
+                  , SlackConversation.ImType
+                  ]
+              }
       Slack.conversationsList listReq
-        `runReaderT` apiConfig >>= \case
+        `runReaderT` apiConfig
+        >>= \case
           Right (SlackConversation.ListRsp cs) -> do
             pPrint cs
           Left err -> do
@@ -76,7 +71,7 @@ main = do
         if getsAll
           then do
             (`runReaderT` apiConfig) $ do
-              fetchPage <- Slack.conversationsHistoryAll $ (SlackConversation.mkHistoryReq conversationId) { SlackConversation.historyReqCount = 2 }
+              fetchPage <- Slack.conversationsHistoryAll $ (SlackConversation.mkHistoryReq conversationId) {SlackConversation.historyReqCount = 2}
               void . iterateUntil null $ do
                 result <- either (liftIO . throwIO) return =<< fetchPage
                 liftIO $ pPrint result
@@ -85,16 +80,18 @@ main = do
             nowUtc <- getCurrentTime
             let now = Slack.mkSlackTimestamp nowUtc
                 thirtyDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 30) nowUtc
-                histReq = SlackConversation.HistoryReq
-                  { SlackConversation.historyReqChannel = conversationId
-                  , SlackConversation.historyReqCount = 5
-                  , SlackConversation.historyReqLatest = Just now
-                  , SlackConversation.historyReqOldest = Just thirtyDaysAgo
-                  , SlackConversation.historyReqInclusive = True
-                  , SlackConversation.historyReqCursor = Nothing
-                  }
+                histReq =
+                  SlackConversation.HistoryReq
+                    { SlackConversation.historyReqChannel = conversationId
+                    , SlackConversation.historyReqCount = 5
+                    , SlackConversation.historyReqLatest = Just now
+                    , SlackConversation.historyReqOldest = Just thirtyDaysAgo
+                    , SlackConversation.historyReqInclusive = True
+                    , SlackConversation.historyReqCursor = Nothing
+                    }
             Slack.conversationsHistory histReq
-              `runReaderT` apiConfig >>= \case
+              `runReaderT` apiConfig
+              >>= \case
                 Right rsp ->
                   pPrint rsp
                 Left err -> do
@@ -111,25 +108,26 @@ main = do
       pageSize <- addParamRead "PAGE_SIZE" (paramHelpStr "How many messages to get by a request.")
       addCmdImpl $ do
         -- NOTE: butcher's CmdParser isn't a MonadFail
-        threadTimeStamp <- either
-          (\emsg -> fail $ "Invalid timestamp " ++ show threadTimeStampStr ++ ": " ++ emsg)
-          return
-          ethreadTimeStamp
+        threadTimeStamp <-
+          either
+            (\emsg -> fail $ "Invalid timestamp " ++ show threadTimeStampStr ++ ": " ++ emsg)
+            return
+            ethreadTimeStamp
         nowUtc <- getCurrentTime
         let now = Slack.mkSlackTimestamp nowUtc
             tenDaysAgo = Slack.mkSlackTimestamp $ addUTCTime (nominalDay * negate 10) nowUtc
-            req = (SlackConversation.mkRepliesReq conversationId threadTimeStamp)
-              { SlackConversation.repliesReqLimit = pageSize
-              , SlackConversation.repliesReqLatest = Just now
-              , SlackConversation.repliesReqOldest = Just tenDaysAgo
-              }
+            req =
+              (SlackConversation.mkRepliesReq conversationId threadTimeStamp)
+                { SlackConversation.repliesReqLimit = pageSize
+                , SlackConversation.repliesReqLatest = Just now
+                , SlackConversation.repliesReqOldest = Just tenDaysAgo
+                }
         (`runReaderT` apiConfig) $ do
           fetchPage <- Slack.repliesFetchAll req
           void . iterateUntil null $ do
             result <- either (liftIO . throwIO) return =<< fetchPage
             liftIO $ pPrint result
             return result
-
 
 peepInResponseBody err = do
   {- Uncomment these lines when you want to see the JSON in the reponse body.
