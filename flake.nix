@@ -83,8 +83,8 @@
             # it's not yet in hackage2nix
             string-variants = hfinal.callHackageDirect {
               pkg = "string-variants";
-              ver = "0.1.0.0";
-              sha256 = "sha256-4MJAZmlCx9GeNzpW93BNjL8Q9kCUDxWi+1cz7Vycxng=";
+              ver = "0.1.0.1";
+              sha256 = "sha256-7oNYwPP8xRNYxKNdNH+21zBHdeUeiWBtKOK5G43xtSQ=";
             } {};
           });
       };
