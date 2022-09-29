@@ -15,6 +15,9 @@
 module Web.Slack.Auth
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson.TH
 
@@ -44,7 +47,7 @@ data TestRsp =
     , testRspUserId :: Text
     , testRspEnterpriseId :: Maybe Text
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData TestRsp
 

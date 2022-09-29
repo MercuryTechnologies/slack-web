@@ -1,9 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-
 ----------------------------------------------------------------------
 -- |
 -- Module: Web.Slack.Types
@@ -26,30 +20,22 @@ module Web.Slack.Types
   )
   where
 
+import Web.Slack.Prelude
+
 -- aeson
 import Data.Aeson
-
--- base
-import Data.Bifunctor (second)
-import GHC.Generics (Generic)
-
--- deepseq
-import Control.DeepSeq (NFData)
-
--- hashable
-import Data.Hashable (Hashable)
 
 -- http-api-data
 import Web.HttpApiData
 
 -- text
-import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Text.Read (rational)
 
 -- time
 import Data.Time.Clock
 import Data.Time.Clock.POSIX
+import Control.Monad (MonadFail(..))
 
 -- Ord to allow it to be a key of a Map
 newtype Color = Color { unColor :: Text }

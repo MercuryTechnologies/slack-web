@@ -43,7 +43,7 @@
           };
 
           # for debugging
-          # inherit pkgs;
+          inherit pkgs;
 
           devShells.default =
             let haskellPackages = pkgs.haskell.packages.${ghcVer};
@@ -73,6 +73,12 @@
           let hlib = prev.haskell.lib; in
           {
             slack-web = hprev.callCabal2nix "slack-web" ./. { };
+            # test-suite doesn't compile; probably fixed in a newer nixpkgs,
+            # but there's other jackage on newer nixpkgs such as the ghcid bug:
+            # https://github.com/NixOS/nixpkgs/issues/140774#issuecomment-1186546139
+            # and the fourmolu/ormolu bug:
+            # https://github.com/tweag/ormolu/issues/927
+            mutable-containers = hlib.dontCheck hprev.mutable-containers;
           });
       };
     };

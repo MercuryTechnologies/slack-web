@@ -34,6 +34,9 @@ module Web.Slack.Classy
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- base
 import Control.Arrow ((&&&))
 import Data.Maybe

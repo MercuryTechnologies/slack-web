@@ -14,6 +14,9 @@ module Web.Slack.Util
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson.TH
 import Data.Aeson.Types

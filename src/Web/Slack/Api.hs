@@ -19,6 +19,9 @@ module Web.Slack.Api
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson.TH
 
@@ -47,7 +50,7 @@ data TestReq =
     { testReqError :: Maybe Text
     , testReqFoo :: Maybe Text
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData TestReq
 
@@ -88,7 +91,7 @@ data TestRsp =
   TestRsp
     { testRspArgs :: Maybe TestReq
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData TestRsp
 

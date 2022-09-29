@@ -19,6 +19,9 @@ module Web.Slack.Chat
   )
   where
 
+-- FIXME: Web.Slack.Prelude
+import Prelude
+
 -- aeson
 import Data.Aeson.TH
 
@@ -53,7 +56,7 @@ data PostMsg =
     , postMsgThreadTs :: Maybe Text
     , postMsgReplyBroadcast :: Maybe Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData PostMsg
 
@@ -86,7 +89,7 @@ data PostMsgReq =
     , postMsgReqThreadTs :: Maybe Text
     , postMsgReqReplyBroadcast :: Maybe Bool
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData PostMsgReq
 
@@ -143,7 +146,7 @@ data PostMsgRsp =
     { postMsgRspTs :: String
     , postMsgRspMessage :: PostMsg
     }
-  deriving (Eq, Generic, Show)
+  deriving stock (Eq, Generic, Show)
 
 instance NFData PostMsgRsp
 
