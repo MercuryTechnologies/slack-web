@@ -68,9 +68,6 @@ library
   ghc-options:
       -Wall
 
--- the test suite doesn't depend on slack-web
--- but rather has the src as an extra source directory.
--- that allows us to refer to non exported modules from tests.
 test-suite tests
   main-is:
       Spec.hs
@@ -127,4 +124,4 @@ executable slack-web-cli
 
 source-repository head
   type: git
-  location: https://github.com/jpvillaisaza/slack-web
+  location: https://github.com/MercuryTechnologies/slack-web
