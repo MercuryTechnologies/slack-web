@@ -20,8 +20,3 @@ raw-project
     location: https://github.com/nikita-volkov/refined
     tag: eced2bb0991bde971646e4b3d291870d0aab83a3
     --sha256: sha256-QvZSFeAmgdBwdyneGRKMCMNGnP+8rD/uTED0icQB+4s=
-
-  allow-newer:
-    -- fixed but not released on hackage yet
-    -- https://github.com/chessai/these-skinny/pull/3
-    these-skinny:base
