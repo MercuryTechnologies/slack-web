@@ -79,6 +79,13 @@
             # and the fourmolu/ormolu bug:
             # https://github.com/tweag/ormolu/issues/927
             mutable-containers = hlib.dontCheck hprev.mutable-containers;
+
+            # it's not yet in hackage2nix
+            string-variants = hfinal.callHackageDirect {
+              pkg = "string-variants";
+              ver = "0.1.0.1";
+              sha256 = "sha256-7oNYwPP8xRNYxKNdNH+21zBHdeUeiWBtKOK5G43xtSQ=";
+            } {};
           });
       };
     };

@@ -107,32 +107,38 @@ library
       Web.Slack.Pager
       Web.Slack.Types
       Web.Slack.User
+      Web.Slack.Experimental.Blocks
+      Web.Slack.Experimental.Blocks.Types
   other-modules:
       Web.Slack.Util
       Web.Slack.Prelude
+      Web.Slack.AesonUtils
   build-depends:
       aeson >= 2.0 && < 2.2
     , base >= 4.11 && < 4.18
-    , scientific
+    , classy-prelude
     , containers
     , deepseq
-    , unordered-containers
-    , mono-traversable
-    , classy-prelude
+    , errors
     , hashable
-    , string-conversions
     , http-api-data >= 0.3 && < 0.6
     , http-client >= 0.5 && < 0.8
     , http-client-tls >= 0.3 && < 0.4
+    , megaparsec >= 5.0 && < 10
+    , mono-traversable
+    , mtl
+    , refined
+    , scientific
     , servant >= 0.16 && < 0.20
     , servant-client >= 0.16 && < 0.20
     , servant-client-core >= 0.16 && < 0.20
+    , string-conversions
+    , string-variants >= 0.1.0.1
     , text (>= 1.2 && < 1.3) || (>= 2.0 && < 2.1)
-    , transformers
-    , mtl
     , time
-    , errors
-    , megaparsec >= 5.0 && < 10
+    , transformers
+    , unordered-containers
+    , vector
   default-language:
       Haskell2010
   ghc-options:
