@@ -1,5 +1,5 @@
 name: "Run nix checks"
-on: pull_request
+on: [push, pull_request]
 jobs:
   check_fourmolu:
     runs-on: ubuntu-latest
