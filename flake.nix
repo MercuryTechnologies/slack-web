@@ -12,6 +12,8 @@
   };
 
   nixConfig.allow-import-from-derivation = true; # cabal2nix uses IFD
+  nixConfig.extra-substituters = [ "https://slack-web.cachix.org" ];
+  nixConfig.extra-trusted-public-keys = [ "slack-web.cachix.org-1:k2R87YfuLXjp6C33D/KZZEBhYWEE9t5ph8oKa/u0ccE=" ];
 
   outputs = { self, nixpkgs, flake-utils, pre-commit-hooks }:
     let
@@ -99,6 +101,9 @@
             # and the fourmolu/ormolu bug:
             # https://github.com/tweag/ormolu/issues/927
             mutable-containers = hlib.dontCheck hprev.mutable-containers;
+
+            # 0.6.3 in the repo
+            refined = hfinal.refined_0_7;
 
             # it's not yet in hackage2nix
             string-variants = hfinal.callHackageDirect
