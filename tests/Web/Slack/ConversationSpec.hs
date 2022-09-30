@@ -10,24 +10,12 @@ where
 
 -- aeson
 import Data.Aeson
--- base
-import Data.Maybe
--- hspec
-
--- QuickCheck
-
--- quickcheck-instances
-
--- slack-web
-
--- text
-import Data.Text (Text)
 -- time
 import Data.Time.Clock.POSIX
-import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 import Test.QuickCheck.Instances ()
+import TestImport
 import Web.Slack.Common
 import Web.Slack.Conversation
 
@@ -112,11 +100,11 @@ instance Arbitrary ImConversation where
 instance Arbitrary Conversation where
   arbitrary = oneof [Channel <$> arbitrary, Group <$> arbitrary, Im <$> arbitrary]
 
-deriving instance Arbitrary ConversationId
+deriving newtype instance Arbitrary ConversationId
 
-deriving instance Arbitrary SlackMessageText
+deriving newtype instance Arbitrary SlackMessageText
 
-deriving instance Arbitrary TeamId
+deriving newtype instance Arbitrary TeamId
 
 spec :: Spec
 spec = describe "ToJSON and FromJSON for Conversation" $ do

@@ -156,11 +156,14 @@ test-suite tests
       Web.Slack.PagerSpec
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
+      TestImport
   build-tool-depends:
     hspec-discover:hspec-discover >=2.6.0 && <2.11
   build-depends:
       base
     , slack-web
+    , classy-prelude
+    , string-conversions
     , aeson
     , fakepull
     , hspec

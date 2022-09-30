@@ -1,22 +1,10 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Web.Slack.PagerSpec (spec) where
 
--- base
-import Control.Exception (throwIO)
-import Data.Maybe (fromJust)
--- fakepull
-
--- hspec
-
--- slack-web
-
--- text
 import Data.Text qualified as Text
 -- time
-import Data.Time.Clock (addUTCTime, getCurrentTime, nominalDay)
-import Test.Hspec
+import Data.Time.Clock (addUTCTime, nominalDay)
 import Test.Pull.Fake.IO (FakeStream, newFakeStream, pull)
+import TestImport
 import Web.Slack.Common
   ( Cursor (..),
     Message (..),

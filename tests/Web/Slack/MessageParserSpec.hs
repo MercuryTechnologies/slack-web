@@ -1,14 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Web.Slack.MessageParserSpec (spec) where
 
--- hspec
-
--- slack-web
-
--- text
-import Data.Text (Text)
-import Test.Hspec
+import TestImport
 import Web.Slack.MessageParser
 import Web.Slack.Types
 
