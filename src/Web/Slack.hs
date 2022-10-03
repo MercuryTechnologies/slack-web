@@ -19,6 +19,7 @@ module Web.Slack
     authTest,
     chatPostMessage,
     conversationsList,
+    conversationsListAll,
     conversationsHistory,
     conversationsHistoryAll,
     conversationsReplies,
@@ -147,6 +148,20 @@ conversationsList_ ::
   Conversation.ListReq ->
   ClientM (ResponseJSON Conversation.ListRsp)
 
+-- | Returns an action to send a request to get the list of conversations in the
+--   workspace.
+--
+--   To fetch all replies in the conversation, run the returned 'LoadPage' action
+--   repeatedly until it returns an empty list.
+conversationsListAll ::
+  SlackConfig ->
+  -- | The first request to send. _NOTE_: 'Conversation.listReqCursor' is silently ignored.
+  Conversation.ListReq ->
+  -- | An action which returns a new page of messages every time called.
+  --   If there are no pages anymore, it returns an empty list.
+  IO (LoadPage IO Conversation.Conversation)
+conversationsListAll = fetchAllBy . conversationsList
+
 -- |
 --
 -- Retrieve ceonversation history.
@@ -264,7 +279,7 @@ conversationsHistoryAll ::
   -- | An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
   IO (LoadPage IO Common.Message)
-conversationsHistoryAll = conversationsHistoryAllBy . conversationsHistory
+conversationsHistoryAll = fetchAllBy . conversationsHistory
 
 -- | Returns an action to send a request to get the replies of a conversation.
 --
@@ -282,7 +297,7 @@ repliesFetchAll ::
   -- | An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
   IO (LoadPage IO Common.Message)
-repliesFetchAll = repliesFetchAllBy . conversationsReplies
+repliesFetchAll = fetchAllBy . conversationsReplies
 
 apiTest_
   :<|> authTest_

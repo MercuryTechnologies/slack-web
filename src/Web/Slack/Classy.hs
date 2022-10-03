@@ -191,7 +191,7 @@ conversationsHistoryAll ::
   -- | An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
   m (LoadPage m Common.Message)
-conversationsHistoryAll = conversationsHistoryAllBy conversationsHistory
+conversationsHistoryAll = fetchAllBy conversationsHistory
 
 -- | Returns an action to send a request to get the replies of a conversation.
 --
@@ -209,7 +209,7 @@ repliesFetchAll ::
   -- | An action which returns a new page of messages every time called.
   --   If there are no pages anymore, it returns an empty list.
   m (LoadPage m Common.Message)
-repliesFetchAll = repliesFetchAllBy conversationsReplies
+repliesFetchAll = fetchAllBy conversationsReplies
 
 liftNonClassy ::
   (MonadReader env m, HasManager env, HasToken env, MonadIO m) =>

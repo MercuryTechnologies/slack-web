@@ -1,56 +1,16 @@
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Web.Slack.Pager
   ( Response,
-    conversationsHistoryAllBy,
-    repliesFetchAllBy,
     LoadPage,
     loadingPage,
+    fetchAllBy,
+    module Web.Slack.Pager.Types,
   )
 where
 
--- FIXME: Web.Slack.Prelude
-
--- base
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.IORef (newIORef, readIORef, writeIORef)
-import Data.Maybe (isNothing)
--- slack-web
 import Web.Slack.Common qualified as Common
 import Web.Slack.Conversation qualified as Conversation
-import Web.Slack.Types (Cursor)
-import Prelude
-
--- | Public only for testing.
-conversationsHistoryAllBy ::
-  MonadIO m =>
-  -- | Response generator
-  (Conversation.HistoryReq -> m (Response Conversation.HistoryRsp)) ->
-  -- | The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
-  Conversation.HistoryReq ->
-  -- | An action which returns a new page of messages every time called.
-  --   If there are no pages anymore, it returns an empty list.
-  m (LoadPage m Common.Message)
-conversationsHistoryAllBy sendRequest initialRequest =
-  genericFetchAllBy
-    sendRequest
-    (\cursor -> initialRequest {Conversation.historyReqCursor = cursor})
-
--- | Public only for testing.
-repliesFetchAllBy ::
-  MonadIO m =>
-  -- | Response generator
-  (Conversation.RepliesReq -> m (Response Conversation.HistoryRsp)) ->
-  -- | The first request to send. _NOTE_: 'Conversation.historyReqCursor' is silently ignored.
-  Conversation.RepliesReq ->
-  -- | An action which returns a new page of messages every time called.
-  --   If there are no pages anymore, it returns an empty list.
-  m (LoadPage m Common.Message)
-repliesFetchAllBy sendRequest initialRequest =
-  genericFetchAllBy
-    sendRequest
-    (\cursor -> initialRequest {Conversation.repliesReqCursor = cursor})
+import Web.Slack.Pager.Types
+import Web.Slack.Prelude
 
 type Response a = Either Common.SlackClientError a
 
@@ -74,24 +34,24 @@ loadingPage loadPage usePage = go mempty
             else (go $!) . (result <>) =<< usePage epage
         Left e -> (result <>) <$> usePage (Left e)
 
-genericFetchAllBy ::
-  MonadIO m =>
-  (a -> m (Response Conversation.HistoryRsp)) ->
-  (Maybe Cursor -> a) ->
-  m (LoadPage m Common.Message)
-genericFetchAllBy sendRequest requestFromCursor = do
+fetchAllBy ::
+  ( MonadIO m
+  , PagedRequest req
+  , PagedResponse resp
+  ) =>
+  (req -> m (Response resp)) ->
+  req ->
+  m (LoadPage m (ResponseObject resp))
+fetchAllBy sendRequest initialRequest = do
   cursorRef <- liftIO $ newIORef Nothing
 
-  let collectAndUpdateCursor
-        Conversation.HistoryRsp
-          { Conversation.historyRspMessages
-          , Conversation.historyRspResponseMetadata
-          } = do
-          let newCursor = Conversation.responseMetadataNextCursor =<< historyRspResponseMetadata
-              -- emptyCursor is used for the marker to show that there are no more pages.
-              cursorToSave = if isNothing newCursor then emptyCursor else newCursor
-          writeIORef cursorRef cursorToSave
-          return historyRspMessages
+  let requestFromCursor cursor = setCursor cursor initialRequest
+      collectAndUpdateCursor resp = do
+        let newCursor = Conversation.responseMetadataNextCursor =<< getResponseMetadata resp
+            -- emptyCursor is used for the marker to show that there are no more pages.
+            cursorToSave = if isNothing newCursor then emptyCursor else newCursor
+        writeIORef cursorRef cursorToSave
+        return $ getResponseData resp
 
   return $ do
     cursor <- liftIO $ readIORef cursorRef

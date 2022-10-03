@@ -6,8 +6,7 @@ import Data.Time.Clock (addUTCTime, nominalDay)
 import Test.Pull.Fake.IO (FakeStream, newFakeStream, pull)
 import TestImport
 import Web.Slack.Common
-  ( Cursor (..),
-    Message (..),
+  ( Message (..),
     MessageType (..),
     SlackMessageText (..),
     mkSlackTimestamp,
@@ -17,7 +16,6 @@ import Web.Slack.Conversation
     HistoryReq (..),
     HistoryRsp (..),
     RepliesReq (..),
-    ResponseMetadata (..),
     mkHistoryReq,
     mkRepliesReq,
   )
@@ -69,7 +67,7 @@ spec = do
               , historyReqOldest = Just oldest
               , historyReqInclusive = False
               }
-      loadPage <- conversationsHistoryAllBy (stubbedSendRequest responsesToReturn) initialRequest
+      loadPage <- fetchAllBy (stubbedSendRequest responsesToReturn) initialRequest
       let actual = unfoldPageM $ either throwIO return =<< loadPage
       expected <- fmap (map historyRspMessages) . either throwIO return $ sequenceA allResponses
       actual `shouldReturn` expected
@@ -84,7 +82,7 @@ spec = do
               , repliesReqOldest = Just oldest
               , repliesReqInclusive = False
               }
-      loadPage <- repliesFetchAllBy (stubbedSendRequest responsesToReturn) initialRequest
+      loadPage <- fetchAllBy (stubbedSendRequest responsesToReturn) initialRequest
       let actual = unfoldPageM $ either throwIO return =<< loadPage
       expected <- fmap (map historyRspMessages) . either throwIO return $ sequenceA allResponses
       actual `shouldReturn` expected
