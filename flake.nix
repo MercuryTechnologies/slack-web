@@ -58,6 +58,9 @@
                 fourmolu.enable = true;
               };
               settings = {
+                # XXX: For bizarre reasons, it seems that the fourmolu pre-commit
+                # hook has Fourmolu not read these from the cabal files as it
+                # normally would. Seems like a bug...
                 ormolu.defaultExtensions = [
                   "ImportQualifiedPost"
                 ];
