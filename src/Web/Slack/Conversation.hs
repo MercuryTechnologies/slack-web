@@ -55,8 +55,10 @@ import Data.Aeson.Types
 -- slack-web
 
 -- scientific
-import Data.Scientific
+
 -- text
+
+import Data.Scientific
 import Data.Text (Text)
 import Data.Text qualified as T
 import GHC.Generics (Generic)
@@ -117,7 +119,8 @@ data ChannelConversation = ChannelConversation
     -- , channelPendingConnectedTeamIds :: [TeamId]
 
     channelIsPendingExtShared :: Bool
-  , channelIsMember :: Bool
+  -- | Absent from @users.conversations@ response
+  , channelIsMember :: Maybe Bool
   , channelTopic :: Topic
   , channelPurpose :: Purpose
   , channelPreviousNames :: [Text]
