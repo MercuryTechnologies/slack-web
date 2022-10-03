@@ -1,11 +1,11 @@
 module Web.Slack.AesonUtils where
 
 import Data.Aeson
+import Data.Aeson qualified as J
+import Data.Aeson.Types (Pair)
 import Data.Char qualified as Char
 import Data.Text qualified as T
 import Web.Slack.Prelude
-import Data.Aeson.Types (Pair)
-import qualified Data.Aeson as J
 
 -- | Checks that a record's field labels each start with the given 'prefix',
 -- then uses a given 'drop (length prefix)' derivingStrategy to drop that prefix from generated JSON.

@@ -4,14 +4,13 @@ module Web.Slack.Internal where
 import Data.Aeson (Value (..))
 import Network.HTTP.Client (Manager)
 import Servant.API hiding (addHeader)
-
 -- import Servant.Client.Core
 
-import Servant.Client (BaseUrl (..), ClientM, Scheme (..), runClientM, ClientError, mkClientEnv)
-import Servant.Client.Core (AuthClientData, AuthenticatedRequest, Request, mkAuthenticatedRequest, addHeader)
+import Servant.Client (BaseUrl (..), ClientError, ClientM, Scheme (..), mkClientEnv, runClientM)
+import Servant.Client.Core (AuthClientData, AuthenticatedRequest, Request, addHeader, mkAuthenticatedRequest)
+import Web.Slack.Common qualified as Common
 import Web.Slack.Pager (Response)
 import Web.Slack.Prelude
-import qualified Web.Slack.Common as Common
 
 data SlackConfig = SlackConfig
   { slackConfigManager :: Manager
@@ -24,9 +23,8 @@ data SlackConfig = SlackConfig
 data ResponseSlackError = ResponseSlackError Text
   deriving stock (Eq, Show)
 
-{- |
- Internal type!
--}
+-- |
+-- Internal type!
 newtype ResponseJSON a = ResponseJSON (Either ResponseSlackError a)
 
 instance FromJSON a => FromJSON (ResponseJSON a) where

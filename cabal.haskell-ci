@@ -1,3 +1,6 @@
+-- Only run the build job on master, since the PR job gets the other branches
+branches: master
+
 -- HI! If you add something in here, make sure to copy it to cabal.project if
 -- needed!
 raw-project

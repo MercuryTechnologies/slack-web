@@ -1,41 +1,38 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- | See https://api.slack.com/docs/message-formatting
---
 module Web.Slack.MessageParser
-  ( messageToHtml
-  , HtmlRenderers(..)
-  , defaultHtmlRenderers
+  ( messageToHtml,
+    HtmlRenderers (..),
+    defaultHtmlRenderers,
   )
-  where
+where
 
 -- FIXME: Web.Slack.Prelude
-import Prelude
 
 -- base
 import Control.Monad
-import Data.List ( intercalate )
-import Data.Maybe
-import Data.Void
-
 -- megaparsec
-import Text.Megaparsec
-import Text.Megaparsec.Char
 
 -- mtl
 import Data.Functor.Identity
-
+import Data.List (intercalate)
+import Data.Maybe
 -- slack-web
-import Web.Slack.Types
 
 -- text
 import Data.Text (Text)
-import qualified Data.Text as T
+import Data.Text qualified as T
+import Data.Void
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import Web.Slack.Types
+import Prelude
 
-newtype SlackUrl = SlackUrl { unSlackUrl :: Text }
+newtype SlackUrl = SlackUrl {unSlackUrl :: Text}
   deriving stock (Show, Eq)
 
 data SlackMsgItem
@@ -66,29 +63,35 @@ anySingle = anyChar
 type SlackParser a = ParsecT MegaparsecError T.Text Identity a
 
 parseMessage :: Text -> [SlackMsgItem]
-parseMessage input = fromMaybe [SlackMsgItemPlainText input] $
-  parseMaybe (some $ parseMessageItem True) input
+parseMessage input =
+  fromMaybe [SlackMsgItemPlainText input] $
+    parseMaybe (some $ parseMessageItem True) input
 
 parseMessageItem :: Bool -> SlackParser SlackMsgItem
-parseMessageItem acceptNewlines
-  = parseBoldSection
-  <|> parseItalicsSection
-  <|> parseStrikethroughSection
-  <|> try parseEmoticon
-  <|> parseCode
-  <|> parseInlineCode
-  <|> parseUserLink
-  <|> parseLink
-  <|> parseBlockQuote
-  <|> parsePlainText
-  <|> parseWhitespace acceptNewlines
+parseMessageItem acceptNewlines =
+  parseBoldSection
+    <|> parseItalicsSection
+    <|> parseStrikethroughSection
+    <|> try parseEmoticon
+    <|> parseCode
+    <|> parseInlineCode
+    <|> parseUserLink
+    <|> parseLink
+    <|> parseBlockQuote
+    <|> parsePlainText
+    <|> parseWhitespace acceptNewlines
 
 parsePlainText :: SlackParser SlackMsgItem
-parsePlainText = SlackMsgItemPlainText . T.pack <$>
-    someTill (noneOf stopChars) (void (lookAhead $ try $ oneOf stopChars)
-                                   <|> lookAhead (try $ choice $ sectionEndSymbol <$> ['*', '_', ':', '~'])
-                                   <|> lookAhead eof)
-    where stopChars = [' ', '\n']
+parsePlainText =
+  SlackMsgItemPlainText . T.pack
+    <$> someTill
+      (noneOf stopChars)
+      ( void (lookAhead $ try $ oneOf stopChars)
+          <|> lookAhead (try $ choice $ sectionEndSymbol <$> ['*', '_', ':', '~'])
+          <|> lookAhead eof
+      )
+  where
+    stopChars = [' ', '\n']
 
 -- slack accepts bold/italics modifiers
 -- only at word boundary. for instance 'my_word'
@@ -121,75 +124,84 @@ parseStrikethroughSection =
   fmap SlackMsgItemStrikethroughSection (parseCharDelimitedSection '~')
 
 parseEmoticon :: SlackParser SlackMsgItem
-parseEmoticon = fmap (SlackMsgItemEmoticon . T.pack) $
-  char ':' *> someTill (alphaNumChar <|> char '_' <|> char '+') (sectionEndSymbol ':')
+parseEmoticon =
+  fmap (SlackMsgItemEmoticon . T.pack) $
+    char ':' *> someTill (alphaNumChar <|> char '_' <|> char '+') (sectionEndSymbol ':')
 
 parseUserLink :: SlackParser SlackMsgItem
 parseUserLink = do
   void (string "<@")
   userId <- UserId . T.pack <$> some (noneOf ['|', '>'])
-  let linkWithoutDesc = char '>' >>
-          pure (SlackMsgItemUserLink userId Nothing)
-  let linkWithDesc = char '|' >>
-          SlackMsgItemUserLink <$> pure userId <*> (Just <$> ((T.pack <$> some (noneOf ['>'])) <* char '>'))
+  let linkWithoutDesc =
+        char '>'
+          >> pure (SlackMsgItemUserLink userId Nothing)
+  let linkWithDesc =
+        char '|'
+          >> SlackMsgItemUserLink <$> pure userId <*> (Just <$> ((T.pack <$> some (noneOf ['>'])) <* char '>'))
   linkWithDesc <|> linkWithoutDesc
 
 parseLink :: SlackParser SlackMsgItem
 parseLink = do
   void (char '<')
   url <- SlackUrl . T.pack <$> some (noneOf ['|', '>'])
-  let linkWithoutDesc = char '>' >>
-          pure (SlackMsgItemLink (unSlackUrl url) url)
-  let linkWithDesc = char '|' >>
-          SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
+  let linkWithoutDesc =
+        char '>'
+          >> pure (SlackMsgItemLink (unSlackUrl url) url)
+  let linkWithDesc =
+        char '|'
+          >> SlackMsgItemLink <$> ((T.pack <$> some (noneOf ['>'])) <* char '>') <*> pure url
   linkWithDesc <|> linkWithoutDesc
 
 parseCode :: SlackParser SlackMsgItem
-parseCode = SlackMsgItemCodeSection . T.pack <$>
-  (string "```" >> manyTill anySingle (string "```"))
+parseCode =
+  SlackMsgItemCodeSection . T.pack
+    <$> (string "```" >> manyTill anySingle (string "```"))
 
 parseInlineCode :: SlackParser SlackMsgItem
-parseInlineCode = SlackMsgItemInlineCodeSection . T.pack <$>
-  (char '`' *> some (noneOf ['`']) <* char '`')
+parseInlineCode =
+  SlackMsgItemInlineCodeSection . T.pack
+    <$> (char '`' *> some (noneOf ['`']) <* char '`')
 
 parseBlockQuote :: SlackParser SlackMsgItem
 parseBlockQuote = SlackMsgItemQuoted . intercalate [SlackMsgItemPlainText "<br/>"] <$> some blockQuoteLine
 
 blockQuoteLine :: SlackParser [SlackMsgItem]
-blockQuoteLine = string "&gt;" *> optional (char ' ') *>
-    manyTill (parseMessageItem False) (eof <|> void newline)
+blockQuoteLine =
+  string "&gt;"
+    *> optional (char ' ')
+    *> manyTill (parseMessageItem False) (eof <|> void newline)
 
 -- |
 -- Convert the slack format for messages (markdown like, see
 -- https://api.slack.com/docs/message-formatting ) to HTML.
-messageToHtml
-  :: HtmlRenderers
-  -- ^ Renderers allow you to customize the message rendering.
+messageToHtml ::
+  -- | Renderers allow you to customize the message rendering.
   -- Give 'defaultHtmlRenderers' for a default implementation.
-  -> (UserId -> Text)
-  -- ^ A function giving a user name for a user id. You can use 'Web.Slack.getUserDesc'
-  -> SlackMessageText
-  -- ^ A slack message to convert to HTML
-  -> Text
-  -- ^ The HTML-formatted slack message
+  HtmlRenderers ->
+  -- | A function giving a user name for a user id. You can use 'Web.Slack.getUserDesc'
+  (UserId -> Text) ->
+  -- | A slack message to convert to HTML
+  SlackMessageText ->
+  -- | The HTML-formatted slack message
+  Text
 messageToHtml htmlRenderers getUserDesc =
   messageToHtml' htmlRenderers getUserDesc . parseMessage . unSlackMessageText
 
 messageToHtml' :: HtmlRenderers -> (UserId -> Text) -> [SlackMsgItem] -> Text
 messageToHtml' htmlRenderers getUserDesc = foldr ((<>) . msgItemToHtml htmlRenderers getUserDesc) ""
 
-data HtmlRenderers
-  = HtmlRenderers
+data HtmlRenderers = HtmlRenderers
   { emoticonRenderer :: Text -> Text
   }
 
 defaultHtmlRenderers :: HtmlRenderers
-defaultHtmlRenderers = HtmlRenderers
-  { emoticonRenderer = \code -> ":" <> code <> ":"
-  }
+defaultHtmlRenderers =
+  HtmlRenderers
+    { emoticonRenderer = \code -> ":" <> code <> ":"
+    }
 
 msgItemToHtml :: HtmlRenderers -> (UserId -> Text) -> SlackMsgItem -> Text
-msgItemToHtml htmlRenderers@HtmlRenderers{..} getUserDesc = \case
+msgItemToHtml htmlRenderers@HtmlRenderers {..} getUserDesc = \case
   SlackMsgItemPlainText txt -> T.replace "\n" "<br/>" txt
   SlackMsgItemBoldSection cts ->
     "<b>" <> messageToHtml' htmlRenderers getUserDesc cts <> "</b>"

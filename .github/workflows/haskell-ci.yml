@@ -14,8 +14,12 @@
 #
 name: Haskell-CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
   linux:
     name: Haskell-CI - Linux - ${{ matrix.compiler }}
@@ -166,8 +170,6 @@ jobs:
             type:     git
             location: https://github.com/nikita-volkov/refined
             tag:      eced2bb0991bde971646e4b3d291870d0aab83a3
-
-          allow-newer: these-skinny:base
           EOF
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(slack-web)$/; }' >> cabal.project.local
           cat cabal.project

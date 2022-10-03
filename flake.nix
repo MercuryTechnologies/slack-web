@@ -4,11 +4,18 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   nixConfig.allow-import-from-derivation = true; # cabal2nix uses IFD
+  nixConfig.extra-substituters = [ "https://slack-web.cachix.org" ];
+  nixConfig.extra-trusted-public-keys = [ "slack-web.cachix.org-1:k2R87YfuLXjp6C33D/KZZEBhYWEE9t5ph8oKa/u0ccE=" ];
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, pre-commit-hooks }:
     let
       ghcVer = "ghc924";
       makeHaskellOverlay = overlay: final: prev: {
@@ -39,7 +46,26 @@
           };
 
           checks = {
-            inherit (self.packages.${system}) slack-web;
+            # due to https://github.com/NixOS/nix/issues/4265 breaking
+            # import-from-derivation inside nix flake checks, this is kind of
+            # useless
+            # inherit (self.packages.${system}) slack-web;
+
+            pre-commit-check = pre-commit-hooks.lib.${system}.run {
+              src = ./.;
+              tools.fourmolu = pkgs.haskell.packages.${ghcVer}.fourmolu;
+              hooks = {
+                fourmolu.enable = true;
+              };
+              settings = {
+                # XXX: For bizarre reasons, it seems that the fourmolu pre-commit
+                # hook has Fourmolu not read these from the cabal files as it
+                # normally would. Seems like a bug...
+                ormolu.defaultExtensions = [
+                  "ImportQualifiedPost"
+                ];
+              };
+            };
           };
 
           # for debugging
@@ -61,8 +87,7 @@
               ] ++ (with pkgs; [
                 sqlite
               ]);
-              # Change the prompt to show that you are in a devShell
-              # shellHook = "export PS1='\\e[1;34mdev > \\e[0m'";
+              shellHook = self.checks.${system}.pre-commit-check.shellHook;
             };
         };
     in
@@ -80,12 +105,17 @@
             # https://github.com/tweag/ormolu/issues/927
             mutable-containers = hlib.dontCheck hprev.mutable-containers;
 
+            # 0.6.3 in the repo
+            refined = hfinal.refined_0_7;
+
             # it's not yet in hackage2nix
-            string-variants = hfinal.callHackageDirect {
-              pkg = "string-variants";
-              ver = "0.1.0.1";
-              sha256 = "sha256-7oNYwPP8xRNYxKNdNH+21zBHdeUeiWBtKOK5G43xtSQ=";
-            } {};
+            string-variants = hfinal.callHackageDirect
+              {
+                pkg = "string-variants";
+                ver = "0.1.0.1";
+                sha256 = "sha256-7oNYwPP8xRNYxKNdNH+21zBHdeUeiWBtKOK5G43xtSQ=";
+              }
+              { };
           });
       };
     };
