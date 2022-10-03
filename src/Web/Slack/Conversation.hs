@@ -38,26 +38,13 @@ module Web.Slack.Conversation
 where
 
 -- FIXME: Web.Slack.Prelude
-
--- aeson
-
--- base
 import Control.Applicative (empty, (<|>))
--- deepseq
 import Control.DeepSeq (NFData)
 import Data.Aeson
 import Data.Aeson.Encoding
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.TH
 import Data.Aeson.Types
--- http-api-data
-
--- slack-web
-
--- scientific
-
--- text
-
 import Data.Scientific
 import Data.Text (Text)
 import Data.Text qualified as T
