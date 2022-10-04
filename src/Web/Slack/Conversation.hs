@@ -38,25 +38,14 @@ module Web.Slack.Conversation
 where
 
 -- FIXME: Web.Slack.Prelude
-
--- aeson
-
--- base
 import Control.Applicative (empty, (<|>))
--- deepseq
 import Control.DeepSeq (NFData)
 import Data.Aeson
 import Data.Aeson.Encoding
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.TH
 import Data.Aeson.Types
--- http-api-data
-
--- slack-web
-
--- scientific
 import Data.Scientific
--- text
 import Data.Text (Text)
 import Data.Text qualified as T
 import GHC.Generics (Generic)
@@ -117,11 +106,13 @@ data ChannelConversation = ChannelConversation
     -- , channelPendingConnectedTeamIds :: [TeamId]
 
     channelIsPendingExtShared :: Bool
-  , channelIsMember :: Bool
+  , channelIsMember :: Maybe Bool
+  -- ^ Absent from @users.conversations@ response
   , channelTopic :: Topic
   , channelPurpose :: Purpose
   , channelPreviousNames :: [Text]
-  , channelNumMembers :: Integer
+  , channelNumMembers :: Maybe Integer
+  -- ^ Absent from @conversations.join@ response
   }
   deriving stock (Eq, Show, Generic)
 
