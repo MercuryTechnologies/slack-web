@@ -52,6 +52,7 @@ import GHC.Generics (Generic)
 import Web.FormUrlEncoded
 import Web.HttpApiData
 import Web.Slack.Common
+import Web.Slack.Pager.Types (PagedRequest (..), PagedResponse (..), ResponseMetadata (..))
 import Web.Slack.Util
 import Prelude
 
@@ -202,7 +203,7 @@ instance FromJSON Conversation where
         (typeMismatch "Conversation" (Object o))
     where
       parseWhen key con o = do
-        is <- (o .: key)
+        is <- o .: key
         if is
           then con <$> parseJSON (Object o)
           else empty
@@ -260,6 +261,9 @@ instance FromJSON ConversationType where
 data ListReq = ListReq
   { listReqExcludeArchived :: Maybe Bool
   , listReqTypes :: [ConversationType]
+  , listReqCursor :: Maybe Cursor
+  , listReqLimit :: Maybe Int
+  , listReqTeamId :: Maybe TeamId
   }
   deriving stock (Eq, Show, Generic)
 
@@ -273,27 +277,51 @@ mkListReq =
   ListReq
     { listReqExcludeArchived = Nothing
     , listReqTypes = []
+    , listReqLimit = Nothing
+    , listReqTeamId = Nothing
+    , listReqCursor = Nothing
     }
 
 instance ToForm ListReq where
-  toForm (ListReq archived types) =
-    archivedForm <> typesForm
-    where
-      archivedForm =
-        maybe mempty (\val -> [("archived", toUrlPiece val)]) archived
-      typesForm =
-        if null types
-          then mempty
-          else [("types", T.intercalate "," $ map toUrlPiece types)]
+  toForm
+    ( ListReq
+        { listReqExcludeArchived = archived
+        , listReqTypes = types
+        , listReqTeamId
+        , listReqCursor
+        , listReqLimit
+        }
+      ) =
+      archivedForm
+        <> typesForm
+        <> toQueryParamIfJust "team_id" listReqTeamId
+        <> toQueryParamIfJust "cursor" listReqCursor
+        <> toQueryParamIfJust "limit" listReqLimit
+      where
+        archivedForm =
+          maybe mempty (\val -> [("archived", toUrlPiece val)]) archived
+        typesForm =
+          if null types
+            then mempty
+            else [("types", T.intercalate "," $ map toUrlPiece types)]
 
-newtype ListRsp = ListRsp
+data ListRsp = ListRsp
   { listRspChannels :: [Conversation]
+  , listRspResponseMetadata :: Maybe ResponseMetadata
   }
   deriving stock (Eq, Show, Generic)
 
 instance NFData ListRsp
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+
+instance PagedRequest ListReq where
+  setCursor c r = r {listReqCursor = c}
+
+instance PagedResponse ListRsp where
+  type ResponseObject ListRsp = Conversation
+  getResponseData ListRsp {listRspChannels} = listRspChannels
+  getResponseMetadata ListRsp {listRspResponseMetadata} = listRspResponseMetadata
 
 data HistoryReq = HistoryReq
   { historyReqChannel :: ConversationId
@@ -332,13 +360,6 @@ instance ToForm HistoryReq where
       <> toQueryParamIfJust "oldest" historyReqOldest
       <> [("inclusive", toQueryParam (if historyReqInclusive then 1 :: Int else 0))]
 
-newtype ResponseMetadata = ResponseMetadata {responseMetadataNextCursor :: Maybe Cursor}
-  deriving stock (Eq, Show, Generic)
-
-instance NFData ResponseMetadata
-
-$(deriveJSON (jsonOpts "responseMetadata") ''ResponseMetadata)
-
 data HistoryRsp = HistoryRsp
   { historyRspMessages :: [Message]
   , historyRspResponseMetadata :: Maybe ResponseMetadata
@@ -348,6 +369,14 @@ data HistoryRsp = HistoryRsp
 instance NFData HistoryRsp
 
 $(deriveJSON (jsonOpts "historyRsp") ''HistoryRsp)
+
+instance PagedRequest HistoryReq where
+  setCursor c r = r {historyReqCursor = c}
+
+instance PagedResponse HistoryRsp where
+  type ResponseObject HistoryRsp = Message
+  getResponseMetadata HistoryRsp {historyRspResponseMetadata} = historyRspResponseMetadata
+  getResponseData HistoryRsp {historyRspMessages} = historyRspMessages
 
 data RepliesReq = RepliesReq
   { repliesReqTs :: SlackTimestamp
@@ -374,6 +403,9 @@ instance ToForm RepliesReq where
       <> toQueryParamIfJust "latest" repliesReqLatest
       <> toQueryParamIfJust "oldest" repliesReqOldest
       <> [("inclusive", toQueryParam (if repliesReqInclusive then 1 :: Int else 0))]
+
+instance PagedRequest RepliesReq where
+  setCursor c r = r {repliesReqCursor = c}
 
 mkRepliesReq ::
   ConversationId ->

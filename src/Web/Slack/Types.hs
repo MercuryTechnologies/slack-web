@@ -18,14 +18,6 @@ module Web.Slack.Types
   )
 where
 
--- aeson
-
--- http-api-data
-
--- text
-
--- time
-
 import Control.Monad (MonadFail (..))
 import Data.Aeson
 import Data.Text qualified as T
@@ -33,6 +25,7 @@ import Data.Text.Read (rational)
 import Data.Time.Clock
 import Data.Time.Clock.POSIX
 import Web.HttpApiData
+import Web.Slack.Pager.Types
 import Web.Slack.Prelude
 
 -- Ord to allow it to be a key of a Map
@@ -55,10 +48,6 @@ newtype ConversationId = ConversationId {unConversationId :: Text}
 -- Ord to allow it to be a key of a Map
 newtype TeamId = TeamId {unTeamId :: Text}
   deriving stock (Eq, Ord, Generic, Show)
-  deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
-
-newtype Cursor = Cursor {unCursor :: Text}
-  deriving stock (Eq, Generic, Show)
   deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
 
 -- | Message text in the format returned by Slack,
