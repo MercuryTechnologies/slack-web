@@ -26,6 +26,13 @@ module Web.Slack.Experimental.Blocks
     slackMessage,
     SlackBlock (..),
 
+    -- ** Blocks' rich text formatting (receive only!)
+    RichItem(..),
+    RichStyle(..),
+    RichLinkAttrs(..),
+    RichTextSectionItem(..),
+    RichText(..),
+
     -- * Rendered messages
     RenderedSlackMessage (..),
     render,
