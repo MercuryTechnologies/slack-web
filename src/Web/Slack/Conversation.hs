@@ -38,12 +38,7 @@ module Web.Slack.Conversation
 where
 
 -- FIXME: Web.Slack.Prelude
-
--- aeson
-
--- base
 import Control.Applicative (empty, (<|>))
--- deepseq
 import Control.DeepSeq (NFData)
 import Data.Aeson
 import Data.Aeson.Encoding
@@ -112,11 +107,13 @@ data ChannelConversation = ChannelConversation
     -- , channelPendingConnectedTeamIds :: [TeamId]
 
     channelIsPendingExtShared :: Bool
-  , channelIsMember :: Bool
+  , channelIsMember :: Maybe Bool
+  -- ^ Absent from @users.conversations@ response
   , channelTopic :: Topic
   , channelPurpose :: Purpose
   , channelPreviousNames :: [Text]
-  , channelNumMembers :: Integer
+  , channelNumMembers :: Maybe Integer
+  -- ^ Absent from @conversations.join@ response
   }
   deriving stock (Eq, Show, Generic)
 
