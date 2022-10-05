@@ -5,11 +5,13 @@ module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
 import Data.Aeson (Object, Value (..), withArray)
+import Data.Aeson.Types ((.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
 import Refined
 import Refined.Unsafe (reallyUnsafeRefine)
 import Web.Slack.AesonUtils
+import Web.Slack.Common (ConversationId, UserId)
 import Web.Slack.Prelude
 
 -- | Class of types that can be turned into part of a Slack Message. 'message'
@@ -250,11 +252,104 @@ instance ToSlackActionList (SlackAction, SlackAction, SlackAction, SlackAction) 
 instance ToSlackActionList (SlackAction, SlackAction, SlackAction, SlackAction, SlackAction) where
   toSlackActionList (a, b, c, d, e) = SlackActionList $ reallyUnsafeRefine [a, b, c, d, e]
 
+-- | A rich text style. You can't actually send these, for some reason.
+data RichStyle = RichStyle
+  { rsBold :: Bool
+  , rsItalic :: Bool
+  }
+  deriving stock (Eq, Show)
+
+instance Semigroup RichStyle where
+  a <> b = RichStyle {rsBold = rsBold a || rsBold b, rsItalic = rsItalic a || rsItalic b}
+
+instance Monoid RichStyle where
+  mempty = RichStyle {rsBold = False, rsItalic = False}
+
+instance FromJSON RichStyle where
+  parseJSON = withObject "RichStyle" \obj -> do
+    rsBold <- obj .:? "bold" .!= False
+    rsItalic <- obj .:? "italic" .!= False
+    pure RichStyle {..}
+
+data RichLinkAttrs = RichLinkAttrs
+  { style :: RichStyle
+  , url :: Text
+  , text :: Maybe Text
+  -- ^ Probably is empty in the case of links that are just the URL
+  }
+  deriving stock (Eq, Show)
+
+-- | Seemingly only documented at
+--  <https://api.slack.com/changelog/2019-09-what-they-see-is-what-you-get-and-more-and-less>
+--
+--  They warn of undocumented element types. Joy.
+data RichItem
+  = RichItemText Text RichStyle
+  | RichItemChannel ConversationId
+  | RichItemUser UserId RichStyle
+  | RichItemLink RichLinkAttrs
+  | RichItemEmoji Text
+  | RichItemOther Text Value
+  -- FIXME(jadel): date, usergroup, team, broadcast
+  deriving stock (Eq, Show)
+
+instance FromJSON RichItem where
+  parseJSON = withObject "RichItem" \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "text" -> do
+        style <- obj .:? "style" .!= mempty
+        text <- obj .: "text"
+        pure $ RichItemText text style
+      "channel" -> do
+        channelId <- obj .: "chanel_id"
+        pure $ RichItemChannel channelId
+      "emoji" -> do
+        name <- obj .: "name"
+        pure $ RichItemEmoji name
+      "link" -> do
+        url <- obj .: "url"
+        text <- obj .:? "text"
+        style <- obj .:? "style" .!= mempty
+        pure $ RichItemLink RichLinkAttrs {..}
+      "user" -> do
+        userId <- obj .: "user_id"
+        style <- obj .:? "style" .!= mempty
+        pure $ RichItemUser userId style
+      _ -> pure $ RichItemOther kind (Object obj)
+
+data RichTextSectionItem
+  = RichTextSectionItemRichText [RichItem]
+  | RichTextSectionItemUnknown Text Value
+  deriving stock (Eq, Show)
+
+instance FromJSON RichTextSectionItem where
+  parseJSON = withObject "RichTextSectionItem" \obj -> do
+    kind <- obj .: "type"
+    case kind of
+      "rich_text_section" -> do
+        elts <- obj .: "elements"
+        pure $ RichTextSectionItemRichText elts
+      _ -> pure $ RichTextSectionItemUnknown kind (Object obj)
+
+data RichText = RichText
+  { blockId :: Maybe SlackBlockId
+  , elements :: [RichTextSectionItem]
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON RichText where
+  parseJSON = withObject "RichText" \obj -> do
+    blockId <- obj .:? "block_id"
+    elements <- obj .: "elements"
+    pure RichText {..}
+
 data SlackBlock
   = SlackBlockSection SlackText
   | SlackBlockImage SlackImage
   | SlackBlockContext SlackContext
   | SlackBlockDivider
+  | SlackBlockRichText RichText
   | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
   deriving stock (Eq)
 
@@ -272,6 +367,7 @@ instance Show SlackBlock where
         , show $ intercalate ", " (map show (unrefine $ unSlackActionList as))
         , "]"
         ]
+  show (SlackBlockRichText rt) = show rt
 
 instance ToJSON SlackBlock where
   toJSON (SlackBlockSection slackText0) =
@@ -295,6 +391,9 @@ instance ToJSON SlackBlock where
       , "block_id" .=? mBlockId
       , "elements" .=! as
       ]
+  -- FIXME(jadel): should this be an error? Slack doesn't accept these
+  toJSON (SlackBlockRichText _) =
+    object []
 
 instance FromJSON SlackBlock where
   parseJSON = withObject "SlackBlock" $ \obj -> do
@@ -316,7 +415,15 @@ instance FromJSON SlackBlock where
         slackActions <- obj .: "elements"
         mBlockId <- obj .:? "block_id"
         pure $ SlackBlockActions mBlockId slackActions
-      _ -> fail "Unknown SlackBlock type, must be one of ['section', 'context', 'image', 'divider']"
+      "rich_text" -> do
+        elements <- obj .: "elements"
+        mBlockId <- obj .:? "block_id"
+        pure . SlackBlockRichText $
+          RichText
+            { blockId = mBlockId
+            , elements
+            }
+      _ -> fail "Unknown SlackBlock type, must be one of ['section', 'context', 'image', 'divider', 'actions', 'rich_text']"
 
 newtype SlackMessage = SlackMessage [SlackBlock]
   deriving newtype (Semigroup, Monoid, Eq)
