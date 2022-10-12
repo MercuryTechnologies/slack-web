@@ -1,10 +1,10 @@
 module Web.Slack.Experimental.RequestVerificationSpec where
 
-import TestImport
-import Data.Time.Clock.POSIX
-import Web.Slack.Experimental.RequestVerification
 import Data.Aeson
-import qualified Data.Aeson.KeyMap as KeyMap
+import Data.Aeson.KeyMap qualified as KeyMap
+import Data.Time.Clock.POSIX
+import TestImport
+import Web.Slack.Experimental.RequestVerification
 
 spec :: Spec
 spec = do
