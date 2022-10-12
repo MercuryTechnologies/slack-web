@@ -7,12 +7,12 @@ build-type: Simple
 license: MIT
 license-file: LICENSE.md
 
-copyright: 2017 Juan Pedro Villa Isaza
+copyright: 2017 Juan Pedro Villa Isaza, 2022 Mercury Technologies, Inc
 author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
-maintainer: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
+maintainer: Jade Lovelace <jadel@mercury.com>
 
-homepage: https://github.com/jpvillaisaza/slack-web
-bug-reports: https://github.com/jpvillaisaza/slack-web/issues
+homepage: https://github.com/MercuryTechnologies/slack-web
+bug-reports: https://github.com/MercuryTechnologies/slack-web/issues
 
 synopsis: Bindings for the Slack web API
 description: Haskell bindings for the Slack web API.
@@ -110,6 +110,7 @@ library
       Web.Slack.User
       Web.Slack.Experimental.Blocks
       Web.Slack.Experimental.Blocks.Types
+      Web.Slack.Experimental.RequestVerification
   other-modules:
       Web.Slack.Util
       Web.Slack.Prelude
@@ -117,9 +118,13 @@ library
   build-depends:
       aeson >= 2.0 && < 2.2
     , base >= 4.11 && < 4.18
+    , base16-bytestring
+    , bytestring
     , classy-prelude
     , containers
+    , cryptonite
     , deepseq
+    , either
     , errors
     , hashable
     , http-api-data >= 0.3 && < 0.6
@@ -157,6 +162,7 @@ test-suite tests
       Web.Slack.PagerSpec
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
+      Web.Slack.Experimental.RequestVerificationSpec
       TestImport
   build-tool-depends:
     hspec-discover:hspec-discover >=2.6.0 && <2.11
