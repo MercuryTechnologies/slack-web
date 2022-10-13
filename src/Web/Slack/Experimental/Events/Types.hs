@@ -153,7 +153,9 @@ instance FromJSON SlackWebhookEvent where
 
 -- * Event responses
 
--- ^ By and large, Slack does not care about the response returned from event
+-- $eventResponses
+--
+-- By and large, Slack does not care about the response returned from event
 -- handlers, at least for the 'EventEventCallback' as long as your service
 -- 200s. The exception is 'EventUrlVerification', which is expected to return a
 -- 'UrlVerificationResponse'
