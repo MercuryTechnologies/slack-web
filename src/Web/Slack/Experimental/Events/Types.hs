@@ -21,7 +21,7 @@ data ChannelType = Channel | Group | Im
 
 $(deriveJSON snakeCaseOptions ''ChannelType)
 
--- <https://api.slack.com/events/message>
+-- | <https://api.slack.com/events/message>
 data MessageEvent = MessageEvent
   { blocks :: [SlackBlock]
   , channel :: ConversationId
@@ -46,11 +46,13 @@ data MessageEvent = MessageEvent
   }
   deriving stock (Show)
 
--- <https://api.slack.com/events/message/message_changed>
+-- | <https://api.slack.com/events/message/message_changed>
 --
--- FIXME(jadel): implement. This is mega jacked! in the normal message event
+-- FIXME(jadel): implement. This is mega cursed! in the normal message event
 -- the channel is called "channel" but here it is called "channelId" and also
--- has a "channel_name" and "channel_team". what the hell
+-- has a "channel_name" and "channel_team". Why?!
+--
+-- We don't decode these on this basis.
 data MessageUpdateEvent = MessageUpdateEvent
   { message :: MessageEvent
   }
@@ -59,6 +61,8 @@ data MessageUpdateEvent = MessageUpdateEvent
 $(deriveFromJSON snakeCaseOptions ''MessageEvent)
 $(deriveFromJSON snakeCaseOptions ''MessageUpdateEvent)
 
+-- | FIXME: this might be a Channel, but may also be missing some fields/have bonus
+-- because Slack is cursed.
 data CreatedChannel = CreatedChannel
   { id :: ConversationId
   , isChannel :: Bool
@@ -73,6 +77,9 @@ data CreatedChannel = CreatedChannel
   }
   deriving stock (Show)
 
+-- | A channel was created.
+--
+-- <https://api.slack.com/events/channel_created>
 data ChannelCreatedEvent = ChannelCreatedEvent
   { channel :: CreatedChannel
   }
@@ -81,6 +88,9 @@ data ChannelCreatedEvent = ChannelCreatedEvent
 $(deriveFromJSON snakeCaseOptions ''CreatedChannel)
 $(deriveFromJSON snakeCaseOptions ''ChannelCreatedEvent)
 
+-- | You left a channel.
+--
+-- <https://api.slack.com/events/channel_left>
 data ChannelLeftEvent = ChannelLeftEvent
   { actorId :: UserId
   , channel :: ConversationId
@@ -90,6 +100,7 @@ data ChannelLeftEvent = ChannelLeftEvent
 
 $(deriveFromJSON snakeCaseOptions ''ChannelLeftEvent)
 
+-- | <https://api.slack.com/events/url_verification>
 data UrlVerificationPayload = UrlVerificationPayload
   { challenge :: Text
   }
@@ -108,7 +119,9 @@ newtype MessageId = MessageId {unMessageId :: Text}
 data Event
   = EventMessage MessageEvent
   | EventMessageChanged
-  | -- | Weird message of subtype channel_join. Undocumented??
+  | -- | Weird message event of subtype channel_join. Undocumented??
+    --   See test/golden/SlackWebhookEvent/joinChannel.json for a sample of
+    --   this event.
     EventChannelJoinMessage
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
