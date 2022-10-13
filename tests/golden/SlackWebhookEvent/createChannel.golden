@@ -1,0 +1,33 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev0445DETPAA" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1664404606
+            , systemNanoseconds = 0
+            }
+        , event = EventChannelCreated
+            ( ChannelCreatedEvent
+                { channel = CreatedChannel
+                    { id = ConversationId
+                        { unConversationId = "C04493BRXEZ" }
+                    , isChannel = True
+                    , name = "new-channel"
+                    , nameNormalized = "new-channel"
+                    , creator = UserId
+                        { unUserId = "U043H11ES4V" }
+                    , created = MkSystemTime
+                        { systemSeconds = 1664404606
+                        , systemNanoseconds = 0
+                        }
+                    , isShared = False
+                    , isOrgShared = False
+                    , contextTeamId = TeamId
+                        { unTeamId = "T043DB835ML" }
+                    }
+                }
+            )
+        }
+    )

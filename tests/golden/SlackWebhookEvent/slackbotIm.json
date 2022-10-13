@@ -1,0 +1,50 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "message",
+    "text": "You have been removed from #testing-slack-app by <@U043H11ES4V>",
+    "user": "USLACKBOT",
+    "ts": "1664826477.425039",
+    "team": "T043DB835ML",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "ZRe",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "You have been removed from #testing-slack-app by "
+              },
+              {
+                "type": "user",
+                "user_id": "U043H11ES4V"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "channel": "D043HMJ0WDU",
+    "event_ts": "1664826477.425039",
+    "channel_type": "im"
+  },
+  "type": "event_callback",
+  "event_id": "Ev044Y3D66M9",
+  "event_time": 1664826477,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

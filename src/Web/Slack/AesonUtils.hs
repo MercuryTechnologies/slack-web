@@ -98,3 +98,10 @@ thenPair True s = s
 thenPair False _ = mempty
 
 infixr 7 `thenPair`
+
+snakeCaseOptions :: Options
+snakeCaseOptions =
+  defaultOptions
+    { fieldLabelModifier = camelTo2 '_'
+    , constructorTagModifier = camelTo2 '_'
+    }

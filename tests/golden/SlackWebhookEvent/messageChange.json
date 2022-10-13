@@ -1,0 +1,127 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "message",
+    "subtype": "message_changed",
+    "message": {
+      "client_msg_id": "de349a9f-62a4-4293-b64d-701a1f566e8a",
+      "type": "message",
+      "text": "<https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369>",
+      "user": "U043H11ES4V",
+      "team": "T043DB835ML",
+      "attachments": [
+        {
+          "from_url": "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369",
+          "ts": "1663966292.304369",
+          "author_id": "U043H11ES4V",
+          "channel_team": "T043DB835ML",
+          "channel_id": "C043YJGBY49",
+          "channel_name": "general",
+          "is_msg_unfurl": true,
+          "message_blocks": [
+            {
+              "team": "T043DB835ML",
+              "channel": "C043YJGBY49",
+              "ts": "1663966292.304369",
+              "message": {
+                "blocks": [
+                  {
+                    "type": "rich_text",
+                    "block_id": "hn8/C",
+                    "elements": [
+                      {
+                        "type": "rich_text_section",
+                        "elements": [
+                          {
+                            "type": "text",
+                            "text": "asdfhlkfasdlhsdf"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "id": 1,
+          "original_url": "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369",
+          "fallback": "[September 23rd, 2022 1:51 PM] jadel: asdfhlkfasdlhsdf",
+          "text": "asdfhlkfasdlhsdf",
+          "author_name": "jadel",
+          "author_link": "https://jadeapptesting.slack.com/team/U043H11ES4V",
+          "author_icon": "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png",
+          "author_subname": "jadel",
+          "mrkdwn_in": [
+            "text"
+          ],
+          "footer": "Posted in #general"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "FXy3n",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "link",
+                  "url": "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ts": "1663969333.524439"
+    },
+    "previous_message": {
+      "client_msg_id": "de349a9f-62a4-4293-b64d-701a1f566e8a",
+      "type": "message",
+      "text": "<https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369>",
+      "user": "U043H11ES4V",
+      "ts": "1663969333.524439",
+      "team": "T043DB835ML",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "FXy3n",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "link",
+                  "url": "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663966292304369"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "channel": "C043YJGBY49",
+    "hidden": true,
+    "ts": "1663969334.001500",
+    "event_ts": "1663969334.001500",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev043QRVT9FD",
+  "event_time": 1663969334,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

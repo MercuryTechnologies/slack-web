@@ -1,0 +1,47 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "client_msg_id": "1efd76a1-5075-4c2c-ad38-1284820b429f",
+    "type": "message",
+    "text": "test",
+    "user": "U043H11ES4V",
+    "ts": "1664408649.009629",
+    "team": "T043DB835ML",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "LSo",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "test"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "channel": "D0442US94JD",
+    "event_ts": "1664408649.009629",
+    "channel_type": "im"
+  },
+  "type": "event_callback",
+  "event_id": "Ev044C51K43V",
+  "event_time": 1664408649,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}
