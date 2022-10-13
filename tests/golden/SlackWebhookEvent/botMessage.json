@@ -1,0 +1,63 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "bot_id": "B0439P161B9",
+    "type": "message",
+    "text": "TEST",
+    "user": "U0442US8QGH",
+    "ts": "1664216870.477049",
+    "app_id": "A0442TUPHGR",
+    "team": "T043DB835ML",
+    "bot_profile": {
+      "id": "B0439P161B9",
+      "deleted": false,
+      "name": "Slacklinker dev",
+      "updated": 1663960005,
+      "app_id": "A0442TUPHGR",
+      "icons": {
+        "image_36": "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png",
+        "image_48": "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png",
+        "image_72": "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+      },
+      "team_id": "T043DB835ML"
+    },
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "FVI",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "TEST"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "thread_ts": "1664216109.798919",
+    "parent_user_id": "U043H11ES4V",
+    "channel": "C043YJGBY49",
+    "event_ts": "1664216870.477049",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev043VFLT545",
+  "event_time": 1664216870,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

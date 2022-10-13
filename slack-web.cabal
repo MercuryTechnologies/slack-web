@@ -110,6 +110,7 @@ library
       Web.Slack.User
       Web.Slack.Experimental.Blocks
       Web.Slack.Experimental.Blocks.Types
+      Web.Slack.Experimental.Events.Types
       Web.Slack.Experimental.RequestVerification
   other-modules:
       Web.Slack.Util
@@ -159,25 +160,33 @@ test-suite tests
   type:
       exitcode-stdio-1.0
   other-modules:
+      JSONGolden
       Web.Slack.PagerSpec
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
       Web.Slack.Experimental.RequestVerificationSpec
+      Web.Slack.Experimental.Events.TypesSpec
       TestImport
   build-tool-depends:
     hspec-discover:hspec-discover >=2.6.0 && <2.11
   build-depends:
       base
-    , slack-web
-    , classy-prelude
-    , string-conversions
+    , QuickCheck
     , aeson
+    , bytestring
+    , classy-prelude
     , fakepull
     , hspec
-    , text
-    , time
-    , QuickCheck
+    , hspec-core
+    , hspec-golden
+    , pretty-simple
     , quickcheck-instances
+    , slack-web
+    , string-conversions
+    , text
+    , template-haskell
+    , th-compat
+    , time
   default-language:
     Haskell2010
   ghc-options:

@@ -1,0 +1,42 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev044C51K43V" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1664408649
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks =
+                    [ RichText
+                        { blockId = Just
+                            ( NonEmptyText "LSo" )
+                        , elements =
+                            [ RichTextSectionItemRichText
+                                [ RichItemText "test"
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "D0442US94JD" }
+                , text = "test"
+                , channelType = Im
+                , user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , ts = "1664408649.009629"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                }
+            )
+        }
+    )

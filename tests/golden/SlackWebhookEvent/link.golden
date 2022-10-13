@@ -1,0 +1,46 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev043R67DQ1H" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1663978925
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks =
+                    [ RichText
+                        { blockId = Just
+                            ( NonEmptyText "MEdM" )
+                        , elements =
+                            [ RichTextSectionItemRichText
+                                [ RichItemLink
+                                    ( RichLinkAttrs
+                                        { style = RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        , url = "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869"
+                                        , text = Nothing
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C043YJGBY49" }
+                , text = "<https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869>"
+                , channelType = Channel
+                , user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , ts = "1663978925.099999"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                }
+            )
+        }
+    )
