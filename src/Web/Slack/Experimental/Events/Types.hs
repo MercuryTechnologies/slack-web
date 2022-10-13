@@ -119,9 +119,11 @@ newtype MessageId = MessageId {unMessageId :: Text}
 data Event
   = EventMessage MessageEvent
   | EventMessageChanged
-  | -- | Weird message event of subtype channel_join. Undocumented??
-    --   See test/golden/SlackWebhookEvent/joinChannel.json for a sample of
-    --   this event.
+  | -- | Weird message event of subtype channel_join. Sent "sometimes", according
+    -- to a random Slack blog post from 2017:
+    -- <https://api.slack.com/changelog/2017-05-rethinking-channel-entrance-and-exit-events-and-messages>
+    --
+    -- Documentation: <https://api.slack.com/events/message/channel_join>
     EventChannelJoinMessage
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
