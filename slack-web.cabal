@@ -17,6 +17,9 @@ bug-reports: https://github.com/MercuryTechnologies/slack-web/issues
 synopsis: Bindings for the Slack web API
 description: Haskell bindings for the Slack web API.
 
+extra-source-files:
+  tests/golden/**
+
 category: Web
 
 tested-with: GHC == 8.10.7 || ==9.2.4 || == 9.4.2
