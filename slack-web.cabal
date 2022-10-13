@@ -18,7 +18,8 @@ synopsis: Bindings for the Slack web API
 description: Haskell bindings for the Slack web API.
 
 extra-source-files:
-  tests/golden/**
+  tests/golden/SlackWebhookEvent/*.json
+  tests/golden/SlackWebhookEvent/*.golden
 
 category: Web
 
