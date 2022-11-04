@@ -1,8 +1,8 @@
 module Web.Slack.UsersConversationsSpec (spec) where
 
 import JSONGolden
-import Web.Slack.UsersConversations (UsersConversationsResponse)
 import TestImport
+import Web.Slack.UsersConversations (UsersConversationsResponse)
 
 spec :: Spec
 spec = describe "User conversations method" do
