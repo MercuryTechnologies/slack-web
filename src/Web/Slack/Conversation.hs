@@ -37,24 +37,20 @@ module Web.Slack.Conversation
   )
 where
 
--- FIXME: Web.Slack.Prelude
-import Control.Applicative (empty, (<|>))
-import Control.DeepSeq (NFData)
 import Data.Aeson
 import Data.Aeson.Encoding
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.TH
 import Data.Aeson.Types
+import Data.List.NonEmpty (NonEmpty)
 import Data.Scientific
-import Data.Text (Text)
 import Data.Text qualified as T
-import GHC.Generics (Generic)
 import Web.FormUrlEncoded
 import Web.HttpApiData
 import Web.Slack.Common
 import Web.Slack.Pager.Types (PagedRequest (..), PagedResponse (..), ResponseMetadata (..))
+import Web.Slack.Prelude
 import Web.Slack.Util
-import Prelude
 
 data Topic = Topic
   { topicValue :: Text
@@ -96,7 +92,9 @@ data ChannelConversation = ChannelConversation
     channelCreator :: UserId
   , channelIsExtShared :: Bool
   , channelIsOrgShared :: Bool
-  , channelSharedTeamIds :: [TeamId]
+  , channelSharedTeamIds :: Maybe (NonEmpty TeamId)
+  -- ^ Ironically this has been observed to be absent on real shared-channel
+  -- responses.
   , -- FIXME:
     -- I'm not sure the correct type of these fields, because I only found
     -- example responses whose @pending_connected_team_ids@ and
@@ -195,18 +193,29 @@ instance NFData Conversation
 
 instance FromJSON Conversation where
   parseJSON = withObject "Conversation" $ \o ->
-    parseWhen "is_channel" Channel o
-      <|> parseWhen "is_group" Group o
-      <|> parseWhen "is_im" Im o
-      <|> prependFailure
-        "parsing a Conversation failed: neither channel, group, nor im, "
-        (typeMismatch "Conversation" (Object o))
+    fromMaybe (noneMatched o)
+      =<< parseWhen "is_channel" Channel o
+      `parseOr` parseWhen "is_group" Group o
+      `parseOr` parseWhen "is_im" Im o
     where
+      noneMatched o =
+        prependFailure
+          "parsing a Conversation failed: neither channel, group, nor im: "
+          (typeMismatch "Conversation" (Object o))
+
+      -- '(<|>)' that pierces one layer of 'Monad' first
+      parseOr :: (Monad m, Alternative a) => m (a b) -> m (a b) -> m (a b)
+      parseOr = liftM2 (<|>)
+
+      -- This uses the outer Parser monad since deciding which parser to use
+      -- is monadic, then the Maybe to decide which parser is picked, then
+      -- finally the inner parser to actually run it
+      parseWhen :: FromJSON a => Key -> (a -> b) -> Object -> Parser (Maybe (Parser b))
       parseWhen key con o = do
         is <- o .: key
         if is
-          then con <$> parseJSON (Object o)
-          else empty
+          then pure . Just $ con <$> parseJSON (Object o)
+          else pure $ Nothing
 
 instance ToJSON Conversation where
   toJSON (Channel channel) =
@@ -215,8 +224,8 @@ instance ToJSON Conversation where
           . KM.insert "is_channel" (Bool True)
           . KM.insert "is_group" (Bool False)
           $ KM.insert "is_im" (Bool False) obj
-  toJSON (Group group) =
-    let (Object obj) = toJSON group
+  toJSON (Group theGroup) =
+    let (Object obj) = toJSON theGroup
      in Object
           . KM.insert "is_channel" (Bool False)
           . KM.insert "is_group" (Bool True)
