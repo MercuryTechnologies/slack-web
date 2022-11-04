@@ -5,6 +5,7 @@ import Data.Aeson qualified as J
 import Data.Aeson.Types (Pair)
 import Data.Char qualified as Char
 import Data.Text qualified as T
+import Web.FormUrlEncoded qualified as F
 import Web.Slack.Prelude
 
 -- | Checks that a record's field labels each start with the given 'prefix',
@@ -104,4 +105,10 @@ snakeCaseOptions =
   defaultOptions
     { fieldLabelModifier = camelTo2 '_'
     , constructorTagModifier = camelTo2 '_'
+    }
+
+snakeCaseFormOptions :: F.FormOptions
+snakeCaseFormOptions =
+  F.defaultFormOptions
+    { F.fieldLabelModifier = camelTo2 '_'
     }

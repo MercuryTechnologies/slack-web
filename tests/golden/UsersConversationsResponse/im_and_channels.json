@@ -1,0 +1,104 @@
+{
+    "ok": true,
+    "channels": [
+        {
+            "id": "C043YJGBY49",
+            "name": "general",
+            "is_channel": true,
+            "is_group": false,
+            "is_im": false,
+            "is_mpim": false,
+            "is_private": false,
+            "created": 1663890553,
+            "is_archived": false,
+            "is_general": true,
+            "unlinked": 0,
+            "name_normalized": "general",
+            "is_shared": false,
+            "is_org_shared": false,
+            "is_pending_ext_shared": false,
+            "pending_shared": [],
+            "context_team_id": "T043DB835ML",
+            "parent_conversation": null,
+            "creator": "U043H11ES4V",
+            "is_ext_shared": false,
+            "shared_team_ids": [
+                "T043DB835ML"
+            ],
+            "pending_connected_team_ids": [],
+            "topic": {
+                "value": "",
+                "creator": "",
+                "last_set": 0
+            },
+            "purpose": {
+                "value": "This is the one channel that will always include everyone. It’s a great spot for announcements and team-wide conversations.",
+                "creator": "U043H11ES4V",
+                "last_set": 1663890553
+            },
+            "previous_names": []
+        },
+        {
+            "id": "C0451SKQN72",
+            "name": "new-channel-2",
+            "is_channel": true,
+            "is_group": false,
+            "is_im": false,
+            "is_mpim": false,
+            "is_private": false,
+            "created": 1664407230,
+            "is_archived": false,
+            "is_general": false,
+            "unlinked": 0,
+            "name_normalized": "new-channel-2",
+            "is_shared": false,
+            "is_org_shared": false,
+            "is_pending_ext_shared": false,
+            "pending_shared": [],
+            "context_team_id": "T043DB835ML",
+            "parent_conversation": null,
+            "creator": "U043H11ES4V",
+            "is_ext_shared": false,
+            "shared_team_ids": [
+                "T043DB835ML"
+            ],
+            "pending_connected_team_ids": [],
+            "topic": {
+                "value": "",
+                "creator": "",
+                "last_set": 0
+            },
+            "purpose": {
+                "value": "",
+                "creator": "",
+                "last_set": 0
+            },
+            "previous_names": []
+        },
+        {
+            "id": "D0442US94JD",
+            "created": 1663960005,
+            "is_archived": false,
+            "is_im": true,
+            "is_org_shared": false,
+            "context_team_id": "T043DB835ML",
+            "user": "U043H11ES4V",
+            "is_user_deleted": false,
+            "priority": 0
+        },
+        {
+            "id": "D043HMJ0WDU",
+            "created": 1663960005,
+            "is_archived": false,
+            "is_im": true,
+            "is_org_shared": false,
+            "context_team_id": "T043DB835ML",
+            "user": "USLACKBOT",
+            "is_user_deleted": false,
+            "priority": 0
+        }
+    ],
+    "response_metadata": {
+        "next_cursor": ""
+    }
+}

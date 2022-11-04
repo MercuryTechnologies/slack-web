@@ -42,7 +42,6 @@ import Data.Aeson.Encoding
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.TH
 import Data.Aeson.Types
-import Data.List.NonEmpty (NonEmpty)
 import Data.Scientific
 import Data.Text qualified as T
 import Web.FormUrlEncoded
@@ -212,7 +211,8 @@ instance FromJSON Conversation where
       -- finally the inner parser to actually run it
       parseWhen :: FromJSON a => Key -> (a -> b) -> Object -> Parser (Maybe (Parser b))
       parseWhen key con o = do
-        is <- o .: key
+        -- Slack only inconsistently includes the is_* attributes if false.
+        is <- o .:? key .!= False
         if is
           then pure . Just $ con <$> parseJSON (Object o)
           else pure $ Nothing

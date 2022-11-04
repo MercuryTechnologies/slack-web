@@ -15,6 +15,8 @@
 module Web.Slack
   ( SlackConfig (..),
     mkSlackConfig,
+
+    -- * Endpoints
     apiTest,
     authTest,
     chatPostMessage,
@@ -27,6 +29,10 @@ module Web.Slack
     getUserDesc,
     usersList,
     userLookupByEmail,
+    UsersConversations.usersConversations,
+    UsersConversations.usersConversationsAll,
+
+    -- * Requests and responses
     authenticateReq,
     Response,
     LoadPage,
@@ -35,23 +41,10 @@ where
 
 -- FIXME: Web.Slack.Prelude
 
--- base
 import Control.Arrow ((&&&))
--- containers
 import Data.Map qualified as Map
 import Data.Maybe
 import Data.Proxy (Proxy (..))
--- http-client
-
--- http-client-tls
-
--- servant
-
--- servant-client
-
--- slack-web
-
--- text
 import Data.Text (Text)
 import Network.HTTP.Client (Manager, newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
@@ -66,6 +59,7 @@ import Web.Slack.Conversation qualified as Conversation
 import Web.Slack.Internal
 import Web.Slack.Pager
 import Web.Slack.User qualified as User
+import Web.Slack.UsersConversations qualified as UsersConversations
 import Prelude
 
 type Api =
