@@ -45,11 +45,19 @@
             slack-web = pkgs.haskell.packages.${ghcVer}.slack-web;
           };
 
-          checks = {
+          checks = rec {
             # due to https://github.com/NixOS/nix/issues/4265 breaking
-            # import-from-derivation inside nix flake checks, this is kind of
-            # useless
-            # inherit (self.packages.${system}) slack-web;
+            # import-from-derivation inside nix flake checks, nix flake check
+            # does not work and you need to use `nix build .#checks.yourSystem.all`
+            all = pkgs.writeTextFile {
+              name = "all-checks";
+              text = ''
+                ${pre-commit-check}
+                ${slack-web}
+              '';
+            };
+
+            inherit (self.packages.${system}) slack-web;
 
             pre-commit-check = pre-commit-hooks.lib.${system}.run {
               src = ./.;
