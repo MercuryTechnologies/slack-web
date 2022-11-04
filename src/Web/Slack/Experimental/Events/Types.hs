@@ -128,7 +128,7 @@ data Event
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
   | EventUnknown Value
-  deriving stock (Show)
+  deriving stock (Show, Generic)
 
 instance FromJSON Event where
   parseJSON = withObject "MessageEvent" \obj -> do
@@ -156,7 +156,7 @@ data SlackWebhookEvent
   = EventUrlVerification UrlVerificationPayload
   | EventEventCallback EventCallback
   | EventUnknownWebhook Value
-  deriving stock (Show)
+  deriving stock (Show, Generic)
 
 instance FromJSON SlackWebhookEvent where
   parseJSON = withObject "SlackWebhookEvent" \obj -> do
