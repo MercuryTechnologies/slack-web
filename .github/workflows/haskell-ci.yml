@@ -157,19 +157,6 @@ jobs:
           echo "package slack-web" >> cabal.project
           echo "    ghc-options: -Werror=missing-methods" >> cabal.project
           cat >> cabal.project <<EOF
-          source-repository-package
-            type:     git
-            location: https://github.com/TeofilC/servant.git
-            tag:      a53d69929cf6fe531bb25aec65e7ab6405278459
-            subdir:
-              servant
-              servant-client
-              servant-client-core
-
-          source-repository-package
-            type:     git
-            location: https://github.com/nikita-volkov/refined
-            tag:      eced2bb0991bde971646e4b3d291870d0aab83a3
           EOF
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(slack-web)$/; }' >> cabal.project.local
           cat cabal.project
