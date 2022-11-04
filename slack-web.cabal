@@ -20,6 +20,8 @@ description: Haskell bindings for the Slack web API.
 extra-source-files:
   tests/golden/SlackWebhookEvent/*.json
   tests/golden/SlackWebhookEvent/*.golden
+  tests/golden/Conversation/*.json
+  tests/golden/Conversation/*.golden
 
 category: Web
 

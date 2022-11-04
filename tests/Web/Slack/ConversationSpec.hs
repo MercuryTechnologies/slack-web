@@ -12,6 +12,7 @@ where
 import Data.Aeson
 -- time
 import Data.Time.Clock.POSIX
+import JSONGolden
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 import Test.QuickCheck.Instances ()
@@ -111,3 +112,26 @@ spec = describe "ToJSON and FromJSON for Conversation" $ do
   prop "the encoded json is decoded as " $ \conversation -> do
     actual <- either fail return . eitherDecode $ encode conversation
     actual `shouldBe` (conversation :: Conversation)
+
+  describe "Golden tests" $ do
+    mapM_ (oneGoldenTest @Conversation) ["shared_channel"]
+
+  it "errors accurately if no variant matches" $ do
+    let badData =
+          object
+            [ ("is_group", Bool False)
+            , ("is_im", Bool False)
+            , ("is_channel", Bool False)
+            ]
+    fromJSON @Conversation badData
+      `shouldBe` Error "parsing a Conversation failed: neither channel, group, nor im: expected Conversation, but encountered Object"
+
+  it "has good errors if a variant matches but is missing fields" $ do
+    let badData =
+          object
+            [ ("is_group", Bool False)
+            , ("is_im", Bool False)
+            , ("is_channel", Bool True)
+            ]
+    fromJSON @Conversation badData
+      `shouldBe` Error "When parsing the record ChannelConversation of type Web.Slack.Conversation.ChannelConversation the key id was not present."
