@@ -294,7 +294,7 @@ mkListReq =
 instance ToForm ListReq where
   toForm
     ( ListReq
-        { listReqExcludeArchived = archived
+        { listReqExcludeArchived
         , listReqTypes = types
         , listReqTeamId
         , listReqCursor
@@ -308,7 +308,7 @@ instance ToForm ListReq where
         <> toQueryParamIfJust "limit" listReqLimit
       where
         archivedForm =
-          maybe mempty (\val -> [("archived", toUrlPiece val)]) archived
+          maybe mempty (\val -> [("exclude_archived", toUrlPiece val)]) listReqExcludeArchived
         typesForm =
           if null types
             then mempty
