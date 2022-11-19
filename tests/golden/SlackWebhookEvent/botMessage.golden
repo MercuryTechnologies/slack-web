@@ -10,8 +10,8 @@ EventEventCallback
             }
         , event = EventMessage
             ( MessageEvent
-                { blocks =
-                    [ RichText
+                { blocks = Just
+                    ( RichText
                         { blockId = Just
                             ( NonEmptyText "FVI" )
                         , elements =
@@ -24,8 +24,8 @@ EventEventCallback
                                     )
                                 ]
                             ]
-                        }
-                    ]
+                        } :| []
+                    )
                 , channel = ConversationId
                     { unConversationId = "C043YJGBY49" }
                 , text = "TEST"

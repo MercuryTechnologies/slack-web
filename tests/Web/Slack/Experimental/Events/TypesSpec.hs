@@ -19,4 +19,5 @@ spec = describe "Types for Slack events" do
         , "messageIm"
         , "slackbotIm"
         , "channel_left"
+        , "share_without_message"
         ]

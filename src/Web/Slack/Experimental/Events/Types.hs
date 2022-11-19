@@ -23,7 +23,7 @@ $(deriveJSON snakeCaseOptions ''ChannelType)
 
 -- | <https://api.slack.com/events/message>
 data MessageEvent = MessageEvent
-  { blocks :: [SlackBlock]
+  { blocks :: Maybe (NonEmpty SlackBlock)
   , channel :: ConversationId
   , text :: Text
   , channelType :: ChannelType

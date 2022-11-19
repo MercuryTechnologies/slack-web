@@ -10,8 +10,8 @@ EventEventCallback
             }
         , event = EventMessage
             ( MessageEvent
-                { blocks =
-                    [ RichText
+                { blocks = Just
+                    ( RichText
                         { blockId = Just
                             ( NonEmptyText "ZRe" )
                         , elements =
@@ -33,8 +33,8 @@ EventEventCallback
                                     )
                                 ]
                             ]
-                        }
-                    ]
+                        } :| []
+                    )
                 , channel = ConversationId
                     { unConversationId = "D043HMJ0WDU" }
                 , text = "You have been removed from #testing-slack-app by <@U043H11ES4V>"
