@@ -12,32 +12,33 @@
 -- *Since 0.4.0.0*: The API functions is now more intuitive for newbies
 -- than before. If you need compatiblity with the previous version, use
 -- 'Web.Slack.Classy' instead.
-module Web.Slack (
-  SlackConfig (..),
-  mkSlackConfig,
+module Web.Slack
+  ( SlackConfig (..),
+    mkSlackConfig,
 
-  -- * Endpoints
-  apiTest,
-  authTest,
-  chatPostMessage,
-  chatUpdate,
-  conversationsList,
-  conversationsListAll,
-  conversationsHistory,
-  conversationsHistoryAll,
-  conversationsReplies,
-  repliesFetchAll,
-  getUserDesc,
-  usersList,
-  userLookupByEmail,
-  UsersConversations.usersConversations,
-  UsersConversations.usersConversationsAll,
+    -- * Endpoints
+    apiTest,
+    authTest,
+    chatPostMessage,
+    chatUpdate,
+    conversationsList,
+    conversationsListAll,
+    conversationsHistory,
+    conversationsHistoryAll,
+    conversationsReplies,
+    repliesFetchAll,
+    getUserDesc,
+    usersList,
+    userLookupByEmail,
+    UsersConversations.usersConversations,
+    UsersConversations.usersConversationsAll,
 
-  -- * Requests and responses
-  authenticateReq,
-  Response,
-  LoadPage,
-) where
+    -- * Requests and responses
+    authenticateReq,
+    Response,
+    LoadPage,
+  )
+where
 
 -- FIXME: Web.Slack.Prelude
 
