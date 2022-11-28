@@ -16,9 +16,9 @@ UsersConversationsResponse
                 , channelIsExtShared = False
                 , channelIsOrgShared = False
                 , channelSharedTeamIds = Just
-                    ( TeamId
-                        { unTeamId = "T043DB835ML" } :| []
-                    )
+                    [ TeamId
+                        { unTeamId = "T043DB835ML" }
+                    ]
                 , channelIsPendingExtShared = False
                 , channelIsMember = Nothing
                 , channelTopic = Topic
@@ -51,9 +51,9 @@ UsersConversationsResponse
                 , channelIsExtShared = False
                 , channelIsOrgShared = False
                 , channelSharedTeamIds = Just
-                    ( TeamId
-                        { unTeamId = "T043DB835ML" } :| []
-                    )
+                    [ TeamId
+                        { unTeamId = "T043DB835ML" }
+                    ]
                 , channelIsPendingExtShared = False
                 , channelIsMember = Nothing
                 , channelTopic = Topic
