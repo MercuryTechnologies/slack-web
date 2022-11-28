@@ -91,7 +91,7 @@ data ChannelConversation = ChannelConversation
     channelCreator :: UserId
   , channelIsExtShared :: Bool
   , channelIsOrgShared :: Bool
-  , channelSharedTeamIds :: Maybe (NonEmpty TeamId)
+  , channelSharedTeamIds :: Maybe [TeamId]
   -- ^ Ironically this has been observed to be absent on real shared-channel
   -- responses.
   , -- FIXME:
