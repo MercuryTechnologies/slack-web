@@ -1,0 +1,6 @@
+UpdateRsp
+    { updateRspChannel = ConversationId
+        { unConversationId = "C024BE91L" }
+    , updateRspTs = "1401383885.000061"
+    , updateRspText = "Updated text you carefully authored"
+    }

@@ -20,4 +20,4 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Run all nix checks
         run: |
-          nix build --keep-going ".#checks.x86_64-linux.all"
+          nix build --print-build-logs --keep-going ".#checks.x86_64-linux.all"

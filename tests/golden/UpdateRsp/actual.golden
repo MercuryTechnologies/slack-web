@@ -1,0 +1,6 @@
+UpdateRsp
+    { updateRspChannel = ConversationId
+        { unConversationId = "D0442US94JD" }
+    , updateRspTs = "1668717810.728689"
+    , updateRspText = "blahblahblah"
+    }

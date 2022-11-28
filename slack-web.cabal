@@ -24,6 +24,8 @@ extra-source-files:
   tests/golden/Conversation/*.golden
   tests/golden/UsersConversationsResponse/*.json
   tests/golden/UsersConversationsResponse/*.golden
+  tests/golden/UpdateRsp/*.json
+  tests/golden/UpdateRsp/*.golden
 
 category: Web
 
@@ -174,6 +176,7 @@ test-suite tests
       Web.Slack.PagerSpec
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
+      Web.Slack.ChatSpec
       Web.Slack.UsersConversationsSpec
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec

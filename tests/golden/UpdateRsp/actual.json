@@ -1,0 +1,48 @@
+{
+    "ok": true,
+    "channel": "D0442US94JD",
+    "ts": "1668717810.728689",
+    "text": "blahblahblah",
+    "message": {
+        "bot_id": "B0439P161B9",
+        "type": "message",
+        "text": "blahblahblah",
+        "user": "U0442US8QGH",
+        "app_id": "A0442TUPHGR",
+        "blocks": [
+            {
+                "type": "rich_text",
+                "block_id": "j1Bvn",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "blahblahblah"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "team": "T043DB835ML",
+        "bot_profile": {
+            "id": "B0439P161B9",
+            "app_id": "A0442TUPHGR",
+            "name": "Slacklinker dev",
+            "icons": {
+                "image_36": "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png",
+                "image_48": "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png",
+                "image_72": "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+            },
+            "deleted": false,
+            "updated": 1663960005,
+            "team_id": "T043DB835ML"
+        },
+        "edited": {
+            "user": "B0439P161B9",
+            "ts": "1668721589.000000"
+        }
+    }
+}

@@ -20,6 +20,7 @@ module Web.Slack
     apiTest,
     authTest,
     chatPostMessage,
+    chatUpdate,
     conversationsList,
     conversationsListAll,
     conversationsHistory,
@@ -85,6 +86,10 @@ type Api =
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] Chat.PostMsgReq
       :> Post '[JSON] (ResponseJSON Chat.PostMsgRsp)
+    :<|> "chat.update"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Chat.UpdateReq
+      :> Post '[JSON] (ResponseJSON Chat.UpdateRsp)
     :<|> "users.list"
       :> AuthProtect "token"
       :> Post '[JSON] (ResponseJSON User.ListRsp)
@@ -213,6 +218,22 @@ chatPostMessage_ ::
   Chat.PostMsgReq ->
   ClientM (ResponseJSON Chat.PostMsgRsp)
 
+-- | Updates a message.
+--
+-- <https://api.slack.com/methods/chat.update>
+chatUpdate ::
+  SlackConfig ->
+  Chat.UpdateReq ->
+  IO (Response Chat.UpdateRsp)
+chatUpdate = flip $ \updateReq -> do
+  authR <- mkSlackAuthenticateReq
+  run (chatUpdate_ authR updateReq) . slackConfigManager
+
+chatUpdate_ ::
+  AuthenticatedRequest (AuthProtect "token") ->
+  Chat.UpdateReq ->
+  ClientM (ResponseJSON Chat.UpdateRsp)
+
 -- |
 --
 -- This method returns a list of all users in the team.
@@ -299,6 +320,7 @@ apiTest_
   :<|> conversationsHistory_
   :<|> conversationsReplies_
   :<|> chatPostMessage_
+  :<|> chatUpdate_
   :<|> usersList_
   :<|> userLookupByEmail_ =
     client (Proxy :: Proxy Api)
