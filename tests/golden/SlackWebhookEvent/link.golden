@@ -11,7 +11,7 @@ EventEventCallback
         , event = EventMessage
             ( MessageEvent
                 { blocks = Just
-                    ( RichText
+                    [ RichText
                         { blockId = Just
                             ( NonEmptyText "MEdM" )
                         , elements =
@@ -28,8 +28,8 @@ EventEventCallback
                                     )
                                 ]
                             ]
-                        } :| []
-                    )
+                        }
+                    ]
                 , channel = ConversationId
                     { unConversationId = "C043YJGBY49" }
                 , text = "<https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869>"
