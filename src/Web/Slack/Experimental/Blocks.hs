@@ -8,6 +8,7 @@ module Web.Slack.Experimental.Blocks
     ticks,
     codeBlock,
     bold,
+    italic,
     newline,
     unorderedList,
     link,
@@ -104,6 +105,9 @@ codeBlock x = "```\n" <> x <> "\n```"
 
 bold :: SlackText -> SlackText
 bold x = "*" <> x <> "*"
+
+italic :: SlackText -> SlackText
+italic x = "_" <> x <> "_"
 
 newline :: SlackText -> SlackText
 newline x = "\n" <> x
