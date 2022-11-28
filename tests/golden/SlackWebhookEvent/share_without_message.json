@@ -1,0 +1,78 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "message",
+    "text": "",
+    "user": "U043H11ES4V",
+    "ts": "1668537593.598469",
+    "team": "T043DB835ML",
+    "attachments": [
+      {
+        "from_url": "https://jadeapptesting.slack.com/archives/C043KSKGJUB/p1665615886364019",
+        "ts": "1665615886.364019",
+        "author_id": "U043H11ES4V",
+        "channel_id": "C043KSKGJUB",
+        "channel_team": "T043DB835ML",
+        "channel_name": "testing-slack-app",
+        "is_msg_unfurl": true,
+        "message_blocks": [
+          {
+            "team": "T043DB835ML",
+            "channel": "C043KSKGJUB",
+            "ts": "1665615886.364019",
+            "message": {
+              "blocks": [
+                {
+                  "type": "rich_text",
+                  "block_id": "TNHa4",
+                  "elements": [
+                    {
+                      "type": "rich_text_section",
+                      "elements": [
+                        {
+                          "type": "text",
+                          "text": "blahblahblahblahblah"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "color": "D0D0D0",
+        "is_share": true,
+        "fallback": "[October 12th, 2022 4:04 PM] jadel: blahblahblahblahblah",
+        "text": "blahblahblahblahblah",
+        "author_name": "jadel",
+        "author_link": "https://jadeapptesting.slack.com/team/U043H11ES4V",
+        "author_icon": "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png",
+        "author_subname": "jadel",
+        "mrkdwn_in": [
+          "text"
+        ],
+        "footer": "Posted in #testing-slack-app"
+      }
+    ],
+    "channel": "C043YJGBY49",
+    "event_ts": "1668537593.598469",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev04BEN3QMSM",
+  "event_time": 1668537593,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

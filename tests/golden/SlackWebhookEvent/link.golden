@@ -10,7 +10,7 @@ EventEventCallback
             }
         , event = EventMessage
             ( MessageEvent
-                { blocks =
+                { blocks = Just
                     [ RichText
                         { blockId = Just
                             ( NonEmptyText "MEdM" )
