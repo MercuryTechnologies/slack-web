@@ -9,7 +9,7 @@ spec = describe "Types for Slack events" do
   describe "SlackWebhookEvent" do
     describe "FromJSON" do
       mapM_
-        (oneGoldenTest @SlackWebhookEvent)
+        (oneGoldenTestDecode @SlackWebhookEvent)
         [ "messageExample"
         , "messageChange"
         , "link"

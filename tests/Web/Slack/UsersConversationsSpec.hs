@@ -7,4 +7,4 @@ import Web.Slack.UsersConversations (UsersConversationsResponse)
 spec :: Spec
 spec = describe "User conversations method" do
   describe "Response FromJSON" do
-    mapM_ (oneGoldenTest @UsersConversationsResponse) ["im_and_channels"]
+    mapM_ (oneGoldenTestDecode @UsersConversationsResponse) ["im_and_channels"]
