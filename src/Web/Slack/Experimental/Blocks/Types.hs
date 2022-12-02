@@ -346,7 +346,7 @@ instance FromJSON RichText where
 
 data SlackAccessory
   = SlackButtonAccessory SlackAction -- button
-  deriving stock (Eq, Show)
+  deriving stock (Eq)
 
 instance ToJSON SlackAccessory where
   toJSON (SlackButtonAccessory btn) = toJSON btn
@@ -354,8 +354,11 @@ instance ToJSON SlackAccessory where
 instance FromJSON SlackAccessory where
   parseJSON v = SlackButtonAccessory <$> parseJSON v
 
+instance Show SlackAccessory where
+  show (SlackButtonAccessory btn) = show btn
+
 buttonAccessory :: SlackAction -> SlackText -> SlackBlock
-buttonAccessory btn txt = SlackBlockSection txt btn
+buttonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
 
 data SlackBlock
   = SlackBlockSection SlackText (Maybe SlackAccessory)
@@ -368,8 +371,9 @@ data SlackBlock
   deriving stock (Eq)
 
 instance Show SlackBlock where
-  show (SlackBlockSection t _) =
-    show t -- TODO show maybe accessory
+  show (SlackBlockSection t Nothing) = show t
+  show (SlackBlockSection t (Just mAccessory)) =
+    show $ mconcat [show t, " [", show mAccessory, "]"]
   show (SlackBlockImage i) = show i
   show (SlackBlockContext contents) = show contents
   show SlackBlockDivider = "|"
