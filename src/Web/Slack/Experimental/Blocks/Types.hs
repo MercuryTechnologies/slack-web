@@ -344,6 +344,8 @@ instance FromJSON RichText where
     elements <- obj .: "elements"
     pure RichText {..}
 
+-- | Accessory is a type of optional block element that floats to the right of text in a BlockSection.
+--   <https://api.slack.com/reference/block-kit/blocks#section_fields>
 data SlackAccessory
   = SlackButtonAccessory SlackAction -- button
   deriving stock (Eq)
@@ -357,8 +359,9 @@ instance FromJSON SlackAccessory where
 instance Show SlackAccessory where
   show (SlackButtonAccessory btn) = show btn
 
-buttonAccessory :: SlackAction -> SlackText -> SlackBlock
-buttonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
+-- | Small helper function for constructing a section with a button accessory out of a button and text components
+sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
+sectionWithButtonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
 
 data SlackBlock
   = SlackBlockSection SlackText (Maybe SlackAccessory)
