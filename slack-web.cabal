@@ -26,6 +26,7 @@ extra-source-files:
   tests/golden/UsersConversationsResponse/*.golden
   tests/golden/UpdateRsp/*.json
   tests/golden/UpdateRsp/*.golden
+  tests/golden/BlockKitBuilderMessage/*.golden.json
 
 category: Web
 
@@ -180,6 +181,7 @@ test-suite tests
       Web.Slack.UsersConversationsSpec
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec
+      Web.Slack.Experimental.BlocksSpec
       TestImport
   build-tool-depends:
     hspec-discover:hspec-discover >=2.6.0 && <2.11
@@ -194,12 +196,14 @@ test-suite tests
     , hspec
     , hspec-core
     , hspec-golden
+    , mtl
     , pretty-simple
     , quickcheck-instances
     , slack-web
     , string-conversions
-    , text
+    , string-variants
     , template-haskell
+    , text
     , th-compat
     , time
   default-language:

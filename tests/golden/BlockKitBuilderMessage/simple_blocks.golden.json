@@ -1,0 +1,137 @@
+{
+    "blocks": [
+        {
+            "text": {
+                "text": "Blah: \na, b, c",
+                "type": "plain_text"
+            },
+            "type": "header"
+        },
+        {
+            "type": "divider"
+        },
+        {
+            "text": {
+                "text": "*blah, blah2, blah3*",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "accessory": {
+                "action_id": "doNothing",
+                "text": {
+                    "text": ":mag: Look at it",
+                    "type": "plain_text"
+                },
+                "type": "button",
+                "url": "https://google.com"
+            },
+            "text": {
+                "text": "`blah`",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "accessory": {
+                "action_id": "doNothing",
+                "text": {
+                    "text": ":office: Look at it but different",
+                    "type": "plain_text"
+                },
+                "type": "button",
+                "url": "https://google.com"
+            },
+            "text": {
+                "text": "*blah, blah2, blah3*",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "text": {
+                "text": "*Letters:*\na, b, c",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "text": {
+                "text": "blah1, blah2, blah3",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "type": "divider"
+        },
+        {
+            "text": {
+                "text": "*blah*",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "accessory": {
+                "action_id": "doNothing",
+                "text": {
+                    "text": ":bank: Look at it!",
+                    "type": "plain_text"
+                },
+                "type": "button",
+                "url": "https://google.com"
+            },
+            "text": {
+                "text": "*blah*",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
+            "elements": [
+                {
+                    "text": ":key: Context!",
+                    "type": "mrkdwn"
+                }
+            ],
+            "type": "context"
+        },
+        {
+            "type": "divider"
+        },
+        {
+            "elements": [
+                {
+                    "action_id": "doNothing",
+                    "text": {
+                        "text": ":mag: View",
+                        "type": "plain_text"
+                    },
+                    "type": "button",
+                    "url": "https://google.com"
+                },
+                {
+                    "action_id": "doNothing2",
+                    "text": {
+                        "text": ":office: View",
+                        "type": "plain_text"
+                    },
+                    "type": "button",
+                    "url": "https://google.com"
+                },
+                {
+                    "action_id": "doNothing3",
+                    "text": {
+                        "text": ":bank: View",
+                        "type": "plain_text"
+                    },
+                    "type": "button",
+                    "url": "https://google.com"
+                }
+            ],
+            "type": "actions"
+        }
+    ]
+}

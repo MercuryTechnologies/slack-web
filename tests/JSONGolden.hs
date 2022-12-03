@@ -43,13 +43,13 @@ goldenTestEncode name value = do
   let output = AP.encodePretty @a value
       theTypeName = typeName @a
    in Golden
-        { output = toStrict . pShowNoColor $ output
+        { output = cs output
         , encodePretty = unpack
         , writeToFile = T.writeFile
         , -- deal with vim related EOF
           readFromFile = \fname -> stripEnd <$> T.readFile fname
-        , goldenFile = filename theTypeName name ++ ".golden"
-        , actualFile = Just $ filename theTypeName name ++ ".actual"
+        , goldenFile = filename theTypeName name ++ ".golden.json"
+        , actualFile = Just $ filename theTypeName name ++ ".actual.json"
         , failFirstTime = True
         }
 
