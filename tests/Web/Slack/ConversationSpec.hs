@@ -114,7 +114,7 @@ spec = describe "ToJSON and FromJSON for Conversation" $ do
     actual `shouldBe` (conversation :: Conversation)
 
   describe "Golden tests" $ do
-    mapM_ (oneGoldenTest @Conversation) ["shared_channel"]
+    mapM_ (oneGoldenTestDecode @Conversation) ["shared_channel"]
 
   it "errors accurately if no variant matches" $ do
     let badData =

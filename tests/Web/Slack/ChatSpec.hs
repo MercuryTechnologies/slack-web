@@ -8,4 +8,4 @@ spec :: Spec
 spec = describe "Chat methods" do
   describe "chat.update" do
     describe "Response FromJSON" do
-      mapM_ (oneGoldenTest @UpdateRsp) ["sample", "actual"]
+      mapM_ (oneGoldenTestDecode @UpdateRsp) ["sample", "actual"]

@@ -344,17 +344,39 @@ instance FromJSON RichText where
     elements <- obj .: "elements"
     pure RichText {..}
 
+-- | Accessory is a type of optional block element that floats to the right of text in a BlockSection.
+--   <https://api.slack.com/reference/block-kit/blocks#section_fields>
+data SlackAccessory
+  = SlackButtonAccessory SlackAction -- button
+  deriving stock (Eq)
+
+instance ToJSON SlackAccessory where
+  toJSON (SlackButtonAccessory btn) = toJSON btn
+
+instance FromJSON SlackAccessory where
+  parseJSON v = SlackButtonAccessory <$> parseJSON v
+
+instance Show SlackAccessory where
+  show (SlackButtonAccessory btn) = show btn
+
+-- | Small helper function for constructing a section with a button accessory out of a button and text components
+sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
+sectionWithButtonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
+
 data SlackBlock
-  = SlackBlockSection SlackText
+  = SlackBlockSection SlackText (Maybe SlackAccessory)
   | SlackBlockImage SlackImage
   | SlackBlockContext SlackContext
   | SlackBlockDivider
   | SlackBlockRichText RichText
   | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
+  | SlackBlockHeader SlackPlainTextOnly -- max length 150
   deriving stock (Eq)
 
 instance Show SlackBlock where
-  show (SlackBlockSection t) = show t
+  show (SlackBlockSection t Nothing) = show t
+  show (SlackBlockSection t (Just mAccessory)) =
+    show $ mconcat [show t, " [", show mAccessory, "]"]
   show (SlackBlockImage i) = show i
   show (SlackBlockContext contents) = show contents
   show SlackBlockDivider = "|"
@@ -368,12 +390,14 @@ instance Show SlackBlock where
         , "]"
         ]
   show (SlackBlockRichText rt) = show rt
+  show (SlackBlockHeader p) = show p
 
 instance ToJSON SlackBlock where
-  toJSON (SlackBlockSection slackText0) =
-    object
-      [ "type" .= ("section" :: Text)
-      , "text" .= SlackContentText slackText0
+  toJSON (SlackBlockSection slackText mSectionAccessory) =
+    objectOptional
+      [ "type" .=! ("section" :: Text)
+      , "text" .=! SlackContentText slackText
+      , "accessory" .=? mSectionAccessory
       ]
   toJSON (SlackBlockImage i) = toJSON (SlackContentImage i)
   toJSON (SlackBlockContext contents) =
@@ -394,6 +418,11 @@ instance ToJSON SlackBlock where
   -- FIXME(jadel): should this be an error? Slack doesn't accept these
   toJSON (SlackBlockRichText _) =
     object []
+  toJSON (SlackBlockHeader slackPlainText) =
+    object
+      [ "type" .= ("header" :: Text)
+      , "text" .= slackPlainText
+      ]
 
 instance FromJSON SlackBlock where
   parseJSON = withObject "SlackBlock" $ \obj -> do
@@ -402,7 +431,8 @@ instance FromJSON SlackBlock where
       "section" -> do
         (sectionContentObj :: Value) <- obj .: "text"
         SlackContentText sectionContentText <- parseJSON sectionContentObj
-        pure $ SlackBlockSection sectionContentText
+        mSectionAccessory <- obj .:? "accessory"
+        pure $ SlackBlockSection sectionContentText mSectionAccessory
       "context" -> do
         (contextElementsObj :: Value) <- obj .: "elements"
         slackContent <- parseJSON contextElementsObj
@@ -423,7 +453,11 @@ instance FromJSON SlackBlock where
             { blockId = mBlockId
             , elements
             }
-      _ -> fail "Unknown SlackBlock type, must be one of ['section', 'context', 'image', 'divider', 'actions', 'rich_text']"
+      "header" -> do
+        (headerContentObj :: Value) <- obj .: "text"
+        headerContentText <- parseJSON headerContentObj
+        pure $ SlackBlockHeader headerContentText
+      _ -> fail "Unknown SlackBlock type, must be one of ['section', 'context', 'image', 'divider', 'actions', 'rich_text', 'header']"
 
 newtype SlackMessage = SlackMessage [SlackBlock]
   deriving newtype (Semigroup, Monoid, Eq)
@@ -447,7 +481,7 @@ class Markdown a where
   markdown :: SlackText -> a
 
 instance Markdown SlackMessage where
-  markdown t = SlackMessage [SlackBlockSection t]
+  markdown t = SlackMessage [SlackBlockSection t Nothing]
 
 instance Markdown SlackContext where
   markdown t = SlackContext [SlackContentText t]

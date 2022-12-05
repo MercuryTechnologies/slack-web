@@ -161,20 +161,20 @@ truncateSlackMessage (SlackMessage blocks) =
    in (SlackMessage truncatedBlocks, or isTruncateds)
 
 truncateSlackBlock :: SlackBlock -> (SlackBlock, Bool)
-truncateSlackBlock sb@(SlackBlockSection (SlackText texts)) =
+truncateSlackBlock sb@(SlackBlockSection (SlackText texts) mAccessory) =
   let messageLength = sum $ map T.length texts
       lengthLimit = 3000
       truncationMessage = "\n...Rest of message truncated for slack\n"
       truncationMessageLength = T.length truncationMessage
       truncateTexts ts = take (lengthLimit - truncationMessageLength) (concat ts)
    in if messageLength > lengthLimit
-        then (SlackBlockSection (SlackText [truncateTexts texts <> "\n...Rest of message truncated for slack\n"]), True)
+        then (SlackBlockSection (SlackText [truncateTexts texts <> "\n...Rest of message truncated for slack\n"]) mAccessory, True)
         else (sb, False)
 -- possible to also truncate SlackContexts, but we never put long strings in there.
 truncateSlackBlock x = (x, False)
 
 prefixFirstSlackBlockSection :: Text -> [SlackBlock] -> ([SlackBlock], Bool)
-prefixFirstSlackBlockSection prefix (SlackBlockSection slackBlockSection : sbs) = (SlackBlockSection (message prefix <> slackBlockSection) : sbs, True)
+prefixFirstSlackBlockSection prefix (SlackBlockSection text mAccessory : sbs) = (SlackBlockSection (message prefix <> text) mAccessory : sbs, True)
 prefixFirstSlackBlockSection prefix (sb : sbs) = let (prefixedSbs, match) = prefixFirstSlackBlockSection prefix sbs in (sb : prefixedSbs, match)
 prefixFirstSlackBlockSection _ [] = ([], False)
 
@@ -189,7 +189,7 @@ prefixFirstSlackMessage _ [] = []
 
 -- | Concatenate a list of 'SlackText' into a single block, and wrap it up as a full message
 slackMessage :: [SlackText] -> SlackMessage
-slackMessage = SlackMessage . pure . SlackBlockSection . mconcat
+slackMessage = SlackMessage . pure . (`SlackBlockSection` Nothing) . mconcat
 
 -- $interactive
 --
