@@ -1,5 +1,0 @@
-resolver: lts-18.19
-flags:
-  slack-web:
-    cli: true
-extra-deps: []

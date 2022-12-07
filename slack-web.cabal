@@ -1,6 +1,6 @@
 cabal-version: 2.2
 name: slack-web
-version: 0.5.0.1
+version: 1.5.0.0
 
 build-type: Simple
 
@@ -8,7 +8,7 @@ license: MIT
 license-file: LICENSE.md
 
 copyright: 2017 Juan Pedro Villa Isaza, 2022 Mercury Technologies, Inc
-author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
+author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>, Jade Lovelace <jadel@mercury.com>, Dennis Hennen <dennis@mercury.com>
 maintainer: Jade Lovelace <jadel@mercury.com>
 
 homepage: https://github.com/MercuryTechnologies/slack-web

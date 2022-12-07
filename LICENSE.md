@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2017 Juan Pedro Villa Isaza
+Copyright (c) 2017 Juan Pedro Villa Isaza, (c) 2022 Mercury Technologies, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

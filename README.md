@@ -1,13 +1,5 @@
 # Haskell bindings for the Slack web API
 
-[![][3]][2]
-[![][5]][4]
-
-[2]: https://www.stackage.org/lts/package/slack-web
-[3]: https://www.stackage.org/package/slack-web/badge/lts
-[4]: https://www.stackage.org/nightly/package/slack-web
-[5]: https://www.stackage.org/package/slack-web/badge/nightly
-
 - Hackage: <https://hackage.haskell.org/package/slack-web>
 
 - Slack web API: <https://api.slack.com/web>
@@ -39,6 +31,17 @@ Right ...
 > Slack.apiTest (Slack.slackConfigManager slackConfig) Api.mkTestReq { Api.testReqFoo = Just "bar" }
 Right ...
 ```
+
+## Contributing
+
+This repository provides a `flake.nix` file which offers pre-commit hooks and
+haskell-language-server. We use `fourmolu` for formatting, which is verified in
+CI.
+
+To use the flake, run `nix develop`, which will get you `cabal` and everything
+else you need to work on `slack-web`.
+
+Pull requests are welcome!
 
 ## License
 
