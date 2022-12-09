@@ -1,3 +1,8 @@
+# 1.5.0.1
+
+* [#119](https://github.com/MercuryTechnologies/slack-web/pull/119) Fix a typo
+  in rich text decoding.
+
 # 1.5.0.0
 
 ## Breaking changes
