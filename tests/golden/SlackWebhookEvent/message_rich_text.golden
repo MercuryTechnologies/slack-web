@@ -1,0 +1,84 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev04EPCGMFLL" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1670625739
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
+                    [ RichText
+                        { blockId = Just
+                            ( NonEmptyText "6r5Zo" )
+                        , elements =
+                            [ RichTextSectionItemRichText
+                                [ RichItemChannel
+                                    ( ConversationId
+                                        { unConversationId = "C043YJGBY49" }
+                                    )
+                                , RichItemText " "
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                , RichItemEmoji "cat"
+                                , RichItemText " "
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                , RichItemUser
+                                    ( UserId
+                                        { unUserId = "U043H11ES4V" }
+                                    )
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                , RichItemText " "
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                , RichItemLink
+                                    ( RichLinkAttrs
+                                        { style = RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        , url = "https://google.com"
+                                        , text = Nothing
+                                        }
+                                    )
+                                , RichItemText " text text text"
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C045V0VJT16" }
+                , text = "<#C043YJGBY49|general> :cat: <@U043H11ES4V> <https://google.com> text text text"
+                , channelType = Channel
+                , user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , ts = "1670625739.704049"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                }
+            )
+        }
+    )

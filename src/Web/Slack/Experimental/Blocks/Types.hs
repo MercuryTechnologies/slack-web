@@ -302,7 +302,7 @@ instance FromJSON RichItem where
         text <- obj .: "text"
         pure $ RichItemText text style
       "channel" -> do
-        channelId <- obj .: "chanel_id"
+        channelId <- obj .: "channel_id"
         pure $ RichItemChannel channelId
       "emoji" -> do
         name <- obj .: "name"
