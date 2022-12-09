@@ -12,6 +12,7 @@ spec = describe "Types for Slack events" do
         (oneGoldenTestDecode @SlackWebhookEvent)
         [ "messageExample"
         , "messageChange"
+        , "message_rich_text"
         , "link"
         , "botMessage"
         , "joinChannel"

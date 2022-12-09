@@ -1,0 +1,76 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "client_msg_id": "93e27a88-b87f-48e9-9b41-4a28af2a25ad",
+    "type": "message",
+    "text": "<#C043YJGBY49|general> :cat: <@U043H11ES4V> <https://google.com> text text text",
+    "user": "U043H11ES4V",
+    "ts": "1670625739.704049",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "6r5Zo",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "channel",
+                "channel_id": "C043YJGBY49"
+              },
+              {
+                "type": "text",
+                "text": " "
+              },
+              {
+                "type": "emoji",
+                "name": "cat",
+                "unicode": "1f431"
+              },
+              {
+                "type": "text",
+                "text": " "
+              },
+              {
+                "type": "user",
+                "user_id": "U043H11ES4V"
+              },
+              {
+                "type": "text",
+                "text": " "
+              },
+              {
+                "type": "link",
+                "url": "https://google.com"
+              },
+              {
+                "type": "text",
+                "text": " text text text"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "team": "T043DB835ML",
+    "channel": "C045V0VJT16",
+    "event_ts": "1670625739.704049",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev04EPCGMFLL",
+  "event_time": 1670625739,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}
