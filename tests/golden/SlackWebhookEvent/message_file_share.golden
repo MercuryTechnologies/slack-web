@@ -8,10 +8,9 @@ EventEventCallback
             { systemSeconds = 1670631527
             , systemNanoseconds = 0
             }
-        , event = EventMessageFileShare
-            ( MessageFileShareEvent
-                { text = "message message message"
-                , blocks = Just
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
                     [ RichText
                         { blockId = Just
                             ( NonEmptyText "MeAN" )
@@ -27,7 +26,11 @@ EventEventCallback
                             ]
                         }
                     ]
-                , files =
+                , channel = ConversationId
+                    { unConversationId = "D0442US94JD" }
+                , text = "message message message"
+                , channelType = Im
+                , files = Just
                     [ VisibleFileObject
                         ( FileObjectVisible
                             { id = FileId
@@ -45,13 +48,10 @@ EventEventCallback
                     ]
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
-                , upload = True
-                , displayAsBot = False
                 , ts = "1670631527.874149"
                 , threadTs = Nothing
-                , channel = ConversationId
-                    { unConversationId = "D0442US94JD" }
-                , channelType = Im
+                , appId = Nothing
+                , botId = Nothing
                 }
             )
         }

@@ -30,6 +30,7 @@ EventEventCallback
                     { unConversationId = "D0442US94JD" }
                 , text = "test"
                 , channelType = Im
+                , files = Nothing
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
                 , ts = "1664408649.009629"

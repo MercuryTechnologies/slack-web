@@ -39,6 +39,7 @@ EventEventCallback
                     { unConversationId = "D043HMJ0WDU" }
                 , text = "You have been removed from #testing-slack-app by <@U043H11ES4V>"
                 , channelType = Im
+                , files = Nothing
                 , user = UserId
                     { unUserId = "USLACKBOT" }
                 , ts = "1664826477.425039"
