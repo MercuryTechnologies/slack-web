@@ -13,6 +13,8 @@ spec = describe "Types for Slack events" do
         [ "messageExample"
         , "messageChange"
         , "message_rich_text"
+        , "message_file_share"
+        , "message_file_share_slack_connect"
         , "link"
         , "botMessage"
         , "joinChannel"

@@ -1,0 +1,14 @@
+VisibleFileObject
+    ( FileObjectVisible
+        { id = FileId
+            { unFileId = "F0S43PZDF" }
+        , created = 2018 - 07 - 16 17 : 49 : 02 UTC
+        , name = "tedair.gif"
+        , title = "tedair.gif"
+        , mimetype = "image/gif"
+        , urlPrivate = "https://.../tedair.gif"
+        , isExternal = False
+        , size = 137531
+        , mode = Hosted
+        }
+    )

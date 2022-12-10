@@ -11,6 +11,7 @@ import Data.Aeson.TH
 import Data.Time.Clock.System (SystemTime)
 import Web.Slack.AesonUtils
 import Web.Slack.Experimental.Blocks (SlackBlock)
+import Web.Slack.Files.Types (FileObject)
 import Web.Slack.Prelude
 import Web.Slack.Types (ConversationId, TeamId, UserId)
 
@@ -46,6 +47,25 @@ data MessageEvent = MessageEvent
   }
   deriving stock (Show)
 
+$(deriveFromJSON snakeCaseOptions ''MessageEvent)
+
+-- <https://api.slack.com/events/message/file_share>
+data MessageFileShareEvent = MessageFileShareEvent
+  { text :: Text
+  , blocks :: Maybe [SlackBlock]
+  , files :: [FileObject]
+  , user :: UserId
+  , upload :: Bool
+  , displayAsBot :: Bool
+  , ts :: Text
+  , threadTs :: Maybe Text
+  , channel :: ConversationId
+  , channelType :: ChannelType
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''MessageFileShareEvent)
+
 -- | <https://api.slack.com/events/message/message_changed>
 --
 -- FIXME(jadel): implement. This is mega cursed! in the normal message event
@@ -58,7 +78,6 @@ data MessageUpdateEvent = MessageUpdateEvent
   }
   deriving stock (Show)
 
-$(deriveFromJSON snakeCaseOptions ''MessageEvent)
 $(deriveFromJSON snakeCaseOptions ''MessageUpdateEvent)
 
 -- | FIXME: this might be a Channel, but may also be missing some fields/have bonus
@@ -119,6 +138,7 @@ newtype MessageId = MessageId {unMessageId :: Text}
 data Event
   = EventMessage MessageEvent
   | EventMessageChanged
+  | EventMessageFileShare MessageFileShareEvent
   | -- | Weird message event of subtype channel_join. Sent "sometimes", according
     -- to a random Slack blog post from 2017:
     -- <https://api.slack.com/changelog/2017-05-rethinking-channel-entrance-and-exit-events-and-messages>
@@ -138,6 +158,7 @@ instance FromJSON Event where
       ("message", Nothing) -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("message", Just "message_changed") -> pure EventMessageChanged
       ("message", Just "channel_join") -> pure EventChannelJoinMessage
+      ("message", Just "file_share") -> EventMessageFileShare <$> parseJSON @MessageFileShareEvent (Object obj)
       ("channel_created", Nothing) -> EventChannelCreated <$> parseJSON (Object obj)
       ("channel_left", Nothing) -> EventChannelLeft <$> parseJSON (Object obj)
       _ -> pure $ EventUnknown (Object obj)

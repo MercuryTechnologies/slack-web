@@ -1,0 +1,33 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev04EEHX2PSS" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1670631527
+            , systemNanoseconds = 0
+            }
+        , event = EventMessageFileShare
+            ( MessageFileShareEvent
+                { text = "message message message"
+                , blocks = Nothing
+                , files =
+                    [ CheckFileInfo
+                        ( FileId
+                            { unFileId = "F12345678" }
+                        )
+                    ]
+                , user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , upload = True
+                , displayAsBot = False
+                , ts = "1670631527.874149"
+                , threadTs = Nothing
+                , channel = ConversationId
+                    { unConversationId = "D0442US94JD" }
+                , channelType = Im
+                }
+            )
+        }
+    )
