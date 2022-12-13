@@ -92,6 +92,7 @@ type Api =
       :> Post '[JSON] (ResponseJSON Chat.UpdateRsp)
     :<|> "users.list"
       :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] User.ListReq
       :> Post '[JSON] (ResponseJSON User.ListRsp)
     :<|> "users.lookupByEmail"
       :> AuthProtect "token"
@@ -234,27 +235,24 @@ chatUpdate_ ::
   Chat.UpdateReq ->
   ClientM (ResponseJSON Chat.UpdateRsp)
 
--- |
---
--- This method returns a list of all users in the team.
+-- | This method returns a list of all users in the team.
 -- This includes deleted/deactivated users.
 --
 -- <https://api.slack.com/methods/users.list>
 usersList ::
   SlackConfig ->
+  User.ListReq ->
   IO (Response User.ListRsp)
-usersList = do
-  authR <- mkSlackAuthenticateReq
-  run (usersList_ authR) . slackConfigManager
+usersList config req = do
+  let authR = mkSlackAuthenticateReq config
+  run (usersList_ authR req) (slackConfigManager config)
 
 usersList_ ::
   AuthenticatedRequest (AuthProtect "token") ->
+  User.ListReq ->
   ClientM (ResponseJSON User.ListRsp)
 
--- |
---
--- This method returns a list of all users in the team.
--- This includes deleted/deactivated users.
+-- | Find a user by email address.
 --
 -- <https://api.slack.com/methods/users.lookupByEmail>
 userLookupByEmail ::

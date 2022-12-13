@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 ----------------------------------------------------------------------
 
 ----------------------------------------------------------------------
@@ -29,22 +27,7 @@ module Web.Slack.Classy
   )
 where
 
--- FIXME: Web.Slack.Prelude
-
--- base
-import Control.Arrow ((&&&))
--- containers
-
--- http-client
-
--- mtl
-import Control.Monad.Reader
 import Data.Map qualified as Map
-import Data.Maybe
--- slack-web
-
--- text
-import Data.Text (Text)
 import Network.HTTP.Client (Manager)
 import Web.Slack (SlackConfig (..), authenticateReq, mkSlackConfig)
 import Web.Slack qualified as NonClassy
@@ -54,13 +37,8 @@ import Web.Slack.Chat qualified as Chat
 import Web.Slack.Common qualified as Common
 import Web.Slack.Conversation qualified as Conversation
 import Web.Slack.Pager
+import Web.Slack.Prelude
 import Web.Slack.User qualified as User
-import Prelude
-
-#if !MIN_VERSION_servant(0,13,0)
-mkClientEnv :: Manager -> BaseUrl -> ClientEnv
-mkClientEnv = ClientEnv
-#endif
 
 -- | Implemented by 'SlackConfig'
 class HasManager a where
@@ -152,8 +130,9 @@ chatPostMessage = liftNonClassy . flip NonClassy.chatPostMessage
 -- <https://api.slack.com/methods/users.list>
 usersList ::
   (MonadReader env m, HasManager env, HasToken env, MonadIO m) =>
+  User.ListReq ->
   m (Response User.ListRsp)
-usersList = liftNonClassy NonClassy.usersList
+usersList = liftNonClassy . flip NonClassy.usersList
 
 -- |
 --
