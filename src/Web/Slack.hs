@@ -29,6 +29,7 @@ module Web.Slack
     repliesFetchAll,
     getUserDesc,
     usersList,
+    usersListAll,
     userLookupByEmail,
     UsersConversations.usersConversations,
     UsersConversations.usersConversationsAll,
@@ -251,6 +252,14 @@ usersList_ ::
   AuthenticatedRequest (AuthProtect "token") ->
   User.ListReq ->
   ClientM (ResponseJSON User.ListRsp)
+usersListAll ::
+  SlackConfig ->
+  -- | The first request to send. _NOTE_: 'User.listReqCursor' is silently ignored.
+  User.ListReq ->
+  -- | An action which returns a new page of messages every time called.
+  --   If there are no pages anymore, it returns an empty list.
+  IO (LoadPage IO User.User)
+usersListAll = fetchAllBy . usersList
 
 -- | Find a user by email address.
 --
