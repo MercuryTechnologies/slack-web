@@ -62,6 +62,8 @@ data User = User
 $(deriveFromJSON (jsonOpts "user") ''User)
 
 -- | @users.list@ request. See <https://api.slack.com/methods/users.list#args>
+--
+-- @since 1.6.0.0
 data ListReq = ListReq
   { listReqCursor :: Maybe Cursor
   , listReqLimit :: Maybe Int
