@@ -116,6 +116,14 @@
             # 0.6.3 in the repo
             refined = hfinal.refined_0_7;
 
+            pretty-simple = hfinal.callHackageDirect
+              {
+                pkg = "pretty-simple";
+                ver = "4.1.2.0";
+                sha256 = "sha256-uM1oyi/isWMicKPIw0KKeRJzY8Zu5yQNE0A2mpeBPHg=";
+              }
+              { };
+
             # it's not yet in hackage2nix
             string-variants = hfinal.callHackageDirect
               {

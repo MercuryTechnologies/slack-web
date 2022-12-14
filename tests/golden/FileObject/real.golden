@@ -1,0 +1,14 @@
+VisibleFileObject
+    ( FileObjectVisible
+        { id = FileId
+            { unFileId = "F04EEHX1EES" }
+        , created = 2022-12-10 00:18:47 UTC
+        , name = "namenamename.txt"
+        , title = "namenamename.txt"
+        , mimetype = "text/plain"
+        , urlPrivate = "https://files.slack.com/files-pri/T043DB835ML-F04EEHX1EES/namenamename.txt"
+        , isExternal = False
+        , size = 12
+        , mode = Snippet
+        }
+    )

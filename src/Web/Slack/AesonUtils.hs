@@ -5,6 +5,7 @@ import Data.Aeson qualified as J
 import Data.Aeson.Types (Pair)
 import Data.Char qualified as Char
 import Data.Text qualified as T
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
 import Web.FormUrlEncoded qualified as F
 import Web.Slack.Prelude
 
@@ -112,3 +113,12 @@ snakeCaseFormOptions =
   F.defaultFormOptions
     { F.fieldLabelModifier = camelTo2 '_'
     }
+
+newtype UnixTimestamp = UnixTimestamp {unUnixTimestamp :: UTCTime}
+  deriving newtype (Show, Eq)
+
+instance FromJSON UnixTimestamp where
+  parseJSON a = UnixTimestamp . posixSecondsToUTCTime <$> parseJSON a
+
+instance ToJSON UnixTimestamp where
+  toJSON (UnixTimestamp a) = toJSON (utcTimeToPOSIXSeconds a)

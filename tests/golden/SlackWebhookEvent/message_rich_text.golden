@@ -72,6 +72,7 @@ EventEventCallback
                     { unConversationId = "C045V0VJT16" }
                 , text = "<#C043YJGBY49|general> :cat: <@U043H11ES4V> <https://google.com> text text text"
                 , channelType = Channel
+                , files = Nothing
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
                 , ts = "1670625739.704049"

@@ -27,6 +27,8 @@ extra-source-files:
   tests/golden/UpdateRsp/*.json
   tests/golden/UpdateRsp/*.golden
   tests/golden/BlockKitBuilderMessage/*.golden.json
+  tests/golden/FileObject/*.json
+  tests/golden/FileObject/*.golden
 
 category: Web
 
@@ -113,6 +115,7 @@ library
       Web.Slack.Classy
       Web.Slack.Common
       Web.Slack.Conversation
+      Web.Slack.Files.Types
       Web.Slack.Internal
       Web.Slack.MessageParser
       Web.Slack.Pager
@@ -178,6 +181,7 @@ test-suite tests
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
       Web.Slack.ChatSpec
+      Web.Slack.Files.TypesSpec
       Web.Slack.UsersConversationsSpec
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec
@@ -197,7 +201,7 @@ test-suite tests
     , hspec-core
     , hspec-golden
     , mtl
-    , pretty-simple
+    , pretty-simple ^>= 4.1
     , quickcheck-instances
     , slack-web
     , string-conversions
@@ -231,7 +235,7 @@ executable slack-web-cli
     , bytestring
     , monad-loops
     , mtl
-    , pretty-simple
+    , pretty-simple ^>= 4.1
     , text
     , time
     , servant-client-core

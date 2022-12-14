@@ -1,24 +1,29 @@
 EventEventCallback
     ( EventCallback
         { eventId = EventId
-            { unEventId = "Ev04BEN3QMSM" }
+            { unEventId = "Ev04EEHX2PSS" }
         , teamId = TeamId
             { unTeamId = "T043DB835ML" }
         , eventTime = MkSystemTime
-            { systemSeconds = 1668537593
+            { systemSeconds = 1670631527
             , systemNanoseconds = 0
             }
         , event = EventMessage
             ( MessageEvent
                 { blocks = Nothing
                 , channel = ConversationId
-                    { unConversationId = "C043YJGBY49" }
-                , text = ""
-                , channelType = Channel
-                , files = Nothing
+                    { unConversationId = "D0442US94JD" }
+                , text = "message message message"
+                , channelType = Im
+                , files = Just
+                    [ CheckFileInfo
+                        ( FileId
+                            { unFileId = "F12345678" }
+                        )
+                    ]
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
-                , ts = "1668537593.598469"
+                , ts = "1670631527.874149"
                 , threadTs = Nothing
                 , appId = Nothing
                 , botId = Nothing

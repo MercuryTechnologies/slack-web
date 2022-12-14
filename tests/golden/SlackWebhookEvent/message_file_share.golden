@@ -1,11 +1,11 @@
 EventEventCallback
     ( EventCallback
         { eventId = EventId
-            { unEventId = "Ev044C51K43V" }
+            { unEventId = "Ev04EEHX2PSS" }
         , teamId = TeamId
             { unTeamId = "T043DB835ML" }
         , eventTime = MkSystemTime
-            { systemSeconds = 1664408649
+            { systemSeconds = 1670631527
             , systemNanoseconds = 0
             }
         , event = EventMessage
@@ -13,10 +13,10 @@ EventEventCallback
                 { blocks = Just
                     [ RichText
                         { blockId = Just
-                            ( NonEmptyText "LSo" )
+                            ( NonEmptyText "MeAN" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemText "test"
+                                [ RichItemText "message message message"
                                     ( RichStyle
                                         { rsBold = False
                                         , rsItalic = False
@@ -28,12 +28,27 @@ EventEventCallback
                     ]
                 , channel = ConversationId
                     { unConversationId = "D0442US94JD" }
-                , text = "test"
+                , text = "message message message"
                 , channelType = Im
-                , files = Nothing
+                , files = Just
+                    [ VisibleFileObject
+                        ( FileObjectVisible
+                            { id = FileId
+                                { unFileId = "F04EEHX1EES" }
+                            , created = 2022-12-10 00:18:47 UTC
+                            , name = "namenamename.txt"
+                            , title = "namenamename.txt"
+                            , mimetype = "text/plain"
+                            , urlPrivate = "https://files.slack.com/files-pri/T043DB835ML-F04EEHX1EES/namenamename.txt"
+                            , isExternal = False
+                            , size = 12
+                            , mode = Snippet
+                            }
+                        )
+                    ]
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
-                , ts = "1664408649.009629"
+                , ts = "1670631527.874149"
                 , threadTs = Nothing
                 , appId = Nothing
                 , botId = Nothing

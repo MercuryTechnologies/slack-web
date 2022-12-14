@@ -34,6 +34,7 @@ EventEventCallback
                     { unConversationId = "C043YJGBY49" }
                 , text = "<https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869>"
                 , channelType = Channel
+                , files = Nothing
                 , user = UserId
                     { unUserId = "U043H11ES4V" }
                 , ts = "1663978925.099999"

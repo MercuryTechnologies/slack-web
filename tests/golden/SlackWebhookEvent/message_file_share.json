@@ -1,0 +1,84 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "message",
+    "text": "message message message",
+    "files": [
+      {
+        "id": "F04EEHX1EES",
+        "created": 1670631527,
+        "timestamp": 1670631527,
+        "name": "namenamename.txt",
+        "title": "namenamename.txt",
+        "mimetype": "text/plain",
+        "filetype": "text",
+        "pretty_type": "Plain Text",
+        "user": "U043H11ES4V",
+        "user_team": "T043DB835ML",
+        "editable": true,
+        "size": 12,
+        "mode": "snippet",
+        "is_external": false,
+        "external_type": "",
+        "is_public": false,
+        "public_url_shared": false,
+        "display_as_bot": false,
+        "username": "",
+        "url_private": "https://files.slack.com/files-pri/T043DB835ML-F04EEHX1EES/namenamename.txt",
+        "url_private_download": "https://files.slack.com/files-pri/T043DB835ML-F04EEHX1EES/download/namenamename.txt",
+        "permalink": "https://jadeapptesting.slack.com/files/U043H11ES4V/F04EEHX1EES/namenamename.txt",
+        "permalink_public": "https://slack-files.com/T043DB835ML-F04EEHX1EES-0ce8936320",
+        "edit_link": "https://jadeapptesting.slack.com/files/U043H11ES4V/F04EEHX1EES/namenamename.txt/edit",
+        "preview": "hug a kitten",
+        "preview_highlight": "<div class=\"CodeMirror cm-s-default CodeMirrorServer\" oncopy=\"if(event.clipboardData){event.clipboardData.setData('text/plain',window.getSelection().toString().replace(/\\u200b/g,''));event.preventDefault();event.stopPropagation();}\">\n<div class=\"CodeMirror-code\">\n<div><pre>hug a kitten</pre></div>\n</div>\n</div>\n",
+        "lines": 1,
+        "lines_more": 0,
+        "preview_is_truncated": false,
+        "has_rich_preview": false,
+        "file_access": "visible"
+      }
+    ],
+    "upload": true,
+    "user": "U043H11ES4V",
+    "display_as_bot": false,
+    "ts": "1670631527.874149",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "MeAN",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "message message message"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "client_msg_id": "a5a11822-d14e-4621-992b-32d561648aa0",
+    "channel": "D0442US94JD",
+    "subtype": "file_share",
+    "event_ts": "1670631527.874149",
+    "channel_type": "im"
+  },
+  "type": "event_callback",
+  "event_id": "Ev04EEHX2PSS",
+  "event_time": 1670631527,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

@@ -11,6 +11,7 @@ import Data.Aeson.TH
 import Data.Time.Clock.System (SystemTime)
 import Web.Slack.AesonUtils
 import Web.Slack.Experimental.Blocks (SlackBlock)
+import Web.Slack.Files.Types (FileObject)
 import Web.Slack.Prelude
 import Web.Slack.Types (ConversationId, TeamId, UserId)
 
@@ -22,11 +23,15 @@ data ChannelType = Channel | Group | Im
 $(deriveJSON snakeCaseOptions ''ChannelType)
 
 -- | <https://api.slack.com/events/message>
+-- and
+-- <https://api.slack.com/events/message/file_share>
 data MessageEvent = MessageEvent
   { blocks :: Maybe [SlackBlock]
   , channel :: ConversationId
   , text :: Text
   , channelType :: ChannelType
+  , files :: Maybe [FileObject]
+  -- ^ @since 1.6.0.0
   , -- FIXME(jadel): clientMsgId??
     user :: UserId
   , ts :: Text
@@ -46,6 +51,8 @@ data MessageEvent = MessageEvent
   }
   deriving stock (Show)
 
+$(deriveFromJSON snakeCaseOptions ''MessageEvent)
+
 -- | <https://api.slack.com/events/message/message_changed>
 --
 -- FIXME(jadel): implement. This is mega cursed! in the normal message event
@@ -58,7 +65,6 @@ data MessageUpdateEvent = MessageUpdateEvent
   }
   deriving stock (Show)
 
-$(deriveFromJSON snakeCaseOptions ''MessageEvent)
 $(deriveFromJSON snakeCaseOptions ''MessageUpdateEvent)
 
 -- | FIXME: this might be a Channel, but may also be missing some fields/have bonus
@@ -138,6 +144,9 @@ instance FromJSON Event where
       ("message", Nothing) -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("message", Just "message_changed") -> pure EventMessageChanged
       ("message", Just "channel_join") -> pure EventChannelJoinMessage
+      -- n.b. these are unified since it is *identical* to a Message event with
+      -- a bonus files field
+      ("message", Just "file_share") -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("channel_created", Nothing) -> EventChannelCreated <$> parseJSON (Object obj)
       ("channel_left", Nothing) -> EventChannelLeft <$> parseJSON (Object obj)
       _ -> pure $ EventUnknown (Object obj)
