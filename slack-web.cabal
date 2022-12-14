@@ -201,7 +201,7 @@ test-suite tests
     , hspec-core
     , hspec-golden
     , mtl
-    , pretty-simple
+    , pretty-simple ^>= 4.0
     , quickcheck-instances
     , slack-web
     , string-conversions
@@ -235,7 +235,7 @@ executable slack-web-cli
     , bytestring
     , monad-loops
     , mtl
-    , pretty-simple
+    , pretty-simple ^>= 4.0
     , text
     , time
     , servant-client-core
