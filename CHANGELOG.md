@@ -1,3 +1,8 @@
+# 1.6.0.0 (2022-12-14)
+
+* [#120](https://github.com/MercuryTechnologies/slack-web/pull/120)
+  Add file share event parsing support.
+
 # 1.5.0.1
 
 * [#119](https://github.com/MercuryTechnologies/slack-web/pull/119) Fix a typo

@@ -31,6 +31,7 @@ data MessageEvent = MessageEvent
   , text :: Text
   , channelType :: ChannelType
   , files :: Maybe [FileObject]
+  -- ^ @since 1.6.0.0
   , -- FIXME(jadel): clientMsgId??
     user :: UserId
   , ts :: Text

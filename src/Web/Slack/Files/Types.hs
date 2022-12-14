@@ -1,5 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+-- | Type definitions for the Slack files APIs.
+-- See <https://api.slack.com/messaging/files>.
+--
+-- @since 1.6.0.0
 module Web.Slack.Files.Types where
 
 import Control.Monad.Fail (MonadFail (..))
@@ -9,6 +13,7 @@ import Data.Aeson.KeyMap qualified as KM
 import Web.Slack.AesonUtils (UnixTimestamp, snakeCaseOptions)
 import Web.Slack.Prelude
 
+-- | ID for a file, which looks something like @F2147483862@.
 newtype FileId = FileId {unFileId :: Text}
   deriving stock (Show, Eq)
   deriving newtype (FromJSON, ToJSON)
