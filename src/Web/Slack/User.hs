@@ -3,45 +3,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-----------------------------------------------------------------------
-
-----------------------------------------------------------------------
-
--- |
--- Module: Web.Slack.User
--- Description:
+-- | @users.*@ methods in the Slack API
 module Web.Slack.User
   ( Profile (..),
     User (..),
+    ListReq (..),
     ListRsp (..),
     Email (..),
     UserRsp (..),
   )
 where
 
--- FIXME: Web.Slack.Prelude
-
--- aeson
-import Data.Aeson.TH
--- base
-
--- slack-web
-
--- text
-import Data.Text (Text)
--- time
 import Data.Time.Clock.POSIX
-import GHC.Generics (Generic)
--- http-api-data
-
 import Web.FormUrlEncoded
 import Web.HttpApiData
 import Web.Slack.Common
+import Web.Slack.Pager.Types (PagedRequest (..), PagedResponse (..), ResponseMetadata)
+import Web.Slack.Prelude
 import Web.Slack.Util
-import Prelude
 
--- See https://api.slack.com/types/user
-
+-- | See <https://api.slack.com/types/user>
 data Profile = Profile
   { profileAvatarHash :: Maybe Text
   , profileStatusText :: Maybe Text
@@ -80,12 +61,39 @@ data User = User
 
 $(deriveFromJSON (jsonOpts "user") ''User)
 
+-- | @users.list@ request. See <https://api.slack.com/methods/users.list#args>
+--
+-- @since 1.6.0.0
+data ListReq = ListReq
+  { listReqCursor :: Maybe Cursor
+  , listReqLimit :: Maybe Int
+  , listReqTeamId :: Maybe TeamId
+  }
+  deriving stock (Show, Generic, Eq)
+  deriving anyclass (Default)
+
+instance ToForm ListReq where
+  toForm (ListReq {listReqCursor, listReqLimit, listReqTeamId}) =
+    toQueryParamIfJust "cursor" listReqCursor
+      <> toQueryParamIfJust "limit" listReqLimit
+      <> toQueryParamIfJust "team_id" listReqTeamId
+
+instance PagedRequest ListReq where
+  setCursor c r = r {listReqCursor = c}
+
+-- | Response to <https://api.slack.com/methods/users.list>
 data ListRsp = ListRsp
   { listRspMembers :: [User]
+  , listRspResponseMetadata :: Maybe ResponseMetadata
   }
   deriving stock (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "listRsp") ''ListRsp)
+
+instance PagedResponse ListRsp where
+  type ResponseObject ListRsp = User
+  getResponseData = listRspMembers
+  getResponseMetadata = listRspResponseMetadata
 
 data UserRsp = UserRsp
   { userRspUser :: User
