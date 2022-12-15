@@ -5,6 +5,7 @@ module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
 import Data.Aeson (Object, Value (..), withArray)
+import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Types ((.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
@@ -361,10 +362,40 @@ instance Show SlackAccessory where
 
 -- | Small helper function for constructing a section with a button accessory out of a button and text components
 sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
-sectionWithButtonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
+sectionWithButtonAccessory btn txt =
+  SlackBlockSection $
+    (slackSectionWithText txt)
+      { slackSectionAccessory = Just $ SlackButtonAccessory btn
+      }
+
+-- | <https://api.slack.com/reference/block-kit/blocks#section>
+data SlackSection = SlackSection
+  { slackSectionText :: Maybe SlackText
+  -- ^ May be absent if 'slackSectionFields' is present.
+  , slackSectionBlockId :: Maybe SlackBlockId
+  , slackSectionFields :: Maybe [SlackText]
+  -- ^ Required if 'slackSectionText' is not provided.
+  , slackSectionAccessory :: Maybe SlackAccessory
+  }
+  deriving stock (Eq)
+
+slackSectionWithText :: SlackText -> SlackSection
+slackSectionWithText t =
+  SlackSection
+    { slackSectionText = Just t
+    , slackSectionBlockId = Nothing
+    , slackSectionFields = Nothing
+    , slackSectionAccessory = Nothing
+    }
+
+instance Show SlackSection where
+  show _ = undefined -- TODO
+  -- show (SlackBlockSection t Nothing) = show t
+  -- show (SlackBlockSection t (Just mAccessory)) =
+  --   show $ mconcat [show t, " [", show mAccessory, "]"]
 
 data SlackBlock
-  = SlackBlockSection SlackText (Maybe SlackAccessory)
+  = SlackBlockSection SlackSection
   | SlackBlockImage SlackImage
   | SlackBlockContext SlackContext
   | SlackBlockDivider
@@ -374,9 +405,7 @@ data SlackBlock
   deriving stock (Eq)
 
 instance Show SlackBlock where
-  show (SlackBlockSection t Nothing) = show t
-  show (SlackBlockSection t (Just mAccessory)) =
-    show $ mconcat [show t, " [", show mAccessory, "]"]
+  show (SlackBlockSection t) = show t
   show (SlackBlockImage i) = show i
   show (SlackBlockContext contents) = show contents
   show SlackBlockDivider = "|"
@@ -393,12 +422,10 @@ instance Show SlackBlock where
   show (SlackBlockHeader p) = show p
 
 instance ToJSON SlackBlock where
-  toJSON (SlackBlockSection slackText mSectionAccessory) =
-    objectOptional
-      [ "type" .=! ("section" :: Text)
-      , "text" .=! SlackContentText slackText
-      , "accessory" .=? mSectionAccessory
-      ]
+  toJSON (SlackBlockSection t) =
+    case toJSON t of
+      Object o -> Object $ o <> KM.fromList [("type", "section")]
+      _ -> error "impossible"
   toJSON (SlackBlockImage i) = toJSON (SlackContentImage i)
   toJSON (SlackBlockContext contents) =
     object
@@ -429,13 +456,9 @@ instance FromJSON SlackBlock where
     (slackBlockType :: Text) <- obj .: "type"
     case slackBlockType of
       "section" -> do
-        (sectionContentObj :: Value) <- obj .: "text"
-        SlackContentText sectionContentText <- parseJSON sectionContentObj
-        mSectionAccessory <- obj .:? "accessory"
-        pure $ SlackBlockSection sectionContentText mSectionAccessory
+        SlackBlockSection <$> parseJSON (Object obj)
       "context" -> do
-        (contextElementsObj :: Value) <- obj .: "elements"
-        slackContent <- parseJSON contextElementsObj
+        slackContent <- obj .: "elements"
         pure $ SlackBlockContext slackContent
       "image" -> do
         SlackContentImage i <- parseJSON $ Object obj
@@ -481,7 +504,7 @@ class Markdown a where
   markdown :: SlackText -> a
 
 instance Markdown SlackMessage where
-  markdown t = SlackMessage [SlackBlockSection t Nothing]
+  markdown t = SlackMessage [SlackBlockSection (slackSectionWithText t)]
 
 instance Markdown SlackContext where
   markdown t = SlackContext [SlackContentText t]
@@ -754,3 +777,5 @@ instance FromJSON SlackAction where
     actionId <- obj .: "action_id"
     slackActionComponent <- parseJSON $ Object obj
     pure $ SlackAction actionId slackActionComponent
+
+$(deriveJSON (jsonDeriveWithAffix "slackSection" jsonDeriveOptionsSnakeCase) ''SlackSection)

@@ -23,4 +23,5 @@ spec = describe "Types for Slack events" do
         , "slackbotIm"
         , "channel_left"
         , "share_without_message"
+        , "circleci"
         ]
