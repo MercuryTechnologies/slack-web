@@ -18,10 +18,42 @@ newtype FileId = FileId {unFileId :: Text}
   deriving stock (Show, Eq)
   deriving newtype (FromJSON, ToJSON)
 
-data FileMode = Hosted | External | Snippet | Post | FileAccess
-  deriving stock (Show, Eq)
+data FileMode
+  = Hosted
+  | External
+  | Snippet
+  | Post
+  | FileAccess
+  | -- | <https://slack.com/help/articles/206819278-Send-emails-to-Slack>
+    --
+    -- @since 1.6.1.0
+    Email
+  | -- | Other file modes.
+    --
+    --   @since 1.6.1.0
+    Other Text
+  deriving stock (Show, Eq, Generic)
 
-$(deriveJSON snakeCaseOptions ''FileMode)
+instance FromJSON FileMode where
+  parseJSON = A.withText "FileMode" \case
+    "hosted" -> pure Hosted
+    "external" -> pure External
+    "snippet" -> pure Snippet
+    "post" -> pure Post
+    "file_access" -> pure FileAccess
+    "email" -> pure Email
+    other -> pure . Other $ other
+
+instance ToJSON FileMode where
+  toJSON =
+    A.String . \case
+      Hosted -> "hosted"
+      External -> "external"
+      Snippet -> "snippet"
+      Post -> "post"
+      FileAccess -> "file_access"
+      Email -> "email"
+      Other s -> s
 
 -- | <https://api.slack.com/types/file>
 data FileObjectVisible = FileObjectVisible
