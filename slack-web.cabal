@@ -8,8 +8,8 @@ license: MIT
 license-file: LICENSE.md
 
 copyright: 2017 Juan Pedro Villa Isaza, 2022 Mercury Technologies, Inc
-author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>, Jade Lovelace <jadel@mercury.com>, Dennis Hennen <dennis@mercury.com>
-maintainer: Jade Lovelace <jadel@mercury.com>
+author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>, Jade Lovelace <software at lfcode dot ca>, Dennis Hennen <dennis@mercury.com>
+maintainer: Jade Lovelace <software at lfcode dot ca>
 
 homepage: https://github.com/MercuryTechnologies/slack-web
 bug-reports: https://github.com/MercuryTechnologies/slack-web/issues
