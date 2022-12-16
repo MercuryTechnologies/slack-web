@@ -23,4 +23,6 @@ spec = describe "Types for Slack events" do
         , "slackbotIm"
         , "channel_left"
         , "share_without_message"
+        , -- https://slack.com/help/articles/206819278-Send-emails-to-Slack
+          "email_message"
         ]

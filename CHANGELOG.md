@@ -1,3 +1,9 @@
+# 1.6.1.0 (2022-12-16)
+
+* [#124](https://github.com/MercuryTechnologies/slack-web/pull/124)
+  Parse [Slack incoming emails](https://slack.com/help/articles/206819278-Send-emails-to-Slack)
+  without throwing an error.
+
 # 1.6.0.0 (2022-12-14)
 
 ## Breaking changes
