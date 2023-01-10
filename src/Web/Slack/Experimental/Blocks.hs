@@ -81,6 +81,7 @@ import Web.Slack.Experimental.Blocks.Types
 import Web.Slack.Prelude
 import Web.Slack.Types
 
+-- | Concatenate two 'SlackText's with a space separator.
 (<+>) :: SlackText -> SlackText -> SlackText
 x <+> y = x <> " " <> y
 
@@ -109,6 +110,7 @@ bold x = "*" <> x <> "*"
 italic :: SlackText -> SlackText
 italic x = "_" <> x <> "_"
 
+-- | Add a newline before a 'SlackText'.
 newline :: SlackText -> SlackText
 newline x = "\n" <> x
 
