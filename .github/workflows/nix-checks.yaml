@@ -10,9 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Nix
-        uses: cachix/install-nix-action@v19
+        uses: cachix/install-nix-action@v17
         with:
-          install_url: https://releases.nixos.org/nix/nix-2.13.3/install
           extra_nix_config: |
             extra-experimental-features = nix-command flakes
       - uses: cachix/cachix-action@v10
