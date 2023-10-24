@@ -1,3 +1,8 @@
+# 1.6.2.0 (2023-10-24)
+
+* [#127](https://github.com/MercuryTechnologies/slack-web/pull/127)
+  Add helper for the divider block type.
+
 # 1.6.1.0 (2022-12-16)
 
 * [#124](https://github.com/MercuryTechnologies/slack-web/pull/124)
