@@ -545,6 +545,11 @@ button actionId buttonText ButtonSettings {..} =
       , slackButtonConfirm = unOptionalSetting buttonConfirm
       }
 
+-- | A divider block.
+-- https://api.slack.com/reference/block-kit/blocks#divider
+divider :: SlackMessage
+divider = SlackMessage [SlackBlockDivider]
+
 -- | Settings for [confirmation dialog objects](https://api.slack.com/reference/block-kit/composition-objects#confirm).
 data ConfirmSettings = ConfirmSettings
   { confirmTitle :: Text
