@@ -547,6 +547,8 @@ button actionId buttonText ButtonSettings {..} =
 
 -- | A divider block.
 -- https://api.slack.com/reference/block-kit/blocks#divider
+--
+-- @since 1.6.2.0
 divider :: SlackMessage
 divider = SlackMessage [SlackBlockDivider]
 
