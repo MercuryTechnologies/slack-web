@@ -81,6 +81,7 @@ import Web.Slack.Experimental.Blocks.Types
 import Web.Slack.Prelude
 import Web.Slack.Types
 
+-- | Concatenate two 'SlackText's with a space separator.
 (<+>) :: SlackText -> SlackText -> SlackText
 x <+> y = x <> " " <> y
 
@@ -109,6 +110,7 @@ bold x = "*" <> x <> "*"
 italic :: SlackText -> SlackText
 italic x = "_" <> x <> "_"
 
+-- | Add a newline before a 'SlackText'.
 newline :: SlackText -> SlackText
 newline x = "\n" <> x
 
@@ -160,23 +162,45 @@ truncateSlackMessage (SlackMessage blocks) =
   let (truncatedBlocks, isTruncateds) = unzip $ map truncateSlackBlock blocks
    in (SlackMessage truncatedBlocks, or isTruncateds)
 
+-- | TODO(maxh) Update this for the SlackSection
 truncateSlackBlock :: SlackBlock -> (SlackBlock, Bool)
-truncateSlackBlock sb@(SlackBlockSection (SlackText texts) mAccessory) =
-  let messageLength = sum $ map T.length texts
+truncateSlackBlock sb@(SlackBlockSection SlackSection {..}) =
+  let texts = maybe mempty unSlackTexts slackSectionText
+      messageLength = sum $ map T.length texts
       lengthLimit = 3000
       truncationMessage = "\n...Rest of message truncated for slack\n"
       truncationMessageLength = T.length truncationMessage
       truncateTexts ts = take (lengthLimit - truncationMessageLength) (concat ts)
+      truncatedSection =
+        SlackBlockSection
+          SlackSection
+            { slackSectionText = Just $ SlackText [truncateTexts texts <> "\n...Rest of message truncated for slack\n"]
+            , slackSectionAccessory
+            , slackSectionBlockId
+            , slackSectionFields
+            }
    in if messageLength > lengthLimit
-        then (SlackBlockSection (SlackText [truncateTexts texts <> "\n...Rest of message truncated for slack\n"]) mAccessory, True)
+        then (truncatedSection, True)
         else (sb, False)
 -- possible to also truncate SlackContexts, but we never put long strings in there.
 truncateSlackBlock x = (x, False)
 
 prefixFirstSlackBlockSection :: Text -> [SlackBlock] -> ([SlackBlock], Bool)
-prefixFirstSlackBlockSection prefix (SlackBlockSection text mAccessory : sbs) = (SlackBlockSection (message prefix <> text) mAccessory : sbs, True)
-prefixFirstSlackBlockSection prefix (sb : sbs) = let (prefixedSbs, match) = prefixFirstSlackBlockSection prefix sbs in (sb : prefixedSbs, match)
-prefixFirstSlackBlockSection _ [] = ([], False)
+prefixFirstSlackBlockSection prefix (SlackBlockSection SlackSection {..} : sbs) =
+  let prefixedSection =
+        SlackBlockSection
+          SlackSection
+            { slackSectionText = mappend (message prefix) <$> slackSectionText
+            , slackSectionBlockId
+            , slackSectionFields
+            , slackSectionAccessory
+            }
+   in (prefixedSection : sbs, True)
+prefixFirstSlackBlockSection prefix (sb : sbs) =
+  let (prefixedSbs, match) = prefixFirstSlackBlockSection prefix sbs
+   in (sb : prefixedSbs, match)
+prefixFirstSlackBlockSection _ [] =
+  ([], False)
 
 prefixFirstSlackMessage :: Text -> [SlackMessage] -> [SlackMessage]
 prefixFirstSlackMessage prefix (sm : sms) =
@@ -189,7 +213,7 @@ prefixFirstSlackMessage _ [] = []
 
 -- | Concatenate a list of 'SlackText' into a single block, and wrap it up as a full message
 slackMessage :: [SlackText] -> SlackMessage
-slackMessage = SlackMessage . pure . (`SlackBlockSection` Nothing) . mconcat
+slackMessage = SlackMessage . pure . SlackBlockSection . slackSectionWithText . mconcat
 
 -- $interactive
 --

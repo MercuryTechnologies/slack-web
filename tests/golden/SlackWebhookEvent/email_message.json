@@ -1,0 +1,91 @@
+{
+  "token": "aaaa",
+  "team_id": "T012346789",
+  "api_app_id": "A012346789",
+  "event": {
+    "type": "message",
+    "text": "",
+    "files": [
+      {
+        "id": "F0123468789",
+        "created": 1671217113,
+        "timestamp": 1671217110,
+        "name": "meow",
+        "title": "meow",
+        "mimetype": "text/html",
+        "filetype": "email",
+        "pretty_type": "Email",
+        "user": "USLACKBOT",
+        "user_team": "T012346789",
+        "editable": true,
+        "size": 6212,
+        "mode": "email",
+        "is_external": false,
+        "external_type": "",
+        "is_public": true,
+        "public_url_shared": false,
+        "display_as_bot": true,
+        "username": "Email",
+        "url_private": "https://example.com",
+        "url_private_download": "https://example.com",
+        "permalink": "https://example.com",
+        "permalink_public": "https://example.com",
+        "subject": "meow",
+        "to": [
+          {
+            "address": "",
+            "name": "Email",
+            "original": "Email <>"
+          }
+        ],
+        "from": [
+          {
+            "address": "addr@example.com",
+            "name": "meow",
+            "original": "meow <addr@example.com>"
+          }
+        ],
+        "cc": [],
+        "attachments": [],
+        "original_attachment_count": 0,
+        "plain_text": "meow",
+        "preview": "meow",
+        "preview_plain_text": "meow",
+        "headers": {
+          "date": "Fri, 16 Dec 2022 18:58:30 +0000",
+          "in_reply_to": null,
+          "reply_to": null,
+          "message_id": "<meow@example.com>"
+        },
+        "has_more": false,
+        "sent_to_self": false,
+        "bot_id": "B012346789",
+        "has_rich_preview": false,
+        "file_access": "visible"
+      }
+    ],
+    "upload": true,
+    "user": "USLACKBOT",
+    "display_as_bot": true,
+    "bot_id": "B012346789",
+    "ts": "1671217113.292829",
+    "channel": "C012346789",
+    "subtype": "file_share",
+    "event_ts": "1671217113.292829",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev0123467899",
+  "event_time": 1671217113,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T012346789",
+      "user_id": "U012346789",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

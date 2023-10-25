@@ -1,0 +1,43 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev0123467899" }
+        , teamId = TeamId
+            { unTeamId = "T012346789" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1671217113
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Nothing
+                , channel = ConversationId
+                    { unConversationId = "C012346789" }
+                , text = ""
+                , channelType = Channel
+                , files = Just
+                    [ VisibleFileObject
+                        ( FileObjectVisible
+                            { id = FileId
+                                { unFileId = "F0123468789" }
+                            , created = 2022-12-16 18:58:33 UTC
+                            , name = "meow"
+                            , title = "meow"
+                            , mimetype = "text/html"
+                            , urlPrivate = "https://example.com"
+                            , isExternal = False
+                            , size = 6212
+                            , mode = Email
+                            }
+                        )
+                    ]
+                , user = UserId
+                    { unUserId = "USLACKBOT" }
+                , ts = "1671217113.292829"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Just "B012346789"
+                }
+            )
+        }
+    )

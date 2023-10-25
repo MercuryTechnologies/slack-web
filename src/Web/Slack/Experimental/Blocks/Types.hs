@@ -5,7 +5,6 @@ module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
 import Data.Aeson (Object, Value (..), withArray)
-import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Types ((.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
@@ -95,6 +94,14 @@ instance Show SlackText where
 
 instance ToJSON SlackText where
   toJSON (SlackText arr) = toJSON $ concat arr
+
+instance FromJSON SlackText where
+  parseJSON v =
+    case v of
+      String t ->
+        pure $ SlackText [t]
+      _ ->
+        fail "SlackText must be a string."
 
 instance IsString SlackText where
   fromString = message
@@ -377,7 +384,7 @@ data SlackSection = SlackSection
   -- ^ Required if 'slackSectionText' is not provided.
   , slackSectionAccessory :: Maybe SlackAccessory
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
 
 slackSectionWithText :: SlackText -> SlackSection
 slackSectionWithText t =
@@ -388,12 +395,6 @@ slackSectionWithText t =
     , slackSectionAccessory = Nothing
     }
 
-instance Show SlackSection where
-  show _ = undefined -- TODO
-  -- show (SlackBlockSection t Nothing) = show t
-  -- show (SlackBlockSection t (Just mAccessory)) =
-  --   show $ mconcat [show t, " [", show mAccessory, "]"]
-
 data SlackBlock
   = SlackBlockSection SlackSection
   | SlackBlockImage SlackImage
@@ -402,30 +403,17 @@ data SlackBlock
   | SlackBlockRichText RichText
   | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
   | SlackBlockHeader SlackPlainTextOnly -- max length 150
-  deriving stock (Eq)
-
-instance Show SlackBlock where
-  show (SlackBlockSection t) = show t
-  show (SlackBlockImage i) = show i
-  show (SlackBlockContext contents) = show contents
-  show SlackBlockDivider = "|"
-  show (SlackBlockActions mBlockId as) =
-    show $
-      mconcat
-        [ "actions("
-        , show mBlockId
-        , ") = ["
-        , show $ intercalate ", " (map show (unrefine $ unSlackActionList as))
-        , "]"
-        ]
-  show (SlackBlockRichText rt) = show rt
-  show (SlackBlockHeader p) = show p
+  deriving stock (Eq, Show)
 
 instance ToJSON SlackBlock where
-  toJSON (SlackBlockSection t) =
-    case toJSON t of
-      Object o -> Object $ o <> KM.fromList [("type", "section")]
-      _ -> error "impossible"
+  toJSON (SlackBlockSection SlackSection {..}) =
+    objectOptional
+      [ "type" .=! ("section" :: Text)
+      , "text" .=? slackSectionText
+      , "block_id" .=? slackSectionBlockId
+      , "fields" .=? slackSectionFields
+      , "accessory" .=? slackSectionAccessory
+      ]
   toJSON (SlackBlockImage i) = toJSON (SlackContentImage i)
   toJSON (SlackBlockContext contents) =
     object
@@ -456,7 +444,11 @@ instance FromJSON SlackBlock where
     (slackBlockType :: Text) <- obj .: "type"
     case slackBlockType of
       "section" -> do
-        SlackBlockSection <$> parseJSON (Object obj)
+        slackSectionText <- obj .:? "text"
+        slackSectionBlockId <- obj .:? "block_id"
+        slackSectionFields <- obj .:? "fields"
+        slackSectionAccessory <- obj .:? "accessory"
+        pure $ SlackBlockSection SlackSection {..}
       "context" -> do
         slackContent <- obj .: "elements"
         pure $ SlackBlockContext slackContent
@@ -567,6 +559,13 @@ button actionId buttonText ButtonSettings {..} =
       , slackButtonStyle = unOptionalSetting buttonStyle
       , slackButtonConfirm = unOptionalSetting buttonConfirm
       }
+
+-- | A divider block.
+-- https://api.slack.com/reference/block-kit/blocks#divider
+--
+-- @since 1.6.2.0
+divider :: SlackMessage
+divider = SlackMessage [SlackBlockDivider]
 
 -- | Settings for [confirmation dialog objects](https://api.slack.com/reference/block-kit/composition-objects#confirm).
 data ConfirmSettings = ConfirmSettings
