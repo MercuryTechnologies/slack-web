@@ -173,6 +173,13 @@ data SlackContent
   | SlackContentImage SlackImage
   deriving stock (Eq)
 
+slackContentToSlackText :: SlackContent -> Maybe SlackText
+slackContentToSlackText c = case c of
+  SlackContentText slackText ->
+    Just slackText
+  SlackContentImage _ ->
+    Nothing
+
 instance Show SlackContent where
   show (SlackContentText t) = show t
   show (SlackContentImage i) = show i
@@ -403,15 +410,32 @@ data SlackBlock
   | SlackBlockRichText RichText
   | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
   | SlackBlockHeader SlackPlainTextOnly -- max length 150
-  deriving stock (Eq, Show)
+  deriving stock (Eq)
+
+instance Show SlackBlock where
+  show (SlackBlockSection section) = show section
+  show (SlackBlockImage i) = show i
+  show (SlackBlockContext contents) = show contents
+  show SlackBlockDivider = "|"
+  show (SlackBlockActions mBlockId as) =
+    show $
+      mconcat
+        [ "actions("
+        , show mBlockId
+        , ") = ["
+        , show $ intercalate ", " (map show (unrefine $ unSlackActionList as))
+        , "]"
+        ]
+  show (SlackBlockRichText rt) = show rt
+  show (SlackBlockHeader p) = show p
 
 instance ToJSON SlackBlock where
   toJSON (SlackBlockSection SlackSection {..}) =
     objectOptional
       [ "type" .=! ("section" :: Text)
-      , "text" .=? slackSectionText
+      , "text" .=? (SlackContentText <$> slackSectionText)
       , "block_id" .=? slackSectionBlockId
-      , "fields" .=? slackSectionFields
+      , "fields" .=? (map SlackContentText <$> slackSectionFields)
       , "accessory" .=? slackSectionAccessory
       ]
   toJSON (SlackBlockImage i) = toJSON (SlackContentImage i)
@@ -444,9 +468,11 @@ instance FromJSON SlackBlock where
     (slackBlockType :: Text) <- obj .: "type"
     case slackBlockType of
       "section" -> do
-        slackSectionText <- obj .:? "text"
+        slackSectionTextContent <- obj .:? "text"
+        let slackSectionText = slackSectionTextContent >>= slackContentToSlackText
         slackSectionBlockId <- obj .:? "block_id"
-        slackSectionFields <- obj .:? "fields"
+        slackSectionFieldsContent <- obj .:? "fields"
+        let slackSectionFields = slackSectionFieldsContent >>= traverse slackContentToSlackText
         slackSectionAccessory <- obj .:? "accessory"
         pure $ SlackBlockSection SlackSection {..}
       "context" -> do
@@ -677,7 +703,7 @@ instance FromJSON SlackInteractivePayload where
 -- | Which component and it's IDs that triggered an interactive webhook call.
 data SlackActionResponse = SlackActionResponse
   { sarBlockId :: SlackBlockId
-  , sarActionId :: SlackActionId
+  , sarActionId :: Maybe SlackActionId
   , sarActionComponent :: SlackActionComponent
   }
   deriving stock (Show)
@@ -685,7 +711,7 @@ data SlackActionResponse = SlackActionResponse
 instance FromJSON SlackActionResponse where
   parseJSON = withObject "SlackActionResponse" $ \obj -> do
     sarBlockId <- obj .: "block_id"
-    sarActionId <- obj .: "action_id"
+    sarActionId <- obj .:? "action_id"
     sarActionComponent <- parseJSON $ Object obj
     pure $ SlackActionResponse {..}
 

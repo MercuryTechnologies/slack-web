@@ -14,13 +14,22 @@ headerBlock :: SlackText -> WriterT [SlackBlock] Identity ()
 headerBlock = tell . pure . SlackBlockHeader . SlackPlainTextOnly
 
 sectionBlock :: SlackText -> WriterT [SlackBlock] Identity ()
-sectionBlock text = tell . pure $ SlackBlockSection text Nothing
+sectionBlock = tell . pure . SlackBlockSection . slackSectionWithText
 
 sectionBlockWithAccessory ::
   SlackText ->
   SlackAction ->
   WriterT [SlackBlock] Identity ()
-sectionBlockWithAccessory a b = tell . pure $ SlackBlockSection a (Just . SlackButtonAccessory $ b)
+sectionBlockWithAccessory t b =
+  tell $
+    pure $
+      SlackBlockSection
+        SlackSection
+          { slackSectionText = Just t
+          , slackSectionBlockId = Nothing
+          , slackSectionFields = Nothing
+          , slackSectionAccessory = Just $ SlackButtonAccessory b
+          }
 
 dividerBlock :: WriterT [SlackBlock] Identity ()
 dividerBlock = tell . pure $ SlackBlockDivider
