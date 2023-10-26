@@ -162,7 +162,6 @@ truncateSlackMessage (SlackMessage blocks) =
   let (truncatedBlocks, isTruncateds) = unzip $ map truncateSlackBlock blocks
    in (SlackMessage truncatedBlocks, or isTruncateds)
 
--- | TODO(maxh) Update this for the SlackSection
 truncateSlackBlock :: SlackBlock -> (SlackBlock, Bool)
 truncateSlackBlock sb@(SlackBlockSection SlackSection {..}) =
   let texts = maybe mempty unSlackTexts slackSectionText
