@@ -712,7 +712,7 @@ instance FromJSON SlackInteractivePayload where
 -- | Which component and it's IDs that triggered an interactive webhook call.
 data SlackActionResponse = SlackActionResponse
   { sarBlockId :: SlackBlockId
-  , sarActionId :: Maybe SlackActionId
+  , sarActionId :: SlackActionId
   , sarActionComponent :: SlackActionComponent
   }
   deriving stock (Show)
@@ -720,7 +720,7 @@ data SlackActionResponse = SlackActionResponse
 instance FromJSON SlackActionResponse where
   parseJSON = withObject "SlackActionResponse" $ \obj -> do
     sarBlockId <- obj .: "block_id"
-    sarActionId <- obj .:? "action_id"
+    sarActionId <- obj .: "action_id"
     sarActionComponent <- parseJSON $ Object obj
     pure $ SlackActionResponse {..}
 
