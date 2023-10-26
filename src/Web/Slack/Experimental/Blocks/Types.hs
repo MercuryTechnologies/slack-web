@@ -4,7 +4,7 @@
 module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
-import Data.Aeson (Object, Value (..), withArray)
+import Data.Aeson (Object, Result (..), Value (..), fromJSON, withArray)
 import Data.Aeson.Types ((.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
@@ -473,7 +473,16 @@ instance FromJSON SlackBlock where
         slackSectionBlockId <- obj .:? "block_id"
         slackSectionFieldsContent <- obj .:? "fields"
         let slackSectionFields = slackSectionFieldsContent >>= traverse slackContentToSlackText
-        slackSectionAccessory <- obj .:? "accessory"
+        (slackSectionAccessoryValue :: Maybe Value) <- obj .:? "accessory"
+        -- The section accessory can be any block element but `SlackAcessory`
+        -- only implements button.
+        let slackSectionAccessory =
+              slackSectionAccessoryValue >>= \v ->
+                case fromJSON v of
+                  Error _ ->
+                    Nothing
+                  Success slackAccessory ->
+                    Just slackAccessory
         pure $ SlackBlockSection SlackSection {..}
       "context" -> do
         slackContent <- obj .: "elements"

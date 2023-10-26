@@ -1,0 +1,56 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev0000000000" }
+        , teamId = TeamId
+            { unTeamId = "T0123456789" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1671046987
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
+                    [ SlackPlainTextOnly "Job Failed. :red_circle:"
+                    , SlackSection
+                        { slackSectionText = Nothing
+                        , slackSectionBlockId = Just
+                            ( NonEmptyText "jO2E" )
+                        , slackSectionFields = Just [ "*Job*: something" ]
+                        , slackSectionAccessory = Nothing
+                        }
+                    , SlackSection
+                        { slackSectionText = Nothing
+                        , slackSectionBlockId = Just
+                            ( NonEmptyText "adB9" )
+                        , slackSectionFields = Just
+                            [ "*Project*: something"
+                            , "*Branch*: master"
+                            , "*Author*: someone"
+                            ]
+                        , slackSectionAccessory = Nothing
+                        }
+                    , SlackSection
+                        { slackSectionText = Nothing
+                        , slackSectionBlockId = Just
+                            ( NonEmptyText "=sdEQ" )
+                        , slackSectionFields = Just [ "*Mentions*: <!subteam^S0123468791|@someone>" ]
+                        , slackSectionAccessory = Nothing
+                        }
+                    , "actions(Just (NonEmptyText "eeK")) = ["SlackActionId {unSlackActionId = NonEmptyText \"zHNw\"} [button SlackButtonText (NonEmptyText \"View Job\")]"]"
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C012345678" }
+                , text = "CircleCI job failed."
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U04130YGVK8" }
+                , ts = "1671046987.237089"
+                , threadTs = Nothing
+                , appId = Just "A56789123"
+                , botId = Just "B01234687"
+                }
+            )
+        }
+    )
