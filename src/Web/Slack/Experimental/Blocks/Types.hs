@@ -95,14 +95,6 @@ instance Show SlackText where
 instance ToJSON SlackText where
   toJSON (SlackText arr) = toJSON $ concat arr
 
-instance FromJSON SlackText where
-  parseJSON v =
-    case v of
-      String t ->
-        pure $ SlackText [t]
-      _ ->
-        fail "SlackText must be a string."
-
 instance IsString SlackText where
   fromString = message
 
@@ -811,5 +803,3 @@ instance FromJSON SlackAction where
     actionId <- obj .: "action_id"
     slackActionComponent <- parseJSON $ Object obj
     pure $ SlackAction actionId slackActionComponent
-
-$(deriveJSON (jsonDeriveWithAffix "slackSection" jsonDeriveOptionsSnakeCase) ''SlackSection)
