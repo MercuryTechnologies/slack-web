@@ -4,7 +4,7 @@
 module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
-import Data.Aeson (Object, Value (..), withArray)
+import Data.Aeson (Object, Result (..), Value (..), fromJSON, withArray)
 import Data.Aeson.Types ((.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
@@ -164,6 +164,13 @@ data SlackContent
   = SlackContentText SlackText
   | SlackContentImage SlackImage
   deriving stock (Eq)
+
+slackContentToSlackText :: SlackContent -> Maybe SlackText
+slackContentToSlackText c = case c of
+  SlackContentText slackText ->
+    Just slackText
+  SlackContentImage _ ->
+    Nothing
 
 instance Show SlackContent where
   show (SlackContentText t) = show t
@@ -361,10 +368,34 @@ instance Show SlackAccessory where
 
 -- | Small helper function for constructing a section with a button accessory out of a button and text components
 sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
-sectionWithButtonAccessory btn txt = SlackBlockSection txt (Just $ SlackButtonAccessory btn)
+sectionWithButtonAccessory btn txt =
+  SlackBlockSection $
+    (slackSectionWithText txt)
+      { slackSectionAccessory = Just $ SlackButtonAccessory btn
+      }
+
+-- | <https://api.slack.com/reference/block-kit/blocks#section>
+data SlackSection = SlackSection
+  { slackSectionText :: Maybe SlackText
+  -- ^ May be absent if 'slackSectionFields' is present.
+  , slackSectionBlockId :: Maybe SlackBlockId
+  , slackSectionFields :: Maybe [SlackText]
+  -- ^ Required if 'slackSectionText' is not provided.
+  , slackSectionAccessory :: Maybe SlackAccessory
+  }
+  deriving stock (Eq, Show)
+
+slackSectionWithText :: SlackText -> SlackSection
+slackSectionWithText t =
+  SlackSection
+    { slackSectionText = Just t
+    , slackSectionBlockId = Nothing
+    , slackSectionFields = Nothing
+    , slackSectionAccessory = Nothing
+    }
 
 data SlackBlock
-  = SlackBlockSection SlackText (Maybe SlackAccessory)
+  = SlackBlockSection SlackSection
   | SlackBlockImage SlackImage
   | SlackBlockContext SlackContext
   | SlackBlockDivider
@@ -374,9 +405,7 @@ data SlackBlock
   deriving stock (Eq)
 
 instance Show SlackBlock where
-  show (SlackBlockSection t Nothing) = show t
-  show (SlackBlockSection t (Just mAccessory)) =
-    show $ mconcat [show t, " [", show mAccessory, "]"]
+  show (SlackBlockSection section) = show section
   show (SlackBlockImage i) = show i
   show (SlackBlockContext contents) = show contents
   show SlackBlockDivider = "|"
@@ -393,11 +422,13 @@ instance Show SlackBlock where
   show (SlackBlockHeader p) = show p
 
 instance ToJSON SlackBlock where
-  toJSON (SlackBlockSection slackText mSectionAccessory) =
+  toJSON (SlackBlockSection SlackSection {..}) =
     objectOptional
       [ "type" .=! ("section" :: Text)
-      , "text" .=! SlackContentText slackText
-      , "accessory" .=? mSectionAccessory
+      , "text" .=? (SlackContentText <$> slackSectionText)
+      , "block_id" .=? slackSectionBlockId
+      , "fields" .=? (map SlackContentText <$> slackSectionFields)
+      , "accessory" .=? slackSectionAccessory
       ]
   toJSON (SlackBlockImage i) = toJSON (SlackContentImage i)
   toJSON (SlackBlockContext contents) =
@@ -429,13 +460,24 @@ instance FromJSON SlackBlock where
     (slackBlockType :: Text) <- obj .: "type"
     case slackBlockType of
       "section" -> do
-        (sectionContentObj :: Value) <- obj .: "text"
-        SlackContentText sectionContentText <- parseJSON sectionContentObj
-        mSectionAccessory <- obj .:? "accessory"
-        pure $ SlackBlockSection sectionContentText mSectionAccessory
+        slackSectionTextContent <- obj .:? "text"
+        let slackSectionText = slackSectionTextContent >>= slackContentToSlackText
+        slackSectionBlockId <- obj .:? "block_id"
+        slackSectionFieldsContent <- obj .:? "fields"
+        let slackSectionFields = slackSectionFieldsContent >>= traverse slackContentToSlackText
+        (slackSectionAccessoryValue :: Maybe Value) <- obj .:? "accessory"
+        -- The section accessory can be any block element but `SlackAcessory`
+        -- only implements button.
+        let slackSectionAccessory =
+              slackSectionAccessoryValue >>= \v ->
+                case fromJSON v of
+                  Error _ ->
+                    Nothing
+                  Success slackAccessory ->
+                    Just slackAccessory
+        pure $ SlackBlockSection SlackSection {..}
       "context" -> do
-        (contextElementsObj :: Value) <- obj .: "elements"
-        slackContent <- parseJSON contextElementsObj
+        slackContent <- obj .: "elements"
         pure $ SlackBlockContext slackContent
       "image" -> do
         SlackContentImage i <- parseJSON $ Object obj
@@ -481,7 +523,7 @@ class Markdown a where
   markdown :: SlackText -> a
 
 instance Markdown SlackMessage where
-  markdown t = SlackMessage [SlackBlockSection t Nothing]
+  markdown t = SlackMessage [SlackBlockSection (slackSectionWithText t)]
 
 instance Markdown SlackContext where
   markdown t = SlackContext [SlackContentText t]

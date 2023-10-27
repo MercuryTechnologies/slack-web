@@ -90,6 +90,31 @@
             "type": "section"
         },
         {
+            "fields": [
+                {
+                    "text": "*Field 1*\nFoo",
+                    "type": "mrkdwn"
+                },
+                {
+                    "text": "*Field 2*\nBar",
+                    "type": "mrkdwn"
+                },
+                {
+                    "text": "*Field 3*\nBaz",
+                    "type": "mrkdwn"
+                },
+                {
+                    "text": "*Field 4*\nQux",
+                    "type": "mrkdwn"
+                }
+            ],
+            "text": {
+                "text": "Section with text and fields",
+                "type": "mrkdwn"
+            },
+            "type": "section"
+        },
+        {
             "elements": [
                 {
                     "text": ":key: Context!",

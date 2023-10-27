@@ -1,3 +1,8 @@
+# 2.0.0.0 (2023-10-26)
+
+* [#123](https://github.com/MercuryTechnologies/slack-web/pull/123)
+  Add support for section fields.
+
 # 1.6.2.0 (2023-10-24)
 
 * [#127](https://github.com/MercuryTechnologies/slack-web/pull/127)

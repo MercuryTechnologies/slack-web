@@ -1,0 +1,119 @@
+{
+  "token": "aaaa",
+  "team_id": "T0123456789",
+  "api_app_id": "A12346789",
+  "event": {
+    "bot_id": "B01234687",
+    "type": "message",
+    "text": "CircleCI job failed.",
+    "user": "U04130YGVK8",
+    "ts": "1671046987.237089",
+    "app_id": "A56789123",
+    "blocks": [
+      {
+        "type": "header",
+        "block_id": "+6hb",
+        "text": {
+          "type": "plain_text",
+          "text": "Job Failed. :red_circle:",
+          "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "jO2E",
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*Job*: something",
+            "verbatim": false
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "block_id": "adB9",
+        "accessory": {
+          "type": "image",
+          "image_url": "https://example.com",
+          "alt_text": "CircleCI logo"
+        },
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*Project*: something",
+            "verbatim": false
+          },
+          {
+            "type": "mrkdwn",
+            "text": "*Branch*: master",
+            "verbatim": false
+          },
+          {
+            "type": "mrkdwn",
+            "text": "*Author*: someone",
+            "verbatim": false
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "block_id": "=sdEQ",
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*Mentions*: <!subteam^S0123468791|@someone>",
+            "verbatim": false
+          }
+        ]
+      },
+      {
+        "type": "actions",
+        "block_id": "eeK",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "zHNw",
+            "text": {
+              "type": "plain_text",
+              "text": "View Job",
+              "emoji": true
+            },
+            "url": "https://circleci.com/gh/aaaaaaaaaaaaaaaaaaa/aaaaaaaaaaa/000000"
+          }
+        ]
+      }
+    ],
+    "team": "T0123456789",
+    "bot_profile": {
+      "id": "B01234687",
+      "deleted": false,
+      "name": "CircleCI integration",
+      "updated": 1662492349,
+      "app_id": "A56789123",
+      "icons": {
+        "image_36": "https://example.com",
+        "image_48": "https://example.com",
+        "image_72": "https://example.com"
+      },
+      "team_id": "T0123456789"
+    },
+    "channel": "C012345678",
+    "event_ts": "1671046987.237089",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev0000000000",
+  "event_time": 1671046987,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T0123456789",
+      "user_id": "U01234678",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}

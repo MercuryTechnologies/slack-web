@@ -14,13 +14,34 @@ headerBlock :: SlackText -> WriterT [SlackBlock] Identity ()
 headerBlock = tell . pure . SlackBlockHeader . SlackPlainTextOnly
 
 sectionBlock :: SlackText -> WriterT [SlackBlock] Identity ()
-sectionBlock text = tell . pure $ SlackBlockSection text Nothing
+sectionBlock = tell . pure . SlackBlockSection . slackSectionWithText
+
+sectionBlockWithFields :: SlackText -> [SlackText] -> WriterT [SlackBlock] Identity ()
+sectionBlockWithFields text fields =
+  tell $
+    pure $
+      SlackBlockSection $
+        SlackSection
+          { slackSectionText = Just text
+          , slackSectionBlockId = Nothing
+          , slackSectionFields = Just fields
+          , slackSectionAccessory = Nothing
+          }
 
 sectionBlockWithAccessory ::
   SlackText ->
   SlackAction ->
   WriterT [SlackBlock] Identity ()
-sectionBlockWithAccessory a b = tell . pure $ SlackBlockSection a (Just . SlackButtonAccessory $ b)
+sectionBlockWithAccessory t b =
+  tell $
+    pure $
+      SlackBlockSection
+        SlackSection
+          { slackSectionText = Just t
+          , slackSectionBlockId = Nothing
+          , slackSectionFields = Nothing
+          , slackSectionAccessory = Just $ SlackButtonAccessory b
+          }
 
 dividerBlock :: WriterT [SlackBlock] Identity ()
 dividerBlock = tell . pure $ SlackBlockDivider
@@ -63,6 +84,13 @@ slackShowBlockFormat =
       sectionBlockWithAccessory
         (bold . textMessage $ "blah")
         (button slackActionDoNothing ":bank: Look at it!" buttonSettings {buttonUrl = google})
+      sectionBlockWithFields
+        (message @Text "Section with text and fields")
+        [ (bold $ message @Text "Field 1") <> (newline $ message @Text "Foo")
+        , (bold $ message @Text "Field 2") <> (newline $ message @Text "Bar")
+        , (bold $ message @Text "Field 3") <> (newline $ message @Text "Baz")
+        , (bold $ message @Text "Field 4") <> (newline $ message @Text "Qux")
+        ]
       contextBlock [SlackContentText ":key: Context!"]
       dividerBlock
       actionsBlock Nothing $
