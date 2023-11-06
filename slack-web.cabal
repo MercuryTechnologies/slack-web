@@ -138,7 +138,7 @@ library
     , bytestring
     , classy-prelude
     , containers
-    , cryptonite
+    , crypton
     , data-default-class
     , deepseq
     , either
