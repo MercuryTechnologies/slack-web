@@ -64,11 +64,12 @@ main = do
 
     addCmd "conversations.history" $ do
       conversationId <-
-        Slack.ConversationId . Text.pack
+        Slack.ConversationId
+          . Text.pack
           <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
       getsAll <- addSimpleBoolFlag "A" ["all"] (flagHelpStr "Get all available messages in the channel")
-      addCmdImpl $
-        if getsAll
+      addCmdImpl
+        $ if getsAll
           then do
             (`runReaderT` apiConfig) $ do
               fetchPage <- Slack.conversationsHistoryAll $ (SlackConversation.mkHistoryReq conversationId) {SlackConversation.historyReqCount = 2}
@@ -101,7 +102,8 @@ main = do
 
     addCmd "conversations.replies" $ do
       conversationId <-
-        Slack.ConversationId . Text.pack
+        Slack.ConversationId
+          . Text.pack
           <$> addParamString "CONVERSATION_ID" (paramHelpStr "ID of the conversation to fetch")
       threadTimeStampStr <- addParamString "TIMESTAMP" (paramHelpStr "Timestamp of the thread to fetch")
       let ethreadTimeStamp = Slack.timestampFromText $ Text.pack threadTimeStampStr

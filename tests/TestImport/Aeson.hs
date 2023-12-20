@@ -9,6 +9,8 @@ aesonRoundtrips a =
       parsed = A.parse (parseJSON @a) encoded
       roundTwo = fmap (toJSON @a) parsed
    in -- The encoding is the same
-      A.Success encoded == roundTwo
+      A.Success encoded
+        == roundTwo
         -- AND the object itself is the same
-        && A.Success a == parsed
+        && A.Success a
+        == parsed

@@ -5,18 +5,17 @@
 -- |
 -- Module: Web.Slack.Types
 -- Description:
-module Web.Slack.Types
-  ( Color (..),
-    UserId (..),
-    ConversationId (..),
-    TeamId (..),
-    Cursor (..),
-    SlackTimestamp (..),
-    mkSlackTimestamp,
-    timestampFromText,
-    SlackMessageText (..),
-  )
-where
+module Web.Slack.Types (
+  Color (..),
+  UserId (..),
+  ConversationId (..),
+  TeamId (..),
+  Cursor (..),
+  SlackTimestamp (..),
+  mkSlackTimestamp,
+  timestampFromText,
+  SlackMessageText (..),
+) where
 
 import Control.Monad (MonadFail (..))
 import Data.Aeson
@@ -87,9 +86,9 @@ instance ToHttpApiData SlackTimestamp where
 
 instance FromJSON SlackTimestamp where
   parseJSON =
-    withText "Slack ts" $
-      either (fail . ("Invalid Slack ts: " ++)) pure
-        . timestampFromText
+    withText "Slack ts"
+      $ either (fail . ("Invalid Slack ts: " ++)) pure
+      . timestampFromText
 
 instance ToJSON SlackTimestamp where
   toJSON = String . slackTimestampTs

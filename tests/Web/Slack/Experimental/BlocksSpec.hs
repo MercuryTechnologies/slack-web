@@ -18,30 +18,30 @@ sectionBlock = tell . pure . SlackBlockSection . slackSectionWithText
 
 sectionBlockWithFields :: SlackText -> [SlackText] -> WriterT [SlackBlock] Identity ()
 sectionBlockWithFields text fields =
-  tell $
-    pure $
-      SlackBlockSection $
-        SlackSection
-          { slackSectionText = Just text
-          , slackSectionBlockId = Nothing
-          , slackSectionFields = Just fields
-          , slackSectionAccessory = Nothing
-          }
+  tell
+    $ pure
+    $ SlackBlockSection
+    $ SlackSection
+      { slackSectionText = Just text
+      , slackSectionBlockId = Nothing
+      , slackSectionFields = Just fields
+      , slackSectionAccessory = Nothing
+      }
 
 sectionBlockWithAccessory ::
   SlackText ->
   SlackAction ->
   WriterT [SlackBlock] Identity ()
 sectionBlockWithAccessory t b =
-  tell $
-    pure $
-      SlackBlockSection
-        SlackSection
-          { slackSectionText = Just t
-          , slackSectionBlockId = Nothing
-          , slackSectionFields = Nothing
-          , slackSectionAccessory = Just $ SlackButtonAccessory b
-          }
+  tell
+    $ pure
+    $ SlackBlockSection
+      SlackSection
+        { slackSectionText = Just t
+        , slackSectionBlockId = Nothing
+        , slackSectionFields = Nothing
+        , slackSectionAccessory = Just $ SlackButtonAccessory b
+        }
 
 dividerBlock :: WriterT [SlackBlock] Identity ()
 dividerBlock = tell . pure $ SlackBlockDivider
@@ -66,8 +66,9 @@ slackActionDoNothing3 = SlackActionId . fromJust . mkNonEmptyText $ "doNothing3"
 
 slackShowBlockFormat :: BlockKitBuilderMessage
 slackShowBlockFormat =
-  BlockKitBuilderMessage $
-    execWriter $ do
+  BlockKitBuilderMessage
+    $ execWriter
+    $ do
       headerBlock ("Blah: " <> list ["a", "b", "c"])
       dividerBlock
       sectionBlock (bold $ list ["blah", "blah2", "blah3"])
@@ -93,8 +94,8 @@ slackShowBlockFormat =
         ]
       contextBlock [SlackContentText ":key: Context!"]
       dividerBlock
-      actionsBlock Nothing $
-        toSlackActionList
+      actionsBlock Nothing
+        $ toSlackActionList
           ( button slackActionDoNothing ":mag: View" buttonSettings {buttonUrl = google}
           , button slackActionDoNothing2 ":office: View" buttonSettings {buttonUrl = google}
           , button slackActionDoNothing3 ":bank: View" buttonSettings {buttonUrl = google}

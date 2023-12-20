@@ -15,27 +15,26 @@
 -- |
 -- Module: Web.Slack.Channel
 -- Description: Types and functions related to <https://api.slack.com/docs/conversations-api Conversation API>
-module Web.Slack.Conversation
-  ( Conversation (..),
-    ConversationId (..),
-    ConversationType (..),
-    ChannelConversation (..),
-    GroupConversation (..),
-    ImConversation (..),
-    TeamId (..),
-    Purpose (..),
-    Topic (..),
-    ListReq (..),
-    mkListReq,
-    ListRsp (..),
-    HistoryReq (..),
-    mkHistoryReq,
-    HistoryRsp (..),
-    RepliesReq (..),
-    mkRepliesReq,
-    ResponseMetadata (..),
-  )
-where
+module Web.Slack.Conversation (
+  Conversation (..),
+  ConversationId (..),
+  ConversationType (..),
+  ChannelConversation (..),
+  GroupConversation (..),
+  ImConversation (..),
+  TeamId (..),
+  Purpose (..),
+  Topic (..),
+  ListReq (..),
+  mkListReq,
+  ListRsp (..),
+  HistoryReq (..),
+  mkHistoryReq,
+  HistoryRsp (..),
+  RepliesReq (..),
+  mkRepliesReq,
+  ResponseMetadata (..),
+) where
 
 import Data.Aeson
 import Data.Aeson.Encoding
@@ -209,7 +208,7 @@ instance FromJSON Conversation where
       -- This uses the outer Parser monad since deciding which parser to use
       -- is monadic, then the Maybe to decide which parser is picked, then
       -- finally the inner parser to actually run it
-      parseWhen :: FromJSON a => Key -> (a -> b) -> Object -> Parser (Maybe (Parser b))
+      parseWhen :: (FromJSON a) => Key -> (a -> b) -> Object -> Parser (Maybe (Parser b))
       parseWhen key con o = do
         -- Slack only inconsistently includes the is_* attributes if false.
         is <- o .:? key .!= False

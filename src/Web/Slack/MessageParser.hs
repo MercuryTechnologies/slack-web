@@ -4,12 +4,11 @@
 {-# LANGUAGE RecordWildCards #-}
 
 -- | See https://api.slack.com/docs/message-formatting
-module Web.Slack.MessageParser
-  ( messageToHtml,
-    HtmlRenderers (..),
-    defaultHtmlRenderers,
-  )
-where
+module Web.Slack.MessageParser (
+  messageToHtml,
+  HtmlRenderers (..),
+  defaultHtmlRenderers,
+) where
 
 -- FIXME: Web.Slack.Prelude
 

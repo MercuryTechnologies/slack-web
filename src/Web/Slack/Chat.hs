@@ -2,16 +2,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Web.Slack.Chat
-  ( PostMsg (..),
-    PostMsgReq (..),
-    mkPostMsgReq,
-    PostMsgRsp (..),
-    UpdateReq (..),
-    mkUpdateReq,
-    UpdateRsp (..),
-  )
-where
+module Web.Slack.Chat (
+  PostMsg (..),
+  PostMsgReq (..),
+  mkPostMsgReq,
+  PostMsgRsp (..),
+  UpdateReq (..),
+  mkUpdateReq,
+  UpdateRsp (..),
+) where
 
 import Web.FormUrlEncoded
 import Web.Slack.Conversation (ConversationId)

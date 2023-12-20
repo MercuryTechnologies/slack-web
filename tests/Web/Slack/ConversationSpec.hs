@@ -3,10 +3,9 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Web.Slack.ConversationSpec
-  ( spec,
-  )
-where
+module Web.Slack.ConversationSpec (
+  spec,
+) where
 
 -- aeson
 import Data.Aeson

@@ -15,21 +15,20 @@
 -- |
 -- Module: Web.Slack.Common
 -- Description:
-module Web.Slack.Common
-  ( Color (..),
-    UserId (..),
-    ConversationId (..),
-    TeamId (..),
-    Cursor (..),
-    SlackTimestamp (..),
-    mkSlackTimestamp,
-    timestampFromText,
-    Message (..),
-    MessageType (..),
-    SlackClientError (..),
-    SlackMessageText (..),
-  )
-where
+module Web.Slack.Common (
+  Color (..),
+  UserId (..),
+  ConversationId (..),
+  TeamId (..),
+  Cursor (..),
+  SlackTimestamp (..),
+  mkSlackTimestamp,
+  timestampFromText,
+  Message (..),
+  MessageType (..),
+  SlackClientError (..),
+  SlackMessageText (..),
+) where
 
 -- FIXME: Web.Slack.Prelude
 

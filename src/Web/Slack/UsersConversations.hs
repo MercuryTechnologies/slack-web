@@ -3,13 +3,12 @@
 
 -- | Client for Slack's @users.conversations@ endpoint.
 -- <https://api.slack.com/methods/users.conversations>
-module Web.Slack.UsersConversations
-  ( UsersConversationsRequest (..),
-    UsersConversationsResponse (..),
-    usersConversations,
-    usersConversationsAll,
-  )
-where
+module Web.Slack.UsersConversations (
+  UsersConversationsRequest (..),
+  UsersConversationsResponse (..),
+  usersConversations,
+  usersConversationsAll,
+) where
 
 import Servant.API
 import Servant.Client hiding (Response)
