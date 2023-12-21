@@ -81,13 +81,13 @@ instance FromJSON SlackTextObject where
   parseJSON = withObject "SlackTextObject" $ \obj -> do
     (slackTextType :: Text) <- obj .: "type"
     case slackTextType of
-      "text" -> do
+      "plain_text" -> do
         text <- obj .: "text"
         pure . SlackPlainText . SlackText $ lines text
       "mrkdwn" -> do
         text <- obj .: "text"
         pure . SlackMarkdownText . SlackText $ lines text
-      _ -> fail "Unknown SlackTextObject type, must be one of ['text', 'mrkdwn']"
+      _ -> fail "Unknown SlackTextObject type, must be one of ['plain_text', 'mrkdwn']"
 
 instance Show SlackText where
   show (SlackText arr) = show $ concat arr
@@ -653,7 +653,7 @@ data SlackConfirmObject = SlackConfirmObject
   , slackConfirmDeny :: SlackPlainTextOnly -- max length 30
   , slackConfirmStyle :: Maybe SlackStyle
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
 
 instance ToJSON SlackConfirmObject where
   toJSON SlackConfirmObject {..} =
