@@ -76,13 +76,13 @@ objectOptional :: [Maybe Pair] -> Value
 objectOptional = J.object . catMaybes
 
 -- | Encode a value for 'objectOptional'
-(.=!) :: ToJSON v => Key -> v -> Maybe Pair
+(.=!) :: (ToJSON v) => Key -> v -> Maybe Pair
 key .=! val = Just (key .= val)
 
 infixr 8 .=!
 
 -- | Encode a Maybe value for 'objectOptional'
-(.=?) :: ToJSON v => Key -> Maybe v -> Maybe Pair
+(.=?) :: (ToJSON v) => Key -> Maybe v -> Maybe Pair
 key .=? mVal = fmap (key .=) mVal
 
 infixr 8 .=?

@@ -1,11 +1,10 @@
-module Web.Slack.Pager
-  ( Response,
-    LoadPage,
-    loadingPage,
-    fetchAllBy,
-    module Web.Slack.Pager.Types,
-  )
-where
+module Web.Slack.Pager (
+  Response,
+  LoadPage,
+  loadingPage,
+  fetchAllBy,
+  module Web.Slack.Pager.Types,
+) where
 
 import Web.Slack.Common qualified as Common
 import Web.Slack.Conversation qualified as Conversation

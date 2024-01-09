@@ -49,7 +49,7 @@ instance FromJSON SlackPlainTextOnly where
 
 -- | Create a 'SlackPlainTextOnly'. Some API points can can take either markdown or plain text,
 -- but some can take only plain text. This enforces the latter.
-plaintextonly :: Slack a => a -> SlackPlainTextOnly
+plaintextonly :: (Slack a) => a -> SlackPlainTextOnly
 plaintextonly a = SlackPlainTextOnly $ message a
 
 data SlackTextObject
@@ -70,24 +70,24 @@ instance ToJSON SlackTextObject where
       ]
 
 -- | Create a plain text 'SlackTextObject' where the API allows either markdown or plain text.
-plaintext :: Slack a => a -> SlackTextObject
+plaintext :: (Slack a) => a -> SlackTextObject
 plaintext = SlackPlainText . message
 
 -- | Create a markdown 'SlackTextObject' where the API allows either markdown or plain text.
-mrkdwn :: Slack a => a -> SlackTextObject
+mrkdwn :: (Slack a) => a -> SlackTextObject
 mrkdwn = SlackMarkdownText . message
 
 instance FromJSON SlackTextObject where
   parseJSON = withObject "SlackTextObject" $ \obj -> do
     (slackTextType :: Text) <- obj .: "type"
     case slackTextType of
-      "text" -> do
+      "plain_text" -> do
         text <- obj .: "text"
         pure . SlackPlainText . SlackText $ lines text
       "mrkdwn" -> do
         text <- obj .: "text"
         pure . SlackMarkdownText . SlackText $ lines text
-      _ -> fail "Unknown SlackTextObject type, must be one of ['text', 'mrkdwn']"
+      _ -> fail "Unknown SlackTextObject type, must be one of ['plain_text', 'mrkdwn']"
 
 instance Show SlackText where
   show (SlackText arr) = show $ concat arr
@@ -183,12 +183,12 @@ instance ToJSON SlackContent where
       , "text" .= t
       ]
   toJSON (SlackContentImage (SlackImage mtitle altText url)) =
-    object $
-      [ "type" .= ("image" :: Text)
-      , "image_url" .= url
-      , "alt_text" .= altText
-      ]
-        <> maybe [] mkTitle mtitle
+    object
+      $ [ "type" .= ("image" :: Text)
+        , "image_url" .= url
+        , "alt_text" .= altText
+        ]
+      <> maybe [] mkTitle mtitle
     where
       mkTitle title =
         [ "title"
@@ -369,8 +369,8 @@ instance Show SlackAccessory where
 -- | Small helper function for constructing a section with a button accessory out of a button and text components
 sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
 sectionWithButtonAccessory btn txt =
-  SlackBlockSection $
-    (slackSectionWithText txt)
+  SlackBlockSection
+    $ (slackSectionWithText txt)
       { slackSectionAccessory = Just $ SlackButtonAccessory btn
       }
 
@@ -410,8 +410,8 @@ instance Show SlackBlock where
   show (SlackBlockContext contents) = show contents
   show SlackBlockDivider = "|"
   show (SlackBlockActions mBlockId as) =
-    show $
-      mconcat
+    show
+      $ mconcat
         [ "actions("
         , show mBlockId
         , ") = ["
@@ -490,8 +490,9 @@ instance FromJSON SlackBlock where
       "rich_text" -> do
         elements <- obj .: "elements"
         mBlockId <- obj .:? "block_id"
-        pure . SlackBlockRichText $
-          RichText
+        pure
+          . SlackBlockRichText
+          $ RichText
             { blockId = mBlockId
             , elements
             }
@@ -544,11 +545,11 @@ textToContext :: Text -> SlackMessage
 textToContext = context . markdown . message
 
 -- | Generates interactive components such as buttons.
-actions :: ToSlackActionList as => as -> SlackMessage
+actions :: (ToSlackActionList as) => as -> SlackMessage
 actions as = SlackMessage [SlackBlockActions Nothing $ toSlackActionList as]
 
 -- | Generates interactive components such as buttons with a 'SlackBlockId'.
-actionsWithBlockId :: ToSlackActionList as => SlackBlockId -> as -> SlackMessage
+actionsWithBlockId :: (ToSlackActionList as) => SlackBlockId -> as -> SlackMessage
 actionsWithBlockId slackBlockId as = SlackMessage [SlackBlockActions (Just slackBlockId) $ toSlackActionList as]
 
 -- | Settings for [button elements](https://api.slack.com/reference/block-kit/block-elements#button).
@@ -578,8 +579,8 @@ buttonSettings =
 -- | Button builder.
 button :: SlackActionId -> SlackButtonText -> ButtonSettings -> SlackAction
 button actionId buttonText ButtonSettings {..} =
-  SlackAction actionId $
-    SlackButton
+  SlackAction actionId
+    $ SlackButton
       { slackButtonText = buttonText
       , slackButtonUrl = unOptionalSetting buttonUrl
       , slackButtonValue = unOptionalSetting buttonValue
@@ -652,7 +653,7 @@ data SlackConfirmObject = SlackConfirmObject
   , slackConfirmDeny :: SlackPlainTextOnly -- max length 30
   , slackConfirmStyle :: Maybe SlackStyle
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
 
 instance ToJSON SlackConfirmObject where
   toJSON SlackConfirmObject {..} =

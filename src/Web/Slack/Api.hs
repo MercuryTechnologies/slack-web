@@ -9,12 +9,11 @@
 -- |
 -- Module: Web.Slack.Api
 -- Description:
-module Web.Slack.Api
-  ( TestReq (..),
-    mkTestReq,
-    TestRsp (..),
-  )
-where
+module Web.Slack.Api (
+  TestReq (..),
+  mkTestReq,
+  TestRsp (..),
+) where
 
 -- FIXME: Web.Slack.Prelude
 

@@ -1,14 +1,13 @@
-module Web.Slack.Prelude
-  ( module ClassyPrelude,
-    module Data.Aeson,
-    module Data.Aeson.TH,
-    cs,
-    ToHttpApiData,
-    NonEmpty (..),
-    Default (..),
-    Proxy (..),
-  )
-where
+module Web.Slack.Prelude (
+  module ClassyPrelude,
+  module Data.Aeson,
+  module Data.Aeson.TH,
+  cs,
+  ToHttpApiData,
+  NonEmpty (..),
+  Default (..),
+  Proxy (..),
+) where
 
 import ClassyPrelude hiding (link)
 import Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.:?), (.=))

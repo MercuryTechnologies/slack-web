@@ -27,7 +27,7 @@ data ResponseSlackError = ResponseSlackError Text
 -- Internal type!
 newtype ResponseJSON a = ResponseJSON (Either ResponseSlackError a)
 
-instance FromJSON a => FromJSON (ResponseJSON a) where
+instance (FromJSON a) => FromJSON (ResponseJSON a) where
   parseJSON = withObject "Response" $ \o -> do
     ok <- o .: "ok"
     ResponseJSON

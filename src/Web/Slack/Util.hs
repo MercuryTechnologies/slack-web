@@ -5,12 +5,11 @@
 -- |
 -- Module: Web.Slack.Util
 -- Description:
-module Web.Slack.Util
-  ( formOpts,
-    jsonOpts,
-    toQueryParamIfJust,
-  )
-where
+module Web.Slack.Util (
+  formOpts,
+  jsonOpts,
+  toQueryParamIfJust,
+) where
 
 -- FIXME: Web.Slack.Prelude
 
@@ -59,6 +58,6 @@ addUnderscores ::
 addUnderscores =
   camelTo2 '_'
 
-toQueryParamIfJust :: ToHttpApiData a => Text -> Maybe a -> Form
+toQueryParamIfJust :: (ToHttpApiData a) => Text -> Maybe a -> Form
 toQueryParamIfJust key =
   fromList . maybeToList . fmap (\justVal -> (key, toQueryParam justVal))

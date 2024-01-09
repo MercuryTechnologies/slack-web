@@ -5,20 +5,20 @@ import Data.Text qualified as Text
 import Data.Time.Clock (addUTCTime, nominalDay)
 import Test.Pull.Fake.IO (FakeStream, newFakeStream, pull)
 import TestImport
-import Web.Slack.Common
-  ( Message (..),
-    MessageType (..),
-    SlackMessageText (..),
-    mkSlackTimestamp,
-  )
-import Web.Slack.Conversation
-  ( ConversationId (ConversationId),
-    HistoryReq (..),
-    HistoryRsp (..),
-    RepliesReq (..),
-    mkHistoryReq,
-    mkRepliesReq,
-  )
+import Web.Slack.Common (
+  Message (..),
+  MessageType (..),
+  SlackMessageText (..),
+  mkSlackTimestamp,
+ )
+import Web.Slack.Conversation (
+  ConversationId (ConversationId),
+  HistoryReq (..),
+  HistoryRsp (..),
+  RepliesReq (..),
+  mkHistoryReq,
+  mkRepliesReq,
+ )
 import Web.Slack.Pager
 import Web.Slack.Types (UserId (..))
 
@@ -38,16 +38,17 @@ spec = do
               -- The last page's cursor can be either an empty string, null, or non-exisitent in the object.
               (pageN, cursor) <- zip [1 .. 3] ["cursor1=", "cursor2=", ""]
               let pageNT = Text.pack (show pageN)
-              pure . Right $
-                HistoryRsp
+              pure
+                . Right
+                $ HistoryRsp
                   { historyRspMessages = do
                       messageN <- [1 .. messagesPerPage]
                       let messagesPerPageNDT = fromIntegral messagesPerPage
                           messageNDT = fromIntegral messageN
                           messageNT = Text.pack (show messageN)
                           createdBefore = negate $ nominalDay * ((pageN - 1) * messagesPerPageNDT + messageNDT)
-                      pure $
-                        Message
+                      pure
+                        $ Message
                           MessageTypeMessage
                           (Just . UserId $ "U" <> pageNT <> messageNT)
                           (SlackMessageText $ "message " <> pageNT <> "-" <> messageNT)
@@ -57,8 +58,9 @@ spec = do
         responsesToReturn <- newFakeStream allResponses
         return (now, oldest, messagesPerPage, allResponses, responsesToReturn)
 
-  describe "conversationsHistoryAllBy" $
-    it "collect all results by sending requests" $ do
+  describe "conversationsHistoryAllBy"
+    $ it "collect all results by sending requests"
+    $ do
       (now, oldest, messagesPerPage, allResponses, responsesToReturn) <- prepare
       let initialRequest =
             (mkHistoryReq (ConversationId "C01234567"))
@@ -72,8 +74,9 @@ spec = do
       expected <- fmap (map historyRspMessages) . either throwIO return $ sequenceA allResponses
       actual `shouldReturn` expected
 
-  describe "repliesFetchAllBy" $
-    it "collect all results by sending requests" $ do
+  describe "repliesFetchAllBy"
+    $ it "collect all results by sending requests"
+    $ do
       (now, oldest, messagesPerPage, allResponses, responsesToReturn) <- prepare
       let initialRequest =
             (mkRepliesReq (ConversationId "C98765432") oldest)
@@ -88,7 +91,7 @@ spec = do
       actual `shouldReturn` expected
 
 -- | Runs the given action repeatedly until it returns an empty list.
-unfoldPageM :: Monad m => m [a] -> m [[a]]
+unfoldPageM :: (Monad m) => m [a] -> m [[a]]
 unfoldPageM act = reverse <$> go []
   where
     go accum = do

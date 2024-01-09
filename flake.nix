@@ -17,7 +17,7 @@
 
   outputs = { self, nixpkgs, flake-utils, pre-commit-hooks }:
     let
-      ghcVer = "ghc924";
+      ghcVer = "ghc948";
       makeHaskellOverlay = overlay: final: prev: {
         haskell = prev.haskell // {
           packages = prev.haskell.packages // {
@@ -85,16 +85,14 @@
             haskellPackages.shellFor {
               packages = p: [ self.packages.${system}.slack-web ];
               withHoogle = true;
-              buildInputs = with haskellPackages; [
-                haskell-language-server
-                fourmolu
-                # jacked on this particular nixpkgs version
-                # ghcid
-                cabal-install
-                fast-tags
-              ] ++ (with pkgs; [
-                sqlite
-              ]);
+              buildInputs = [
+                haskellPackages.haskell-language-server
+                haskellPackages.fourmolu
+                haskellPackages.cabal-install
+                haskellPackages.fast-tags
+              ] ++ [
+                pkgs.sqlite
+              ];
               shellHook = self.checks.${system}.pre-commit-check.shellHook;
             };
         };
@@ -103,35 +101,8 @@
       # this stuff is *not* per-system
       overlays = {
         default = makeHaskellOverlay (prev: hfinal: hprev:
-          let hlib = prev.haskell.lib; in
           {
             slack-web = hprev.callCabal2nix "slack-web" ./. { };
-            # test-suite doesn't compile; probably fixed in a newer nixpkgs,
-            # but there's other jackage on newer nixpkgs such as the ghcid bug:
-            # https://github.com/NixOS/nixpkgs/issues/140774#issuecomment-1186546139
-            # and the fourmolu/ormolu bug:
-            # https://github.com/tweag/ormolu/issues/927
-            mutable-containers = hlib.dontCheck hprev.mutable-containers;
-
-            # 0.6.3 in the repo
-            refined = hfinal.refined_0_7;
-
-            pretty-simple = hfinal.callHackageDirect
-              {
-                pkg = "pretty-simple";
-                ver = "4.1.2.0";
-                sha256 = "sha256-uM1oyi/isWMicKPIw0KKeRJzY8Zu5yQNE0A2mpeBPHg=";
-              }
-              { };
-
-            # it's not yet in hackage2nix
-            string-variants = hfinal.callHackageDirect
-              {
-                pkg = "string-variants";
-                ver = "0.1.0.1";
-                sha256 = "sha256-7oNYwPP8xRNYxKNdNH+21zBHdeUeiWBtKOK5G43xtSQ=";
-              }
-              { };
           });
       };
     };

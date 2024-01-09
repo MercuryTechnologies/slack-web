@@ -1,79 +1,78 @@
-module Web.Slack.Experimental.Blocks
-  ( -- * General Slack Messages
-    SlackText,
-    (<+>),
-    parens,
-    brackets,
-    angleBrackets,
-    ticks,
-    codeBlock,
-    bold,
-    italic,
-    newline,
-    unorderedList,
-    link,
-    monospaced,
-    mentionUser,
-    isSubStringOf,
-    SlackImage (..),
-    SlackMessage,
-    Markdown (..),
-    Image (..),
-    context,
-    textToMessage,
-    prefixFirstSlackMessage,
-    mentionUserGroupById,
-    textToContext,
-    slackMessage,
-    SlackBlock (..),
+module Web.Slack.Experimental.Blocks (
+  -- * General Slack Messages
+  SlackText,
+  (<+>),
+  parens,
+  brackets,
+  angleBrackets,
+  ticks,
+  codeBlock,
+  bold,
+  italic,
+  newline,
+  unorderedList,
+  link,
+  monospaced,
+  mentionUser,
+  isSubStringOf,
+  SlackImage (..),
+  SlackMessage,
+  Markdown (..),
+  Image (..),
+  context,
+  textToMessage,
+  prefixFirstSlackMessage,
+  mentionUserGroupById,
+  textToContext,
+  slackMessage,
+  SlackBlock (..),
 
-    -- ** Blocks' rich text formatting (receive only!)
-    RichItem (..),
-    RichStyle (..),
-    RichLinkAttrs (..),
-    RichTextSectionItem (..),
-    RichText (..),
+  -- ** Blocks' rich text formatting (receive only!)
+  RichItem (..),
+  RichStyle (..),
+  RichLinkAttrs (..),
+  RichTextSectionItem (..),
+  RichText (..),
 
-    -- * Rendered messages
-    RenderedSlackMessage (..),
-    render,
+  -- * Rendered messages
+  RenderedSlackMessage (..),
+  render,
 
-    -- * Introduction to Slack Interactive Messages
-    -- $interactive
+  -- * Introduction to Slack Interactive Messages
+  -- $interactive
 
-    -- * Creating Slack Interactive Messages
-    actions,
-    actionsWithBlockId,
-    SlackActionId (..),
-    SlackBlockId,
-    setting,
-    emptySetting,
-    SlackStyle (..),
-    plaintext,
-    plaintextonly,
-    mrkdwn,
-    button,
-    buttonSettings,
-    ButtonSettings
-      ( buttonUrl,
-        buttonValue,
-        buttonStyle,
-        buttonConfirm
-      ),
-    confirm,
-    confirmAreYouSure,
-    ConfirmSettings
-      ( confirmTitle,
-        confirmText,
-        confirmConfirm,
-        confirmDeny,
-        confirmStyle
-      ),
+  -- * Creating Slack Interactive Messages
+  actions,
+  actionsWithBlockId,
+  SlackActionId (..),
+  SlackBlockId,
+  setting,
+  emptySetting,
+  SlackStyle (..),
+  plaintext,
+  plaintextonly,
+  mrkdwn,
+  button,
+  buttonSettings,
+  ButtonSettings (
+    buttonUrl,
+    buttonValue,
+    buttonStyle,
+    buttonConfirm
+  ),
+  confirm,
+  confirmAreYouSure,
+  ConfirmSettings (
+    confirmTitle,
+    confirmText,
+    confirmConfirm,
+    confirmDeny,
+    confirmStyle
+  ),
 
-    -- * Responding to Slack Interactive Messages
-    SlackInteractiveResponse (..),
-  )
-where
+  -- * Responding to Slack Interactive Messages
+  SlackInteractiveResponse (..),
+) where
 
 import Data.Aeson.Text (encodeToLazyText)
 import Data.Text qualified as T
@@ -98,7 +97,7 @@ ticks :: SlackText -> SlackText
 ticks x = "`" <> x <> "`"
 
 -- | Render a 'Slack' renderable value with ticks around it. Alias for @ticks . message@
-monospaced :: Slack a => a -> SlackText
+monospaced :: (Slack a) => a -> SlackText
 monospaced = ticks . message
 
 codeBlock :: SlackText -> SlackText

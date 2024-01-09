@@ -4,15 +4,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 -- | @users.*@ methods in the Slack API
-module Web.Slack.User
-  ( Profile (..),
-    User (..),
-    ListReq (..),
-    ListRsp (..),
-    Email (..),
-    UserRsp (..),
-  )
-where
+module Web.Slack.User (
+  Profile (..),
+  User (..),
+  ListReq (..),
+  ListRsp (..),
+  Email (..),
+  UserRsp (..),
+) where
 
 import Data.Time.Clock.POSIX
 import Web.FormUrlEncoded

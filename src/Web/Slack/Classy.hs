@@ -5,27 +5,26 @@
 -- |
 -- Module: Web.Slack.Classy
 -- Description: For compatibility with Web.Slack prior to v0.4.0.0.
-module Web.Slack.Classy
-  ( SlackConfig (..),
-    mkSlackConfig,
-    apiTest,
-    authTest,
-    chatPostMessage,
-    conversationsList,
-    conversationsHistory,
-    conversationsHistoryAll,
-    conversationsReplies,
-    repliesFetchAll,
-    getUserDesc,
-    usersList,
-    userLookupByEmail,
-    authenticateReq,
-    Response,
-    LoadPage,
-    HasManager (..),
-    HasToken (..),
-  )
-where
+module Web.Slack.Classy (
+  SlackConfig (..),
+  mkSlackConfig,
+  apiTest,
+  authTest,
+  chatPostMessage,
+  conversationsList,
+  conversationsHistory,
+  conversationsHistoryAll,
+  conversationsReplies,
+  repliesFetchAll,
+  getUserDesc,
+  usersList,
+  userLookupByEmail,
+  authenticateReq,
+  Response,
+  LoadPage,
+  HasManager (..),
+  HasToken (..),
+) where
 
 import Data.Map qualified as Map
 import Network.HTTP.Client (Manager)

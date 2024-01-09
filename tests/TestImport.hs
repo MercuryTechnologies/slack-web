@@ -1,15 +1,14 @@
-module TestImport
-  ( fromJust,
-    module Control.Monad.Fail,
-    module Test.Hspec,
-    module Test.Hspec.QuickCheck,
-    module ClassyPrelude,
-    module Data.Aeson,
-    module Data.Aeson.TH,
-    cs,
-    module Test.QuickCheck,
-  )
-where
+module TestImport (
+  fromJust,
+  module Control.Monad.Fail,
+  module Test.Hspec,
+  module Test.Hspec.QuickCheck,
+  module ClassyPrelude,
+  module Data.Aeson,
+  module Data.Aeson.TH,
+  cs,
+  module Test.QuickCheck,
+) where
 
 import ClassyPrelude hiding (link)
 import Control.Monad.Fail
