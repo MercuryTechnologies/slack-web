@@ -1,6 +1,6 @@
 cabal-version: 2.2
 name: slack-web
-version: 2.0.0.0
+version: 2.0.0.1
 
 build-type: Simple
 
@@ -186,6 +186,7 @@ test-suite tests
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec
       Web.Slack.Experimental.BlocksSpec
+      Web.Slack.Experimental.Blocks.TypesSpec
       TestImport
       TestImport.Aeson
   build-tool-depends:
@@ -205,6 +206,7 @@ test-suite tests
     , mtl
     , pretty-simple ^>= 4.1
     , quickcheck-instances
+    , refined
     , slack-web
     , string-conversions
     , string-variants
