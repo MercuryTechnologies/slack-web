@@ -1,0 +1,53 @@
+{
+    "token": "d90zMGO2eDLrkLHJYcKevn2b",
+    "team_id": "T043DB835ML",
+    "context_team_id": "T043DB835ML",
+    "context_enterprise_id": null,
+    "api_app_id": "A07JRKQPZDH",
+    "event": {
+        "subtype": "bot_message",
+        "text": "<https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929>",
+        "username": "Reacji Channeler",
+        "icons": {
+            "emoji": "bulb"
+        },
+        "type": "message",
+        "ts": "1724955010.440469",
+        "bot_id": "B07JWPS5Y5S",
+        "app_id": "A1BFDR28J",
+        "blocks": [
+            {
+                "type": "rich_text",
+                "block_id": "nmh",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "link",
+                                "url": "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "channel": "C07KH38CR5E",
+        "event_ts": "1724955010.440469",
+        "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev07JQHFTAKH",
+    "event_time": 1724955010,
+    "authorizations": [
+        {
+            "enterprise_id": null,
+            "team_id": "T043DB835ML",
+            "user_id": "U07K4E18KJM",
+            "is_bot": true,
+            "is_enterprise_install": false
+        }
+    ],
+    "is_ext_shared_channel": false,
+    "event_context": "4-eyJldCI6Im1lc3NhZ2UiLCJ0aWQiOiJUMDQzREI4MzVNTCIsImFpZCI6IkEwN0pSS1FQWkRIIiwiY2lkIjoiQzA3S0gzOENSNUUifQ=="
+}
