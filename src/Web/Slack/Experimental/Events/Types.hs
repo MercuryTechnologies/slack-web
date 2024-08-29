@@ -56,6 +56,8 @@ $(deriveFromJSON snakeCaseOptions ''MessageEvent)
 -- | <https://api.slack.com/events/message/bot_message>
 -- This is similar to a MessageEvent but sent by a bot, for example
 -- messages that Reacji Channeler sends.
+--
+-- @since 2.0.0.2
 data BotMessageEvent = BotMessageEvent
   { blocks :: Maybe [SlackBlock]
   , channel :: ConversationId
