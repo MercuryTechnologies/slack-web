@@ -37,6 +37,7 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Nothing
                 , botId = Nothing
+                , attachments = Nothing
                 }
             )
         }

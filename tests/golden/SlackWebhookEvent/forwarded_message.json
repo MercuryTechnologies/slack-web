@@ -1,0 +1,78 @@
+{
+    "token": "d90zMGO2eDLrkLHJYcKevn2b",
+    "team_id": "T043DB835ML",
+    "context_team_id": "T043DB835ML",
+    "context_enterprise_id": null,
+    "api_app_id": "A07JRKQPZDH",
+    "event": {
+        "user": "U05JAA9EN4T",
+        "type": "message",
+        "ts": "1724952300.110719",
+        "text": "",
+        "team": "T043DB835ML",
+        "attachments": [
+            {
+                "ts": "1724952281.623809",
+                "author_id": "U05JAA9EN4T",
+                "channel_id": "C07KTH1T4CQ",
+                "channel_team": "T043DB835ML",
+                "is_msg_unfurl": true,
+                "message_blocks": [
+                    {
+                        "team": "T043DB835ML",
+                        "channel": "C07KTH1T4CQ",
+                        "ts": "1724952281.623809",
+                        "message": {
+                            "blocks": [
+                                {
+                                    "type": "rich_text",
+                                    "block_id": "nXUog",
+                                    "elements": [
+                                        {
+                                            "type": "rich_text_section",
+                                            "elements": [
+                                                {
+                                                    "type": "text",
+                                                    "text": "123"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "color": "D0D0D0",
+                "from_url": "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724952281623809",
+                "is_share": true,
+                "fallback": "[August 29th, 2024 10:24 AM] lev: 123",
+                "text": "123",
+                "author_name": "lev",
+                "author_link": "https://myworkspace.slack.com/team/U05JAA9EN4T",
+                "author_icon": "https://avatars.slack-edge.com/2023-07-22/5607926127815_66b9d49327ec16a887e5_48.png",
+                "author_subname": "lev",
+                "mrkdwn_in": [
+                    "text"
+                ],
+                "footer": "Slack Conversation"
+            }
+        ],
+        "channel": "C07KHDGQ7K3",
+        "event_ts": "1724952300.110719",
+        "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev07KHG83J1F",
+    "event_time": 1724952300,
+    "authorizations": [
+        {
+            "enterprise_id": null,
+            "team_id": "T043DB835ML",
+            "user_id": "U07K4E18KJM",
+            "is_bot": true,
+            "is_enterprise_install": false
+        }
+    ],
+    "is_ext_shared_channel": false
+}

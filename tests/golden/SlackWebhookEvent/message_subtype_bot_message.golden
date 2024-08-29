@@ -39,6 +39,7 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Just "A1BFDR28J"
                 , botId = "B07JWPS5Y5S"
+                , attachments = Nothing
                 }
             )
         }

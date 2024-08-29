@@ -22,6 +22,73 @@ data ChannelType = Channel | Group | Im
 
 $(deriveJSON snakeCaseOptions ''ChannelType)
 
+-- | <https://api.slack.com/events/message/message_attachment>
+-- Ported from https://github.com/slackapi/node-slack-sdk/blob/fc87d51/packages/types/src/message-attachments.ts
+--
+-- @since 2.0.0.3
+data AttachmentField = AttachmentField
+  { title :: Text
+  , value :: Text
+  , short :: Maybe Bool
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''AttachmentField)
+
+-- | @since 2.0.0.3
+data AttachmentMessageBlockMessage = AttachmentMessageBlockMessage
+  { blocks :: [SlackBlock]
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''AttachmentMessageBlockMessage)
+
+-- | @since 2.0.0.3
+data AttachmentMessageBlock = AttachmentMessageBlock
+  { team :: TeamId
+  , channel :: ConversationId
+  , ts :: Text
+  , message :: AttachmentMessageBlockMessage
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''AttachmentMessageBlock)
+
+-- | <https://api.slack.com/events/message/message_attachment>
+-- Ported from https://github.com/slackapi/node-slack-sdk/blob/fc87d51/packages/types/src/message-attachments.ts
+--
+-- @since 2.0.0.3
+data MessageAttachment = MessageAttachment
+  { fallback :: Maybe Text
+  , color :: Maybe Text
+  , pretext :: Maybe Text
+  , authorName :: Maybe Text
+  , authorLink :: Maybe Text
+  , authorIcon :: Maybe Text
+  , title :: Maybe Text
+  , titleLink :: Maybe Text
+  , text :: Maybe Text
+  , fields :: Maybe [AttachmentField]
+  , imageUrl :: Maybe Text
+  , thumbUrl :: Maybe Text
+  , footer :: Maybe Text
+  , footerIcon :: Maybe Text
+  , ts :: Maybe Text
+  , -- the following are undocumented
+    isMsgUnfurl :: Maybe Bool
+  , messageBlocks :: Maybe [AttachmentMessageBlock]
+  -- ^ unfurled message blocks
+  , authorId :: Maybe UserId
+  , channelId :: Maybe ConversationId
+  , channelTeam :: Maybe TeamId
+  , isAppUnfurl :: Maybe Bool
+  , appUnfurlUrl :: Maybe Text
+  , fromUrl :: Maybe Text
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''MessageAttachment)
+
 -- | <https://api.slack.com/events/message>
 -- and
 -- <https://api.slack.com/events/message/file_share>
@@ -48,6 +115,9 @@ data MessageEvent = MessageEvent
   --   See @botMessage.json@ golden parser test.
   , botId :: Maybe Text
   -- ^ Present if it's sent by a bot user
+  , attachments :: Maybe [MessageAttachment]
+  -- ^ @since 2.0.0.3
+  -- Present if the message has attachments
   }
   deriving stock (Show)
 
@@ -71,6 +141,9 @@ data BotMessageEvent = BotMessageEvent
   -- ^ Some (or all) bots also have an App ID
   , botId :: Text
   -- ^ Always present for bot_message subtype
+  , attachments :: Maybe [MessageAttachment]
+  -- ^ @since 2.0.0.3
+  -- Present if the message has attachments
   }
   deriving stock (Show)
 

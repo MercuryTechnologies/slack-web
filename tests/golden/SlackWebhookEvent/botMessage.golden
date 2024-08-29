@@ -37,6 +37,7 @@ EventEventCallback
                 , threadTs = Just "1664216109.798919"
                 , appId = Just "A0442TUPHGR"
                 , botId = Just "B0439P161B9"
+                , attachments = Nothing
                 }
             )
         }
