@@ -1,0 +1,45 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev07JQHFTAKH" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1724955010
+            , systemNanoseconds = 0
+            }
+        , event = EventBotMessage
+            ( BotMessageEvent
+                { blocks = Just
+                    [ RichText
+                        { blockId = Just
+                            ( NonEmptyText "nmh" )
+                        , elements =
+                            [ RichTextSectionItemRichText
+                                [ RichItemLink
+                                    ( RichLinkAttrs
+                                        { style = RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        , url = "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929"
+                                        , text = Nothing
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C07KH38CR5E" }
+                , text = "<https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929>"
+                , channelType = Channel
+                , files = Nothing
+                , ts = "1724955010.440469"
+                , threadTs = Nothing
+                , appId = Just "A1BFDR28J"
+                , botId = "B07JWPS5Y5S"
+                }
+            )
+        }
+    )

@@ -53,6 +53,29 @@ data MessageEvent = MessageEvent
 
 $(deriveFromJSON snakeCaseOptions ''MessageEvent)
 
+-- | <https://api.slack.com/events/message/bot_message>
+-- This is similar to a MessageEvent but sent by a bot, for example
+-- messages that Reacji Channeler sends.
+--
+-- @since 2.0.0.2
+data BotMessageEvent = BotMessageEvent
+  { blocks :: Maybe [SlackBlock]
+  , channel :: ConversationId
+  , text :: Text
+  , channelType :: ChannelType
+  , files :: Maybe [FileObject]
+  , ts :: Text
+  , threadTs :: Maybe Text
+  -- ^ Present if the message is in a thread
+  , appId :: Maybe Text
+  -- ^ Some (or all) bots also have an App ID
+  , botId :: Text
+  -- ^ Always present for bot_message subtype
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''BotMessageEvent)
+
 -- | <https://api.slack.com/events/message/message_changed>
 --
 -- FIXME(jadel): implement. This is mega cursed! in the normal message event
@@ -124,6 +147,7 @@ newtype MessageId = MessageId {unMessageId :: Text}
 
 data Event
   = EventMessage MessageEvent
+  | EventBotMessage BotMessageEvent
   | EventMessageChanged
   | -- | Weird message event of subtype channel_join. Sent "sometimes", according
     -- to a random Slack blog post from 2017:
@@ -142,6 +166,7 @@ instance FromJSON Event where
     subtype :: Maybe Text <- obj .:? "subtype"
     case (tag, subtype) of
       ("message", Nothing) -> EventMessage <$> parseJSON @MessageEvent (Object obj)
+      ("message", Just "bot_message") -> EventBotMessage <$> parseJSON @BotMessageEvent (Object obj)
       ("message", Just "message_changed") -> pure EventMessageChanged
       ("message", Just "channel_join") -> pure EventChannelJoinMessage
       -- n.b. these are unified since it is *identical* to a Message event with

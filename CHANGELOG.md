@@ -1,3 +1,7 @@
+# 2.0.0.2 (2024-08-29)
+* [#132](https://github.com/MercuryTechnologies/slack-web/pull/132)
+  Add support for bot_message event subtype.
+
 # 2.0.0.0 (2023-10-26)
 
 * [#123](https://github.com/MercuryTechnologies/slack-web/pull/123)

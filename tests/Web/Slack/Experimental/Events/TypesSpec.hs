@@ -26,4 +26,5 @@ spec = describe "Types for Slack events" do
         , "circleci"
         , -- https://slack.com/help/articles/206819278-Send-emails-to-Slack
           "email_message"
+        , "message_subtype_bot_message"
         ]
