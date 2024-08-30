@@ -1,60 +1,75 @@
 EventEventCallback
     ( EventCallback
         { eventId = EventId
-            { unEventId = "Ev04BEN3QMSM" }
+            { unEventId = "Ev07K61TELMR" }
         , teamId = TeamId
             { unTeamId = "T043DB835ML" }
         , eventTime = MkSystemTime
-            { systemSeconds = 1668537593
+            { systemSeconds = 1724966800
             , systemNanoseconds = 0
             }
         , event = EventMessage
             ( MessageEvent
-                { blocks = Nothing
+                { blocks = Just
+                    [ RichText
+                        { blockId = Just
+                            ( NonEmptyText "Yyg6K" )
+                        , elements =
+                            [ RichTextSectionItemRichText
+                                [ RichItemText "hello check that out!"
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
                 , channel = ConversationId
-                    { unConversationId = "C043YJGBY49" }
-                , text = ""
+                    { unConversationId = "C07KHDGQ7K3" }
+                , text = "hello check that out!"
                 , channelType = Channel
                 , files = Nothing
                 , user = UserId
-                    { unUserId = "U043H11ES4V" }
-                , ts = "1668537593.598469"
+                    { unUserId = "U05JAA9EN4T" }
+                , ts = "1724966800.923979"
                 , threadTs = Nothing
                 , appId = Nothing
                 , botId = Nothing
                 , attachments = Just
                     [ MessageAttachment
-                        { fallback = Just "[October 12th, 2022 4:04 PM] jadel: blahblahblahblahblah"
+                        { fallback = Just "[August 29th, 2024 2:26 PM] lev: this will be shared with a message"
                         , color = Just "D0D0D0"
                         , pretext = Nothing
-                        , authorName = Just "jadel"
-                        , authorLink = Just "https://jadeapptesting.slack.com/team/U043H11ES4V"
-                        , authorIcon = Just "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png"
+                        , authorName = Just "lev"
+                        , authorLink = Just "https://myworkspace.slack.com/team/U05JAA9EN4T"
+                        , authorIcon = Just "https://avatars.slack-edge.com/2023-07-22/5607926127815_66b9d49327ec16a887e5_48.png"
                         , title = Nothing
                         , titleLink = Nothing
-                        , text = Just "blahblahblahblahblah"
+                        , text = Just "this will be shared with a message"
                         , fields = Nothing
                         , imageUrl = Nothing
                         , thumbUrl = Nothing
-                        , footer = Just "Posted in #testing-slack-app"
+                        , footer = Just "Slack Conversation"
                         , footerIcon = Nothing
-                        , ts = Just "1665615886.364019"
+                        , ts = Just "1724966776.474889"
                         , isMsgUnfurl = Just True
                         , messageBlocks = Just
                             [ AttachmentMessageBlock
                                 { team = TeamId
                                     { unTeamId = "T043DB835ML" }
                                 , channel = ConversationId
-                                    { unConversationId = "C043KSKGJUB" }
-                                , ts = "1665615886.364019"
+                                    { unConversationId = "C07KTH1T4CQ" }
+                                , ts = "1724966776.474889"
                                 , message = AttachmentMessageBlockMessage
                                     { blocks =
                                         [ RichText
                                             { blockId = Just
-                                                ( NonEmptyText "TNHa4" )
+                                                ( NonEmptyText "BXn1o" )
                                             , elements =
                                                 [ RichTextSectionItemRichText
-                                                    [ RichItemText "blahblahblahblahblah"
+                                                    [ RichItemText "this will be shared with a message"
                                                         ( RichStyle
                                                             { rsBold = False
                                                             , rsItalic = False
@@ -69,11 +84,11 @@ EventEventCallback
                             ]
                         , authorId = Just
                             ( UserId
-                                { unUserId = "U043H11ES4V" }
+                                { unUserId = "U05JAA9EN4T" }
                             )
                         , channelId = Just
                             ( ConversationId
-                                { unConversationId = "C043KSKGJUB" }
+                                { unConversationId = "C07KTH1T4CQ" }
                             )
                         , channelTeam = Just
                             ( TeamId
@@ -81,7 +96,7 @@ EventEventCallback
                             )
                         , isAppUnfurl = Nothing
                         , appUnfurlUrl = Nothing
-                        , fromUrl = Just "https://jadeapptesting.slack.com/archives/C043KSKGJUB/p1665615886364019"
+                        , fromUrl = Just "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724966776474889"
                         }
                     ]
                 }

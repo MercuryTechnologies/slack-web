@@ -1,3 +1,7 @@
+# 2.0.0.3 (2024-08-30)
+* [#133](https://github.com/MercuryTechnologies/slack-web/pull/133)
+  Adds attachment support for message event subscriptions.
+
 # 2.0.0.2 (2024-08-29)
 * [#132](https://github.com/MercuryTechnologies/slack-web/pull/132)
   Add support for bot_message event subtype.

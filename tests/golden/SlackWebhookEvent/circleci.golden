@@ -50,6 +50,7 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Just "A56789123"
                 , botId = Just "B01234687"
+                , attachments = Nothing
                 }
             )
         }
