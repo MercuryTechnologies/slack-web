@@ -1,3 +1,8 @@
+# 2.0.0.4 (2024-09-15)
+* [#135](https://github.com/MercuryTechnologies/slack-web/pull/135)
+  Improves attachement support by providing clients wih the raw JSON value
+  in case of a parse failure.
+
 # 2.0.0.3 (2024-08-30)
 * [#133](https://github.com/MercuryTechnologies/slack-web/pull/133)
   Adds attachment support for message event subscriptions.

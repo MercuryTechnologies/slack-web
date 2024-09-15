@@ -24,64 +24,216 @@ EventEventCallback
                 , botId = Nothing
                 , attachments = Just
                     [ MessageAttachment
-                        { fallback = Just "[October 12th, 2022 4:04 PM] jadel: blahblahblahblahblah"
-                        , color = Just "D0D0D0"
-                        , pretext = Nothing
-                        , authorName = Just "jadel"
-                        , authorLink = Just "https://jadeapptesting.slack.com/team/U043H11ES4V"
-                        , authorIcon = Just "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png"
-                        , title = Nothing
-                        , titleLink = Nothing
-                        , text = Just "blahblahblahblahblah"
-                        , fields = Nothing
-                        , imageUrl = Nothing
-                        , thumbUrl = Nothing
-                        , footer = Just "Posted in #testing-slack-app"
-                        , footerIcon = Nothing
-                        , ts = Just "1665615886.364019"
-                        , isMsgUnfurl = Just True
-                        , messageBlocks = Just
-                            [ AttachmentMessageBlock
-                                { team = TeamId
-                                    { unTeamId = "T043DB835ML" }
-                                , channel = ConversationId
-                                    { unConversationId = "C043KSKGJUB" }
-                                , ts = "1665615886.364019"
-                                , message = AttachmentMessageBlockMessage
-                                    { blocks =
-                                        [ RichText
-                                            { blockId = Just
-                                                ( NonEmptyText "TNHa4" )
-                                            , elements =
-                                                [ RichTextSectionItemRichText
-                                                    [ RichItemText "blahblahblahblahblah"
-                                                        ( RichStyle
-                                                            { rsBold = False
-                                                            , rsItalic = False
-                                                            }
-                                                        )
-                                                    ]
+                        { decoded = Just
+                            ( DecodedMessageAttachment
+                                { fallback = Just "[October 12th, 2022 4:04 PM] jadel: blahblahblahblahblah"
+                                , color = Just "D0D0D0"
+                                , pretext = Nothing
+                                , authorName = Just "jadel"
+                                , authorLink = Just "https://jadeapptesting.slack.com/team/U043H11ES4V"
+                                , authorIcon = Just "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png"
+                                , title = Nothing
+                                , titleLink = Nothing
+                                , text = Just "blahblahblahblahblah"
+                                , fields = Nothing
+                                , imageUrl = Nothing
+                                , thumbUrl = Nothing
+                                , footer = Just "Posted in #testing-slack-app"
+                                , footerIcon = Nothing
+                                , ts = Just "1665615886.364019"
+                                , isMsgUnfurl = Just True
+                                , messageBlocks = Just
+                                    [ AttachmentMessageBlock
+                                        { team = TeamId
+                                            { unTeamId = "T043DB835ML" }
+                                        , channel = ConversationId
+                                            { unConversationId = "C043KSKGJUB" }
+                                        , ts = "1665615886.364019"
+                                        , message = AttachmentMessageBlockMessage
+                                            { blocks =
+                                                [ RichText
+                                                    { blockId = Just
+                                                        ( NonEmptyText "TNHa4" )
+                                                    , elements =
+                                                        [ RichTextSectionItemRichText
+                                                            [ RichItemText "blahblahblahblahblah"
+                                                                ( RichStyle
+                                                                    { rsBold = False
+                                                                    , rsItalic = False
+                                                                    }
+                                                                )
+                                                            ]
+                                                        ]
+                                                    }
                                                 ]
                                             }
-                                        ]
-                                    }
+                                        }
+                                    ]
+                                , authorId = Just
+                                    ( UserId
+                                        { unUserId = "U043H11ES4V" }
+                                    )
+                                , channelId = Just
+                                    ( ConversationId
+                                        { unConversationId = "C043KSKGJUB" }
+                                    )
+                                , channelTeam = Just
+                                    ( TeamId
+                                        { unTeamId = "T043DB835ML" }
+                                    )
+                                , isAppUnfurl = Nothing
+                                , appUnfurlUrl = Nothing
+                                , fromUrl = Just "https://jadeapptesting.slack.com/archives/C043KSKGJUB/p1665615886364019"
                                 }
-                            ]
-                        , authorId = Just
-                            ( UserId
-                                { unUserId = "U043H11ES4V" }
                             )
-                        , channelId = Just
-                            ( ConversationId
-                                { unConversationId = "C043KSKGJUB" }
+                        , raw = Object
+                            ( fromList
+                                [
+                                    ( "author_icon"
+                                    , String "https://secure.gravatar.com/avatar/dcd5bc53dcfaca62ddc3f5726d07ba13.jpg?s=48&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0019-48.png"
+                                    )
+                                ,
+                                    ( "author_id"
+                                    , String "U043H11ES4V"
+                                    )
+                                ,
+                                    ( "author_link"
+                                    , String "https://jadeapptesting.slack.com/team/U043H11ES4V"
+                                    )
+                                ,
+                                    ( "author_name"
+                                    , String "jadel"
+                                    )
+                                ,
+                                    ( "author_subname"
+                                    , String "jadel"
+                                    )
+                                ,
+                                    ( "channel_id"
+                                    , String "C043KSKGJUB"
+                                    )
+                                ,
+                                    ( "channel_name"
+                                    , String "testing-slack-app"
+                                    )
+                                ,
+                                    ( "channel_team"
+                                    , String "T043DB835ML"
+                                    )
+                                ,
+                                    ( "color"
+                                    , String "D0D0D0"
+                                    )
+                                ,
+                                    ( "fallback"
+                                    , String "[October 12th, 2022 4:04 PM] jadel: blahblahblahblahblah"
+                                    )
+                                ,
+                                    ( "footer"
+                                    , String "Posted in #testing-slack-app"
+                                    )
+                                ,
+                                    ( "from_url"
+                                    , String "https://jadeapptesting.slack.com/archives/C043KSKGJUB/p1665615886364019"
+                                    )
+                                ,
+                                    ( "is_msg_unfurl"
+                                    , Bool True
+                                    )
+                                ,
+                                    ( "is_share"
+                                    , Bool True
+                                    )
+                                ,
+                                    ( "message_blocks"
+                                    , Array
+                                        [ Object
+                                            ( fromList
+                                                [
+                                                    ( "channel"
+                                                    , String "C043KSKGJUB"
+                                                    )
+                                                ,
+                                                    ( "message"
+                                                    , Object
+                                                        ( fromList
+                                                            [
+                                                                ( "blocks"
+                                                                , Array
+                                                                    [ Object
+                                                                        ( fromList
+                                                                            [
+                                                                                ( "block_id"
+                                                                                , String "TNHa4"
+                                                                                )
+                                                                            ,
+                                                                                ( "elements"
+                                                                                , Array
+                                                                                    [ Object
+                                                                                        ( fromList
+                                                                                            [
+                                                                                                ( "elements"
+                                                                                                , Array
+                                                                                                    [ Object
+                                                                                                        ( fromList
+                                                                                                            [
+                                                                                                                ( "text"
+                                                                                                                , String "blahblahblahblahblah"
+                                                                                                                )
+                                                                                                            ,
+                                                                                                                ( "type"
+                                                                                                                , String "text"
+                                                                                                                )
+                                                                                                            ]
+                                                                                                        )
+                                                                                                    ]
+                                                                                                )
+                                                                                            ,
+                                                                                                ( "type"
+                                                                                                , String "rich_text_section"
+                                                                                                )
+                                                                                            ]
+                                                                                        )
+                                                                                    ]
+                                                                                )
+                                                                            ,
+                                                                                ( "type"
+                                                                                , String "rich_text"
+                                                                                )
+                                                                            ]
+                                                                        )
+                                                                    ]
+                                                                )
+                                                            ]
+                                                        )
+                                                    )
+                                                ,
+                                                    ( "team"
+                                                    , String "T043DB835ML"
+                                                    )
+                                                ,
+                                                    ( "ts"
+                                                    , String "1665615886.364019"
+                                                    )
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ,
+                                    ( "mrkdwn_in"
+                                    , Array
+                                        [ String "text" ]
+                                    )
+                                ,
+                                    ( "text"
+                                    , String "blahblahblahblahblah"
+                                    )
+                                ,
+                                    ( "ts"
+                                    , String "1665615886.364019"
+                                    )
+                                ]
                             )
-                        , channelTeam = Just
-                            ( TeamId
-                                { unTeamId = "T043DB835ML" }
-                            )
-                        , isAppUnfurl = Nothing
-                        , appUnfurlUrl = Nothing
-                        , fromUrl = Just "https://jadeapptesting.slack.com/archives/C043KSKGJUB/p1665615886364019"
                         }
                     ]
                 }

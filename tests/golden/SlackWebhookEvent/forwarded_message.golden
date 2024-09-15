@@ -24,64 +24,212 @@ EventEventCallback
                 , botId = Nothing
                 , attachments = Just
                     [ MessageAttachment
-                        { fallback = Just "[August 29th, 2024 10:24 AM] lev: 123"
-                        , color = Just "D0D0D0"
-                        , pretext = Nothing
-                        , authorName = Just "lev"
-                        , authorLink = Just "https://myworkspace.slack.com/team/U05JAA9EN4T"
-                        , authorIcon = Just "https://avatars.slack-edge.com/2023-07-22/5607926127815_66b9d49327ec16a887e5_48.png"
-                        , title = Nothing
-                        , titleLink = Nothing
-                        , text = Just "123"
-                        , fields = Nothing
-                        , imageUrl = Nothing
-                        , thumbUrl = Nothing
-                        , footer = Just "Slack Conversation"
-                        , footerIcon = Nothing
-                        , ts = Just "1724952281.623809"
-                        , isMsgUnfurl = Just True
-                        , messageBlocks = Just
-                            [ AttachmentMessageBlock
-                                { team = TeamId
-                                    { unTeamId = "T043DB835ML" }
-                                , channel = ConversationId
-                                    { unConversationId = "C07KTH1T4CQ" }
-                                , ts = "1724952281.623809"
-                                , message = AttachmentMessageBlockMessage
-                                    { blocks =
-                                        [ RichText
-                                            { blockId = Just
-                                                ( NonEmptyText "nXUog" )
-                                            , elements =
-                                                [ RichTextSectionItemRichText
-                                                    [ RichItemText "123"
-                                                        ( RichStyle
-                                                            { rsBold = False
-                                                            , rsItalic = False
-                                                            }
-                                                        )
-                                                    ]
+                        { decoded = Just
+                            ( DecodedMessageAttachment
+                                { fallback = Just "[August 29th, 2024 10:24 AM] lev: 123"
+                                , color = Just "D0D0D0"
+                                , pretext = Nothing
+                                , authorName = Just "lev"
+                                , authorLink = Just "https://myworkspace.slack.com/team/U05JAA9EN4T"
+                                , authorIcon = Just "https://avatars.slack-edge.com/2023-07-22/5607926127815_66b9d49327ec16a887e5_48.png"
+                                , title = Nothing
+                                , titleLink = Nothing
+                                , text = Just "123"
+                                , fields = Nothing
+                                , imageUrl = Nothing
+                                , thumbUrl = Nothing
+                                , footer = Just "Slack Conversation"
+                                , footerIcon = Nothing
+                                , ts = Just "1724952281.623809"
+                                , isMsgUnfurl = Just True
+                                , messageBlocks = Just
+                                    [ AttachmentMessageBlock
+                                        { team = TeamId
+                                            { unTeamId = "T043DB835ML" }
+                                        , channel = ConversationId
+                                            { unConversationId = "C07KTH1T4CQ" }
+                                        , ts = "1724952281.623809"
+                                        , message = AttachmentMessageBlockMessage
+                                            { blocks =
+                                                [ RichText
+                                                    { blockId = Just
+                                                        ( NonEmptyText "nXUog" )
+                                                    , elements =
+                                                        [ RichTextSectionItemRichText
+                                                            [ RichItemText "123"
+                                                                ( RichStyle
+                                                                    { rsBold = False
+                                                                    , rsItalic = False
+                                                                    }
+                                                                )
+                                                            ]
+                                                        ]
+                                                    }
                                                 ]
                                             }
-                                        ]
-                                    }
+                                        }
+                                    ]
+                                , authorId = Just
+                                    ( UserId
+                                        { unUserId = "U05JAA9EN4T" }
+                                    )
+                                , channelId = Just
+                                    ( ConversationId
+                                        { unConversationId = "C07KTH1T4CQ" }
+                                    )
+                                , channelTeam = Just
+                                    ( TeamId
+                                        { unTeamId = "T043DB835ML" }
+                                    )
+                                , isAppUnfurl = Nothing
+                                , appUnfurlUrl = Nothing
+                                , fromUrl = Just "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724952281623809"
                                 }
-                            ]
-                        , authorId = Just
-                            ( UserId
-                                { unUserId = "U05JAA9EN4T" }
                             )
-                        , channelId = Just
-                            ( ConversationId
-                                { unConversationId = "C07KTH1T4CQ" }
+                        , raw = Object
+                            ( fromList
+                                [
+                                    ( "author_icon"
+                                    , String "https://avatars.slack-edge.com/2023-07-22/5607926127815_66b9d49327ec16a887e5_48.png"
+                                    )
+                                ,
+                                    ( "author_id"
+                                    , String "U05JAA9EN4T"
+                                    )
+                                ,
+                                    ( "author_link"
+                                    , String "https://myworkspace.slack.com/team/U05JAA9EN4T"
+                                    )
+                                ,
+                                    ( "author_name"
+                                    , String "lev"
+                                    )
+                                ,
+                                    ( "author_subname"
+                                    , String "lev"
+                                    )
+                                ,
+                                    ( "channel_id"
+                                    , String "C07KTH1T4CQ"
+                                    )
+                                ,
+                                    ( "channel_team"
+                                    , String "T043DB835ML"
+                                    )
+                                ,
+                                    ( "color"
+                                    , String "D0D0D0"
+                                    )
+                                ,
+                                    ( "fallback"
+                                    , String "[August 29th, 2024 10:24 AM] lev: 123"
+                                    )
+                                ,
+                                    ( "footer"
+                                    , String "Slack Conversation"
+                                    )
+                                ,
+                                    ( "from_url"
+                                    , String "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724952281623809"
+                                    )
+                                ,
+                                    ( "is_msg_unfurl"
+                                    , Bool True
+                                    )
+                                ,
+                                    ( "is_share"
+                                    , Bool True
+                                    )
+                                ,
+                                    ( "message_blocks"
+                                    , Array
+                                        [ Object
+                                            ( fromList
+                                                [
+                                                    ( "channel"
+                                                    , String "C07KTH1T4CQ"
+                                                    )
+                                                ,
+                                                    ( "message"
+                                                    , Object
+                                                        ( fromList
+                                                            [
+                                                                ( "blocks"
+                                                                , Array
+                                                                    [ Object
+                                                                        ( fromList
+                                                                            [
+                                                                                ( "block_id"
+                                                                                , String "nXUog"
+                                                                                )
+                                                                            ,
+                                                                                ( "elements"
+                                                                                , Array
+                                                                                    [ Object
+                                                                                        ( fromList
+                                                                                            [
+                                                                                                ( "elements"
+                                                                                                , Array
+                                                                                                    [ Object
+                                                                                                        ( fromList
+                                                                                                            [
+                                                                                                                ( "text"
+                                                                                                                , String "123"
+                                                                                                                )
+                                                                                                            ,
+                                                                                                                ( "type"
+                                                                                                                , String "text"
+                                                                                                                )
+                                                                                                            ]
+                                                                                                        )
+                                                                                                    ]
+                                                                                                )
+                                                                                            ,
+                                                                                                ( "type"
+                                                                                                , String "rich_text_section"
+                                                                                                )
+                                                                                            ]
+                                                                                        )
+                                                                                    ]
+                                                                                )
+                                                                            ,
+                                                                                ( "type"
+                                                                                , String "rich_text"
+                                                                                )
+                                                                            ]
+                                                                        )
+                                                                    ]
+                                                                )
+                                                            ]
+                                                        )
+                                                    )
+                                                ,
+                                                    ( "team"
+                                                    , String "T043DB835ML"
+                                                    )
+                                                ,
+                                                    ( "ts"
+                                                    , String "1724952281.623809"
+                                                    )
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ,
+                                    ( "mrkdwn_in"
+                                    , Array
+                                        [ String "text" ]
+                                    )
+                                ,
+                                    ( "text"
+                                    , String "123"
+                                    )
+                                ,
+                                    ( "ts"
+                                    , String "1724952281.623809"
+                                    )
+                                ]
                             )
-                        , channelTeam = Just
-                            ( TeamId
-                                { unTeamId = "T043DB835ML" }
-                            )
-                        , isAppUnfurl = Nothing
-                        , appUnfurlUrl = Nothing
-                        , fromUrl = Just "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724952281623809"
                         }
                     ]
                 }

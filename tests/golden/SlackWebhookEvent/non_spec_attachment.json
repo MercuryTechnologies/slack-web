@@ -1,0 +1,58 @@
+{
+    "token": "aaaa",
+    "team_id": "T043DB835ML",
+    "context_team_id": "T043DB835ML",
+    "context_enterprise_id": null,
+    "api_app_id": "A07JRKQPZDH",
+    "event": {
+        "user": "U07M725KAD7",
+        "type": "message",
+        "ts": "1725998548.581159",
+        "bot_id": "B07LDR01Z63",
+        "app_id": "A01BP7R4KNY",
+        "text": "",
+        "team": "T043DB835ML",
+        "bot_profile": {
+            "id": "B07LDR01Z63",
+            "deleted": false,
+            "name": "GitHub",
+            "updated": 1725998199,
+            "app_id": "A01BP7R4KNY",
+            "icons": {
+                "image_36": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_36.png",
+                "image_48": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_48.png",
+                "image_72": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_72.png"
+            },
+            "team_id": "T043DB835ML"
+        },
+        "attachments": [
+            {
+                "this": "attachments",
+                "does": "not",
+                "follow": 0,
+                "any": {
+                    "specific": "format"
+                },
+                "or": ["spec"],
+                "that": "Slack has ever published.",
+                "but": "It should still parse fine."
+            }
+        ],
+        "channel": "C07LRFB3C8M",
+        "event_ts": "1725998548.581159",
+        "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev07MH6R7FDE",
+    "event_time": 1725998548,
+    "authorizations": [
+        {
+            "enterprise_id": null,
+            "team_id": "T043DB835ML",
+            "user_id": "U07K4E18KJM",
+            "is_bot": true,
+            "is_enterprise_install": false
+        }
+    ],
+    "is_ext_shared_channel": false
+}
