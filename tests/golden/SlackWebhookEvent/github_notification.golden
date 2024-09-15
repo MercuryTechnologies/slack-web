@@ -1,0 +1,197 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev07MH6R7FDE" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1725998548
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Nothing
+                , channel = ConversationId
+                    { unConversationId = "C07LRFB3C8M" }
+                , text = ""
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U07M725KAD7" }
+                , ts = "1725998548.581159"
+                , threadTs = Nothing
+                , appId = Just "A01BP7R4KNY"
+                , botId = Just "B07LDR01Z63"
+                , attachments = Just
+                    [ MessageAttachment
+                        { decoded = Just
+                            ( DecodedMessageAttachment
+                                { fallback = Just "[myorg/myrepo] Issue opened by ldub"
+                                , color = Just "36a64f"
+                                , pretext = Just "Issue created by <https://github.com/ldub|ldub>"
+                                , authorName = Nothing
+                                , authorLink = Nothing
+                                , authorIcon = Nothing
+                                , title = Just "<https://github.com/myorg/myrepo/issues/2|#2 test issue 2>"
+                                , titleLink = Nothing
+                                , text = Just "another oneeeee"
+                                , fields = Nothing
+                                , imageUrl = Nothing
+                                , thumbUrl = Nothing
+                                , footer = Just "<https://github.com/myorg/myrepo|myorg/myrepo>"
+                                , footerIcon = Just "https://slack.github.com/static/img/favicon-neutral.png"
+                                , ts = Just ""1725998545.0""
+                                , isMsgUnfurl = Nothing
+                                , messageBlocks = Nothing
+                                , authorId = Nothing
+                                , channelId = Nothing
+                                , channelTeam = Nothing
+                                , isAppUnfurl = Nothing
+                                , appUnfurlUrl = Nothing
+                                , fromUrl = Nothing
+                                }
+                            )
+                        , raw = Object
+                            ( fromList
+                                [
+                                    ( "actions"
+                                    , Array
+                                        [ Object
+                                            ( fromList
+                                                [
+                                                    ( "id"
+                                                    , String "1"
+                                                    )
+                                                ,
+                                                    ( "name"
+                                                    , String "comment"
+                                                    )
+                                                ,
+                                                    ( "style"
+                                                    , String ""
+                                                    )
+                                                ,
+                                                    ( "text"
+                                                    , String "Comment"
+                                                    )
+                                                ,
+                                                    ( "type"
+                                                    , String "button"
+                                                    )
+                                                ,
+                                                    ( "value"
+                                                    , String "{&amp;amp;quot;selectedOrg&amp;amp;quot;:&amp;amp;quot;myorg&amp;amp;quot;,&amp;amp;quot;selectedOrgId&amp;amp;quot;:140364112,&amp;amp;quot;selectedRepo&amp;amp;quot;:&amp;amp;quot;myrepo&amp;amp;quot;,&amp;amp;quot;selectedRepoId&amp;amp;quot;:809927288,&amp;amp;quot;issueNumber&amp;amp;quot;:2,&amp;amp;quot;issueHtmlUrl&amp;amp;quot;:&amp;amp;quot;https://github.com/myorg/myrepo/issues/2&amp;amp;quot;,&amp;amp;quot;issueTitle&amp;amp;quot;:&amp;amp;quot;test issue 2&amp;amp;quot;}"
+                                                    )
+                                                ]
+                                            )
+                                        , Object
+                                            ( fromList
+                                                [
+                                                    ( "id"
+                                                    , String "2"
+                                                    )
+                                                ,
+                                                    ( "name"
+                                                    , String "edit"
+                                                    )
+                                                ,
+                                                    ( "style"
+                                                    , String ""
+                                                    )
+                                                ,
+                                                    ( "text"
+                                                    , String "Edit"
+                                                    )
+                                                ,
+                                                    ( "type"
+                                                    , String "button"
+                                                    )
+                                                ,
+                                                    ( "value"
+                                                    , String "{&amp;amp;quot;selectedOrg&amp;amp;quot;:&amp;amp;quot;myorg&amp;amp;quot;,&amp;amp;quot;selectedOrgId&amp;amp;quot;:140364112,&amp;amp;quot;selectedRepo&amp;amp;quot;:&amp;amp;quot;myrepo&amp;amp;quot;,&amp;amp;quot;selectedRepoId&amp;amp;quot;:809927288,&amp;amp;quot;issueNumber&amp;amp;quot;:2,&amp;amp;quot;issueHtmlUrl&amp;amp;quot;:&amp;amp;quot;https://github.com/myorg/myrepo/issues/2&amp;amp;quot;,&amp;amp;quot;issueTitle&amp;amp;quot;:&amp;amp;quot;test issue 2&amp;amp;quot;}"
+                                                    )
+                                                ]
+                                            )
+                                        , Object
+                                            ( fromList
+                                                [
+                                                    ( "id"
+                                                    , String "3"
+                                                    )
+                                                ,
+                                                    ( "name"
+                                                    , String "close"
+                                                    )
+                                                ,
+                                                    ( "style"
+                                                    , String "danger"
+                                                    )
+                                                ,
+                                                    ( "text"
+                                                    , String "Close"
+                                                    )
+                                                ,
+                                                    ( "type"
+                                                    , String "button"
+                                                    )
+                                                ,
+                                                    ( "value"
+                                                    , String "{&amp;amp;quot;selectedOrg&amp;amp;quot;:&amp;amp;quot;myorg&amp;amp;quot;,&amp;amp;quot;selectedOrgId&amp;amp;quot;:140364112,&amp;amp;quot;selectedRepo&amp;amp;quot;:&amp;amp;quot;myrepo&amp;amp;quot;,&amp;amp;quot;selectedRepoId&amp;amp;quot;:809927288,&amp;amp;quot;issueNumber&amp;amp;quot;:2,&amp;amp;quot;issueHtmlUrl&amp;amp;quot;:&amp;amp;quot;https://github.com/myorg/myrepo/issues/2&amp;amp;quot;,&amp;amp;quot;issueTitle&amp;amp;quot;:&amp;amp;quot;test issue 2&amp;amp;quot;}"
+                                                    )
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ,
+                                    ( "callback_id"
+                                    , String "issue-opened-interaction"
+                                    )
+                                ,
+                                    ( "color"
+                                    , String "36a64f"
+                                    )
+                                ,
+                                    ( "fallback"
+                                    , String "[myorg/myrepo] Issue opened by ldub"
+                                    )
+                                ,
+                                    ( "footer"
+                                    , String "<https://github.com/myorg/myrepo|myorg/myrepo>"
+                                    )
+                                ,
+                                    ( "footer_icon"
+                                    , String "https://slack.github.com/static/img/favicon-neutral.png"
+                                    )
+                                ,
+                                    ( "id"
+                                    , Number 1.0
+                                    )
+                                ,
+                                    ( "mrkdwn_in"
+                                    , Array
+                                        [ String "text" ]
+                                    )
+                                ,
+                                    ( "pretext"
+                                    , String "Issue created by <https://github.com/ldub|ldub>"
+                                    )
+                                ,
+                                    ( "text"
+                                    , String "another oneeeee"
+                                    )
+                                ,
+                                    ( "title"
+                                    , String "<https://github.com/myorg/myrepo/issues/2|#2 test issue 2>"
+                                    )
+                                ,
+                                    ( "ts"
+                                    , Number 1.725998545e9
+                                    )
+                                ]
+                            )
+                        }
+                    ]
+                }
+            )
+        }
+    )

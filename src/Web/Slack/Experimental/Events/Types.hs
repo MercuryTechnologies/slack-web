@@ -1,4 +1,7 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 -- FIXME(jadel): Use NoFieldSelectors when we drop everything before 9.2.
@@ -8,6 +11,8 @@ module Web.Slack.Experimental.Events.Types where
 
 import Data.Aeson
 import Data.Aeson.TH
+import Data.Aeson.Types (Parser)
+import Data.Scientific qualified as Sci
 import Data.Time.Clock.System (SystemTime)
 import Web.Slack.AesonUtils
 import Web.Slack.Experimental.Blocks (SlackBlock)
@@ -58,7 +63,7 @@ $(deriveFromJSON snakeCaseOptions ''AttachmentMessageBlock)
 -- Ported from https://github.com/slackapi/node-slack-sdk/blob/fc87d51/packages/types/src/message-attachments.ts
 --
 -- @since 2.0.0.3
-data MessageAttachment = MessageAttachment
+data DecodedMessageAttachment = DecodedMessageAttachment
   { fallback :: Maybe Text
   , color :: Maybe Text
   , pretext :: Maybe Text
@@ -87,7 +92,57 @@ data MessageAttachment = MessageAttachment
   }
   deriving stock (Show)
 
-$(deriveFromJSON snakeCaseOptions ''MessageAttachment)
+instance FromJSON DecodedMessageAttachment where
+  parseJSON = withObject "DecodedMessageAttachment" $ \v -> do
+    fallback <- v .:? "fallback"
+    color <- v .:? "color"
+    pretext <- v .:? "pretext"
+    authorName <- v .:? "author_name"
+    authorLink <- v .:? "author_link"
+    authorIcon <- v .:? "author_icon"
+    title <- v .:? "title"
+    titleLink <- v .:? "title_link"
+    text <- v .:? "text"
+    fields <- v .:? "fields"
+    imageUrl <- v .:? "image_url"
+    thumbUrl <- v .:? "thumb_url"
+    footer <- v .:? "footer"
+    footerIcon <- v .:? "footer_icon"
+    ts <- v .:? "ts" >>= maybe (return Nothing) parseTs
+    isMsgUnfurl <- v .:? "is_msg_unfurl"
+    messageBlocks <- v .:? "message_blocks"
+    authorId <- v .:? "author_id"
+    channelId <- v .:? "channel_id"
+    channelTeam <- v .:? "channel_team"
+    isAppUnfurl <- v .:? "is_app_unfurl"
+    appUnfurlUrl <- v .:? "app_unfurl_url"
+    fromUrl <- v .:? "from_url"
+    pure DecodedMessageAttachment {..}
+    where
+      parseTs :: Value -> Parser (Maybe Text)
+      parseTs (String s) = pure $ Just s
+      parseTs (Number n) =
+        let s = show (Sci.formatScientific Sci.Fixed Nothing n)
+            formatted = if '.' `elem` s then s else s ++ ".000000"
+         in pure $ Just (pack formatted)
+      parseTs _ = pure Nothing
+
+data MessageAttachment = MessageAttachment
+  { decoded :: Maybe DecodedMessageAttachment
+  -- ^ If the attachment can be decoded, this will be populated
+  , raw :: Value
+  -- ^ Slack does not document the attachment schema/spec very well and we can't
+  -- decode many attachments. In these cases clients can work with the raw JSON.
+  }
+  deriving stock (Show)
+
+instance FromJSON MessageAttachment where
+  parseJSON = withObject "MessageAttachment" $ \v -> do
+    let ov = Object v
+    -- Attempt to parse the entire object as DecodedMessageAttachment
+    decodedContent <- optional $ parseJSON ov
+    -- Return the structured data with raw JSON preserved
+    pure MessageAttachment {decoded = decodedContent, raw = ov}
 
 -- | <https://api.slack.com/events/message>
 -- and
@@ -117,7 +172,9 @@ data MessageEvent = MessageEvent
   -- ^ Present if it's sent by a bot user
   , attachments :: Maybe [MessageAttachment]
   -- ^ @since 2.0.0.3
-  -- Present if the message has attachments
+  -- Present if the message has attachments. Slack doesn't have very good documentation about
+  -- the schema for message attachements, so if we're unable to decode it we'll just give the client
+  -- back an aeson Value to work with.
   }
   deriving stock (Show)
 

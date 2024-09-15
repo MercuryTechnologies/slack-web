@@ -29,4 +29,6 @@ spec = describe "Types for Slack events" do
           "email_message"
         , "message_subtype_bot_message"
         , "forwarded_message"
+        , "github_notification"
+        , "non_spec_attachment"
         ]

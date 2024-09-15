@@ -1,0 +1,99 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev07MH6R7FDE" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1725998548
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Nothing
+                , channel = ConversationId
+                    { unConversationId = "C07LRFB3C8M" }
+                , text = ""
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U07M725KAD7" }
+                , ts = "1725998548.581159"
+                , threadTs = Nothing
+                , appId = Just "A01BP7R4KNY"
+                , botId = Just "B07LDR01Z63"
+                , attachments = Just
+                    [ MessageAttachment
+                        { decoded = Just
+                            ( DecodedMessageAttachment
+                                { fallback = Nothing
+                                , color = Nothing
+                                , pretext = Nothing
+                                , authorName = Nothing
+                                , authorLink = Nothing
+                                , authorIcon = Nothing
+                                , title = Nothing
+                                , titleLink = Nothing
+                                , text = Nothing
+                                , fields = Nothing
+                                , imageUrl = Nothing
+                                , thumbUrl = Nothing
+                                , footer = Nothing
+                                , footerIcon = Nothing
+                                , ts = Nothing
+                                , isMsgUnfurl = Nothing
+                                , messageBlocks = Nothing
+                                , authorId = Nothing
+                                , channelId = Nothing
+                                , channelTeam = Nothing
+                                , isAppUnfurl = Nothing
+                                , appUnfurlUrl = Nothing
+                                , fromUrl = Nothing
+                                }
+                            )
+                        , raw = Object
+                            ( fromList
+                                [
+                                    ( "any"
+                                    , Object
+                                        ( fromList
+                                            [
+                                                ( "specific"
+                                                , String "format"
+                                                )
+                                            ]
+                                        )
+                                    )
+                                ,
+                                    ( "but"
+                                    , String "It should still parse fine."
+                                    )
+                                ,
+                                    ( "does"
+                                    , String "not"
+                                    )
+                                ,
+                                    ( "follow"
+                                    , Number 0.0
+                                    )
+                                ,
+                                    ( "or"
+                                    , Array
+                                        [ String "spec" ]
+                                    )
+                                ,
+                                    ( "that"
+                                    , String "Slack has ever published."
+                                    )
+                                ,
+                                    ( "this"
+                                    , String "attachments"
+                                    )
+                                ]
+                            )
+                        }
+                    ]
+                }
+            )
+        }
+    )
