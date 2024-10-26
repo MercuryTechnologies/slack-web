@@ -40,7 +40,7 @@ EventEventCallback
                                 , thumbUrl = Nothing
                                 , footer = Just "<https://github.com/myorg/myrepo|myorg/myrepo>"
                                 , footerIcon = Just "https://slack.github.com/static/img/favicon-neutral.png"
-                                , ts = Just "1725998545.0"
+                                , ts = Just "1725998545.123456"
                                 , isMsgUnfurl = Nothing
                                 , messageBlocks = Nothing
                                 , authorId = Nothing
@@ -185,7 +185,7 @@ EventEventCallback
                                     )
                                 ,
                                     ( "ts"
-                                    , Number 1.725998545e9
+                                    , String "1725998545.123456"
                                     )
                                 ]
                             )

@@ -122,7 +122,7 @@ instance FromJSON DecodedMessageAttachment where
       parseTs :: Value -> Parser (Maybe Text)
       parseTs (String s) = pure $ Just s
       parseTs (Number n) =
-        let s = show (Sci.formatScientific Sci.Fixed Nothing n)
+        let s = Sci.formatScientific Sci.Fixed Nothing n
             formatted = if '.' `elem` s then s else s ++ ".000000"
          in pure $ Just (pack formatted)
       parseTs _ = pure Nothing
