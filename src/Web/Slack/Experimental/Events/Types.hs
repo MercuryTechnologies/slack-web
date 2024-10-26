@@ -172,9 +172,7 @@ data MessageEvent = MessageEvent
   -- ^ Present if it's sent by a bot user
   , attachments :: Maybe [MessageAttachment]
   -- ^ @since 2.0.0.3
-  -- Present if the message has attachments. Slack doesn't have very good documentation about
-  -- the schema for message attachements, so if we're unable to decode it we'll just give the client
-  -- back an aeson Value to work with.
+  -- Present if the message has attachments
   }
   deriving stock (Show)
 
