@@ -1,0 +1,72 @@
+{
+    "token": "aaaa",
+    "team_id": "T043DB835ML",
+    "context_team_id": "T043DB835ML",
+    "context_enterprise_id": null,
+    "api_app_id": "A07JRKQPZDH",
+    "event": {
+        "user": "U07M725KAD7",
+        "type": "message",
+        "ts": "1730339959.644979",
+        "bot_id": "B07LDR01Z63",
+        "app_id": "A01BP7R4KNY",
+        "text": "",
+        "team": "T043DB835ML",
+        "bot_profile": {
+            "id": "B07LDR01Z63",
+            "deleted": false,
+            "name": "GitHub",
+            "updated": 1725998199,
+            "app_id": "A01BP7R4KNY",
+            "icons": {
+                "image_36": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_36.png",
+                "image_48": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_48.png",
+                "image_72": "https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_72.png"
+            },
+            "team_id": "T043DB835ML"
+        },
+        "attachments": [
+            {
+                "id": 1,
+                "footer_icon": "https://slack.github.com/static/img/favicon-neutral.png",
+                "ts": 1730339957,
+                "color": "36a64f",
+                "fallback": "[myorg/myrepo] Pull request opened by ldub",
+                "text": "this is a fake pr with a link\n\n<https://myteam.slack.com/archives/C07KTH1T4CQ/p1730339894629249|https://myteam.slack.com/archives/C07KTH1T4CQ/p1730339894629249>",
+                "pretext": "Pull request opened by <https://github.com/ldub|ldub>",
+                "title": "<https://github.com/myorg/myrepo/pull/8|#8 https://myteam.slack.com/archives/C07KTH1T4CQ/p1730339894629249>",
+                "callback_id": "pr-opened-interaction",
+                "footer": "<https://github.com/myorg/myrepo|myorg/myrepo>",
+                "mrkdwn_in": [
+                    "text"
+                ],
+                "actions": [
+                    {
+                        "id": "1",
+                        "name": "comment",
+                        "text": "Comment",
+                        "type": "button",
+                        "value": "{&amp;amp;quot;selectedOrg&amp;amp;quot;:&amp;amp;quot;myorg&amp;amp;quot;,&amp;amp;quot;selectedOrgId&amp;amp;quot;:140364112,&amp;amp;quot;selectedRepo&amp;amp;quot;:&amp;amp;quot;myrepo&amp;amp;quot;,&amp;amp;quot;selectedRepoId&amp;amp;quot;:669978765,&amp;amp;quot;number&amp;amp;quot;:8,&amp;amp;quot;htmlUrl&amp;amp;quot;:&amp;amp;quot;https://github.com/myorg/myrepo/pull/8&amp;amp;quot;,&amp;amp;quot;title&amp;amp;quot;:&amp;amp;quot;https://myteam.slack.com/archives/C07KTH1T4CQ/p1730339894629249&amp;amp;quot;}",
+                        "style": ""
+                    }
+                ]
+            }
+        ],
+        "channel": "C07LRFB3C8M",
+        "event_ts": "1730339959.644979",
+        "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev07U5U3EQCV",
+    "event_time": 1730339959,
+    "authorizations": [
+        {
+            "enterprise_id": null,
+            "team_id": "T043DB835ML",
+            "user_id": "U07K4E18KJM",
+            "is_bot": true,
+            "is_enterprise_install": false
+        }
+    ],
+    "is_ext_shared_channel": false
+}
