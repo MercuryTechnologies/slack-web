@@ -133,7 +133,7 @@ library
       Web.Slack.AesonUtils
   build-depends:
       aeson >= 2.0 && < 2.2
-    , base >= 4.11 && < 4.18
+    , base >= 4.11 && < 4.19
     , base16-bytestring
     , bytestring
     , classy-prelude
@@ -152,9 +152,9 @@ library
     , mtl
     , refined
     , scientific
-    , servant >= 0.16 && < 0.20
-    , servant-client >= 0.16 && < 0.20
-    , servant-client-core >= 0.16 && < 0.20
+    , servant >= 0.16 && < 0.21
+    , servant-client >= 0.16 && < 0.21
+    , servant-client-core >= 0.16 && < 0.21
     , string-conversions
     , string-variants >= 0.1.0.1
     , text (>= 1.2 && < 1.3) || (>= 2.0 && < 2.1)
