@@ -1,5 +1,5 @@
 # 2.0.1.0 (2025-01-09)
-* [#135](https://github.com/MercuryTechnologies/slack-web/pull/136)
+* [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)
   Bumps the version ranges for dependencies to be compativle with LTS 22.43.
 
 # 2.0.0.4 (2024-09-15)
