@@ -7,7 +7,6 @@
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
@@ -17,7 +16,7 @@
 
   outputs = { self, nixpkgs, flake-utils, pre-commit-hooks }:
     let
-      ghcVer = "ghc948";
+      ghcVer = "ghc96";
       makeHaskellOverlay = overlay: final: prev: {
         haskell = prev.haskell // {
           packages = prev.haskell.packages // {
