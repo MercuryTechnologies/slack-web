@@ -273,6 +273,42 @@ newtype MessageId = MessageId {unMessageId :: Text}
   deriving newtype (FromJSON)
   deriving stock (Show, Eq)
 
+-- | Which tab of App Home is open.
+--
+-- @since 2.1.0.0
+newtype AppHomeTab = AppHomeTab {unAppHomeTab :: Text}
+  deriving stock (Show, Eq)
+  deriving newtype (FromJSON, ToJSON)
+
+-- | Home tab of App Home.
+--
+-- @since 2.1.0.0
+appHomeTabHome :: AppHomeTab
+appHomeTabHome = AppHomeTab "home"
+
+-- | Messages tab of App Home.
+--
+-- @since 2.1.0.0
+appHomeTabMessages :: AppHomeTab
+appHomeTabMessages = AppHomeTab "messages"
+
+-- | App Home Opened event: when a Slack bot's home page is opened.
+--
+-- <https://api.slack.com/events/app_home_opened>
+--
+-- See also: <https://api.slack.com/reference/app-home>
+--
+-- @since 2.1.0.0
+data AppHomeOpenedEvent = AppHomeOpenedEvent
+  { user :: UserId
+  , channel :: ConversationId
+  , tab :: AppHomeTab
+  , eventTs :: Text
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''AppHomeOpenedEvent)
+
 data Event
   = EventMessage MessageEvent
   | EventBotMessage BotMessageEvent
@@ -285,6 +321,8 @@ data Event
     EventChannelJoinMessage
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
+  | -- | @since 2.1.0.0
+    EventAppHomeOpened AppHomeOpenedEvent
   | EventUnknown Value
   deriving stock (Show, Generic)
 
@@ -302,6 +340,7 @@ instance FromJSON Event where
       ("message", Just "file_share") -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("channel_created", Nothing) -> EventChannelCreated <$> parseJSON (Object obj)
       ("channel_left", Nothing) -> EventChannelLeft <$> parseJSON (Object obj)
+      ("app_home_opened", Nothing) -> EventAppHomeOpened <$> parseJSON (Object obj)
       _ -> pure $ EventUnknown (Object obj)
 
 data EventCallback = EventCallback
