@@ -402,6 +402,7 @@ data SlackBlock
   | SlackBlockRichText RichText
   | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
   | SlackBlockHeader SlackPlainTextOnly -- max length 150
+  | SlackBlockOther Object
   deriving stock (Eq)
 
 instance Show SlackBlock where
@@ -420,6 +421,7 @@ instance Show SlackBlock where
         ]
   show (SlackBlockRichText rt) = show rt
   show (SlackBlockHeader p) = show p
+  show (SlackBlockOther o) = "SlackBlockOther " <> show o
 
 instance ToJSON SlackBlock where
   toJSON (SlackBlockSection SlackSection {..}) =
@@ -454,6 +456,7 @@ instance ToJSON SlackBlock where
       [ "type" .= ("header" :: Text)
       , "text" .= slackPlainText
       ]
+  toJSON (SlackBlockOther o) = Object o
 
 instance FromJSON SlackBlock where
   parseJSON = withObject "SlackBlock" $ \obj -> do
@@ -500,7 +503,7 @@ instance FromJSON SlackBlock where
         (headerContentObj :: Value) <- obj .: "text"
         headerContentText <- parseJSON headerContentObj
         pure $ SlackBlockHeader headerContentText
-      _ -> fail "Unknown SlackBlock type, must be one of ['section', 'context', 'image', 'divider', 'actions', 'rich_text', 'header']"
+      _unk -> pure $ SlackBlockOther obj
 
 newtype SlackMessage = SlackMessage [SlackBlock]
   deriving newtype (Semigroup, Monoid, Eq)
