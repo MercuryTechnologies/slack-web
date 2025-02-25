@@ -1,0 +1,16 @@
+SlackView
+    { blocks =
+        [ SlackSection
+            { slackSectionText = Just "A stack of blocks for the sample Block Kit Home tab."
+            , slackSectionBlockId = Nothing
+            , slackSectionFields = Nothing
+            , slackSectionAccessory = Nothing
+            }
+        , "actions(Nothing) = ["SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this\"} [button SlackButtonText (NonEmptyText \"Action A\")], SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this 2\"} [button SlackButtonText (NonEmptyText \"Action B\")]"]"
+        ]
+    , privateMetadata = Nothing
+    , callbackId = Nothing
+    , externalId = Nothing
+    , inner = HomeTabView
+        { type_ = "home" }
+    }
