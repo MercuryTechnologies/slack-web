@@ -111,6 +111,8 @@ instance Slack Int where
 newtype OptionalSetting a = OptionalSetting {unOptionalSetting :: Maybe a}
   deriving newtype (Eq)
 
+type role OptionalSetting representational
+
 -- | Allows using bare Strings without having to use 'setting'
 instance IsString (OptionalSetting String) where
   fromString = OptionalSetting . Just
