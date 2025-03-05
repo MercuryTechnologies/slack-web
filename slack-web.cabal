@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: slack-web
-version: 2.0.1.0
+version: 2.1.0.0
 
 build-type: Simple
 
@@ -73,7 +73,6 @@ common build-opts
 
   default-extensions:
     AllowAmbiguousTypes
-    ApplicativeDo
     BlockArguments
     DataKinds
     DeriveAnyClass
@@ -101,6 +100,7 @@ common build-opts
     RankNTypes
     RecordWildCards
     RecursiveDo
+    RoleAnnotations
     ScopedTypeVariables
     StandaloneDeriving
     StandaloneKindSignatures
