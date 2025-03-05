@@ -1,4 +1,1 @@
--- HI! for pants reasons, if you add anything load bearing in here, you have to
--- add it to raw-project in cabal.haskell-ci
 packages: .
-
