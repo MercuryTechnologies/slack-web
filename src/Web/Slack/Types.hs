@@ -10,6 +10,7 @@ module Web.Slack.Types (
   UserId (..),
   ConversationId (..),
   TeamId (..),
+  Emoji (..),
   Cursor (..),
   SlackTimestamp (..),
   mkSlackTimestamp,
@@ -48,6 +49,13 @@ newtype ConversationId = ConversationId {unConversationId :: Text}
 newtype TeamId = TeamId {unTeamId :: Text}
   deriving stock (Eq, Ord, Generic, Show)
   deriving newtype (NFData, Hashable, FromJSON, ToJSON, ToHttpApiData)
+
+-- | Slack emoji name.
+--
+-- @since 2.1.0.0
+newtype Emoji = Emoji {unEmoji :: Text}
+  deriving stock (Show, Eq)
+  deriving newtype (NFData, Hashable, IsString, FromJSON, ToJSON, ToHttpApiData)
 
 -- | Message text in the format returned by Slack,
 -- see https://api.slack.com/docs/message-formatting

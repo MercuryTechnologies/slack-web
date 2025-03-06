@@ -1,6 +1,11 @@
 # 2.1.0.0 (2025-03-06)
 * [#138](https://github.com/MercuryTechnologies/slack-web/pull/138)
   Implement `views.publish` method and App Home tab events.
+* [#139](https://github.com/MercuryTechnologies/slack-web/pull/138)
+  Implement `reactions.add` method.
+
+  Breaking change: various places in the API using emoji now use an Emoji
+  newtype.
 
 # 2.0.1.0 (2025-01-09)
 * [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)

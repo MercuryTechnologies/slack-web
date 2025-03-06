@@ -26,7 +26,10 @@ EventEventCallback
                                         , rsItalic = False
                                         }
                                     )
-                                , RichItemEmoji "cat"
+                                , RichItemEmoji
+                                    ( Emoji
+                                        { unEmoji = "cat" }
+                                    )
                                 , RichItemText " "
                                     ( RichStyle
                                         { rsBold = False

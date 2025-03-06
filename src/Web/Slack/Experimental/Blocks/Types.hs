@@ -13,6 +13,7 @@ import Refined.Unsafe (reallyUnsafeRefine)
 import Web.Slack.AesonUtils
 import Web.Slack.Common (ConversationId, UserId)
 import Web.Slack.Prelude
+import Web.Slack.Types (Emoji)
 
 -- | Class of types that can be turned into part of a Slack Message. 'message'
 -- is the primary way of converting primitive and domain-level types into things
@@ -297,7 +298,7 @@ data RichItem
   | RichItemChannel ConversationId
   | RichItemUser UserId RichStyle
   | RichItemLink RichLinkAttrs
-  | RichItemEmoji Text
+  | RichItemEmoji Emoji
   | RichItemOther Text Value
   -- FIXME(jadel): date, usergroup, team, broadcast
   deriving stock (Eq, Show)
