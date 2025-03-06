@@ -2,10 +2,12 @@ module Web.Slack.AesonUtils where
 
 import Data.Aeson
 import Data.Aeson qualified as J
-import Data.Aeson.Types (Pair)
+import Data.Aeson.Types (Pair, parseFail)
 import Data.Char qualified as Char
+import Data.List (dropWhileEnd)
 import Data.Text qualified as T
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
+import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 import Web.FormUrlEncoded qualified as F
 import Web.Slack.Prelude
 
@@ -108,6 +110,15 @@ snakeCaseOptions =
     , constructorTagModifier = camelTo2 '_'
     }
 
+-- | 'snakeCaseOptions' that eats trailing underscores. This is so that you can
+-- have a field called "type_".
+snakeCaseOptionsEatTrailingUnderscore :: Options
+snakeCaseOptionsEatTrailingUnderscore =
+  defaultOptions
+    { fieldLabelModifier = camelTo2 '_' . dropWhileEnd (== '_')
+    , constructorTagModifier = camelTo2 '_'
+    }
+
 snakeCaseFormOptions :: F.FormOptions
 snakeCaseFormOptions =
   F.defaultFormOptions
@@ -122,3 +133,23 @@ instance FromJSON UnixTimestamp where
 
 instance ToJSON UnixTimestamp where
   toJSON (UnixTimestamp a) = toJSON (utcTimeToPOSIXSeconds a)
+
+-- | Expected a given value as a string. Useful for @type@ fields in json.
+data Expected (lit :: Symbol) = Expected
+
+type role Expected phantom
+
+instance (KnownSymbol lit) => Eq (Expected lit) where
+  -- If the types match the values are always equal
+  _ == _ = True
+
+instance (KnownSymbol lit) => FromJSON (Expected lit) where
+  parseJSON = withText "Expected" \s -> do
+    unless (s == T.pack (symbolVal (Proxy @lit))) $ parseFail ("should be " <> symbolVal (Proxy @lit))
+    pure Expected
+
+instance (KnownSymbol lit) => ToJSON (Expected lit) where
+  toJSON _ = String . T.pack $ symbolVal (Proxy @lit)
+
+instance (KnownSymbol lit) => Show (Expected lit) where
+  show _ = show $ symbolVal (Proxy @lit)

@@ -1,3 +1,7 @@
+# 2.1.0.0 (2025-03-06)
+* [#138](https://github.com/MercuryTechnologies/slack-web/pull/138)
+  Implement `views.publish` method and App Home tab events.
+
 # 2.0.1.0 (2025-01-09)
 * [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)
   Bumps the version ranges for dependencies to be compatible with LTS 22.43.

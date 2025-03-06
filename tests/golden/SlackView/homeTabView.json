@@ -1,0 +1,35 @@
+{
+    "type": "home",
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "A stack of blocks for the sample Block Kit Home tab."
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "action_id": "oops our json decoder requires this",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Action A",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "button",
+                    "action_id": "oops our json decoder requires this 2",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Action B",
+                        "emoji": true
+                    }
+                }
+            ]
+        }
+    ]
+}

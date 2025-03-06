@@ -1,0 +1,23 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev08EUG3TZ0S" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1740430328
+            , systemNanoseconds = 0
+            }
+        , event = EventAppHomeOpened
+            ( AppHomeOpenedEvent
+                { user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , channel = ConversationId
+                    { unConversationId = "D0442US94JD" }
+                , tab = AppHomeTab
+                    { unAppHomeTab = "messages" }
+                , eventTs = "1740430328.659101"
+                }
+            )
+        }
+    )

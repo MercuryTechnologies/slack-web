@@ -33,4 +33,6 @@ spec = describe "Types for Slack events" do
         , "github_notification_ts_string"
         , "github_with_link"
         , "non_spec_attachment"
+        , "app_home_opened_home"
+        , "app_home_opened_messages"
         ]

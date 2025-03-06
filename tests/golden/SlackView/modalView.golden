@@ -1,0 +1,86 @@
+SlackView
+    { blocks =
+        [ SlackSection
+            { slackSectionText = Just "It's Block Kit...but _in a modal_"
+            , slackSectionBlockId = Just
+                ( NonEmptyText "section1" )
+            , slackSectionFields = Nothing
+            , slackSectionAccessory = Just SlackActionId
+                { unSlackActionId = NonEmptyText "button_abc" }
+                [ button SlackButtonText
+                    ( NonEmptyText "Click me" )
+                ]
+            }
+        , SlackBlockOther fromList
+            [
+                ( "element"
+                , Object
+                    ( fromList
+                        [
+                            ( "action_id"
+                            , String "input1"
+                            )
+                        ,
+                            ( "multiline"
+                            , Bool False
+                            )
+                        ,
+                            ( "placeholder"
+                            , Object
+                                ( fromList
+                                    [
+                                        ( "text"
+                                        , String "Type in here"
+                                        )
+                                    ,
+                                        ( "type"
+                                        , String "plain_text"
+                                        )
+                                    ]
+                                )
+                            )
+                        ,
+                            ( "type"
+                            , String "plain_text_input"
+                            )
+                        ]
+                    )
+                )
+            ,
+                ( "label"
+                , Object
+                    ( fromList
+                        [
+                            ( "text"
+                            , String "Input label"
+                            )
+                        ,
+                            ( "type"
+                            , String "plain_text"
+                            )
+                        ]
+                    )
+                )
+            ,
+                ( "optional"
+                , Bool False
+                )
+            ,
+                ( "type"
+                , String "input"
+                )
+            ]
+        ]
+    , privateMetadata = Just "Shhhhhhhh"
+    , callbackId = Just "view_identifier_12"
+    , externalId = Nothing
+    , inner = ModalView
+        { type_ = "modal"
+        , title = SlackPlainTextOnly "Modal title"
+        , close = Just
+            ( SlackPlainTextOnly "Cancel" )
+        , submit = Just
+            ( SlackPlainTextOnly "Save" )
+        , submitDisabled = Nothing
+        }
+    }

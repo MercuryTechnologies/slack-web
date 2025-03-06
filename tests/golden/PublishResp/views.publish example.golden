@@ -1,0 +1,18 @@
+PublishResp
+    { view = SlackView
+        { blocks =
+            [ SlackSection
+                { slackSectionText = Just "A simple section with some sample sentence."
+                , slackSectionBlockId = Just
+                    ( NonEmptyText "2WGp9" )
+                , slackSectionFields = Nothing
+                , slackSectionAccessory = Nothing
+                }
+            ]
+        , privateMetadata = Just "Shh it is a secret"
+        , callbackId = Just "identify_your_home_tab"
+        , externalId = Just ""
+        , inner = HomeTabView
+            { type_ = "home" }
+        }
+    }

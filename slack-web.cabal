@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: slack-web
-version: 2.0.1.0
+version: 2.1.0.0
 
 build-type: Simple
 
@@ -29,6 +29,10 @@ extra-source-files:
   tests/golden/BlockKitBuilderMessage/*.golden.json
   tests/golden/FileObject/*.json
   tests/golden/FileObject/*.golden
+  tests/golden/SlackView/*.json
+  tests/golden/SlackView/*.golden
+  tests/golden/PublishResp/*.json
+  tests/golden/PublishResp/*.golden
 
 category: Web
 
@@ -69,7 +73,6 @@ common build-opts
 
   default-extensions:
     AllowAmbiguousTypes
-    ApplicativeDo
     BlockArguments
     DataKinds
     DeriveAnyClass
@@ -97,6 +100,7 @@ common build-opts
     RankNTypes
     RecordWildCards
     RecursiveDo
+    RoleAnnotations
     ScopedTypeVariables
     StandaloneDeriving
     StandaloneKindSignatures
@@ -127,6 +131,7 @@ library
       Web.Slack.Experimental.Blocks
       Web.Slack.Experimental.Blocks.Types
       Web.Slack.Experimental.Events.Types
+      Web.Slack.Experimental.Views
       Web.Slack.Experimental.RequestVerification
   other-modules:
       Web.Slack.Util
@@ -188,6 +193,7 @@ test-suite tests
       Web.Slack.Experimental.Events.TypesSpec
       Web.Slack.Experimental.BlocksSpec
       Web.Slack.Experimental.Blocks.TypesSpec
+      Web.Slack.Experimental.ViewsSpec
       TestImport
       TestImport.Aeson
   build-tool-depends:
