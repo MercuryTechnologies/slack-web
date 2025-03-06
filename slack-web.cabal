@@ -33,6 +33,8 @@ extra-source-files:
   tests/golden/SlackView/*.golden
   tests/golden/PublishResp/*.json
   tests/golden/PublishResp/*.golden
+  tests/golden/ResponseJSON/*.json
+  tests/golden/ResponseJSON/*.golden
 
 category: Web
 
@@ -189,6 +191,7 @@ test-suite tests
       Web.Slack.ConversationSpec
       Web.Slack.ChatSpec
       Web.Slack.Files.TypesSpec
+      Web.Slack.InternalSpec
       Web.Slack.UsersConversationsSpec
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec
