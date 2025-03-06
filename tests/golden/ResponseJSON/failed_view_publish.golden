@@ -1,0 +1,17 @@
+ResponseJSON
+    ( Left
+        ( ResponseSlackError
+            { errorText = "invalid_arguments"
+            , responseMetadata = fromList
+                [
+                    ( "messages"
+                    , Array
+                        [ String "[ERROR] failed to match all allowed schemas [json-pointer:/view]"
+                        , String "[ERROR] must provide an object [json-pointer:/view]"
+                        , String "[ERROR] must provide an object [json-pointer:/view]"
+                        ]
+                    )
+                ]
+            }
+        )
+    )

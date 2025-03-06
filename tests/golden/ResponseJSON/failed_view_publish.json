@@ -1,0 +1,11 @@
+{
+    "ok": false,
+    "error": "invalid_arguments",
+    "response_metadata": {
+        "messages": [
+            "[ERROR] failed to match all allowed schemas [json-pointer:/view]",
+            "[ERROR] must provide an object [json-pointer:/view]",
+            "[ERROR] must provide an object [json-pointer:/view]"
+        ]
+    }
+}

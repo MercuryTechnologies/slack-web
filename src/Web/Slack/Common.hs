@@ -27,6 +27,7 @@ module Web.Slack.Common (
   Message (..),
   MessageType (..),
   SlackClientError (..),
+  ResponseSlackError (..),
   SlackMessageText (..),
 ) where
 
@@ -84,13 +85,28 @@ instance NFData Message
 
 $(deriveJSON (jsonOpts "message") ''Message)
 
+-- | Contains errors that can be returned by the slack API.
+-- constrast with 'SlackClientError' which additionally
+-- contains errors which occured during the network communication.
+--
+-- Includes an Object correponding to the @response_metadata@ field.
+--
+-- @since 2.1.0.0
+data ResponseSlackError = ResponseSlackError
+  { errorText :: Text
+  , responseMetadata :: Object
+  }
+  deriving stock (Eq, Show, Generic)
+
+instance NFData ResponseSlackError
+
 -- |
 -- Errors that can be triggered by a slack request.
 data SlackClientError
   = -- | errors from the network connection
     ServantError ClientError
   | -- | errors returned by the slack API
-    SlackError Text
+    SlackError ResponseSlackError
   deriving stock (Eq, Generic, Show)
 
 instance NFData SlackClientError

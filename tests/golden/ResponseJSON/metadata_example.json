@@ -1,0 +1,14 @@
+{
+    "ok": true,
+    "warnings": [
+        "missing_charset"
+    ],
+    "response_metadata": {
+        "warnings": [
+            "missing_charset"
+        ],
+        "messages": [
+            "[WARN] A Content-Type HTTP header was presented but did not declare a charset, such as a 'utf-8'"
+        ]
+    }
+}

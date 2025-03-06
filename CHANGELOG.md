@@ -1,11 +1,14 @@
 # 2.1.0.0 (2025-03-06)
 * [#138](https://github.com/MercuryTechnologies/slack-web/pull/138)
   Implement `views.publish` method and App Home tab events.
-* [#139](https://github.com/MercuryTechnologies/slack-web/pull/138)
+* [#140](https://github.com/MercuryTechnologies/slack-web/pull/140)
   Implement `reactions.add` method.
 
   Breaking change: various places in the API using emoji now use an Emoji
   newtype.
+* [#141](https://github.com/MercuryTechnologies/slack-web/pull/141)
+  Include `response_metadata` in errors.
+  This is a breaking change since it changes the type of `ResponseSlackError` and friends to add that field.
 
 # 2.0.1.0 (2025-01-09)
 * [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)
