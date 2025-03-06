@@ -9,6 +9,11 @@
 * [#141](https://github.com/MercuryTechnologies/slack-web/pull/141)
   Include `response_metadata` in errors.
   This is a breaking change since it changes the type of `ResponseSlackError` and friends to add that field.
+* [#142](https://github.com/MercuryTechnologies/slack-web/pull/142)
+  Make the block builder previously used in the test suite public as an
+  experimental module `Web.Slack.Experimental.Blocks.Builder`.
+
+  This makes the DSL for specifying messages built with blocks a bit nicer.
 
 # 2.0.1.0 (2025-01-09)
 * [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)

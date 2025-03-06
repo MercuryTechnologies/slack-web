@@ -132,6 +132,7 @@ library
       Web.Slack.User
       Web.Slack.UsersConversations
       Web.Slack.Experimental.Blocks
+      Web.Slack.Experimental.Blocks.Builder
       Web.Slack.Experimental.Blocks.Types
       Web.Slack.Experimental.Events.Types
       Web.Slack.Experimental.Views
