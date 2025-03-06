@@ -19,13 +19,14 @@ import Web.HttpApiData
 import Web.Slack.Common
 import Web.Slack.Pager.Types (PagedRequest (..), PagedResponse (..), ResponseMetadata)
 import Web.Slack.Prelude
+import Web.Slack.Types (Emoji)
 import Web.Slack.Util
 
 -- | See <https://api.slack.com/types/user>
 data Profile = Profile
   { profileAvatarHash :: Maybe Text
   , profileStatusText :: Maybe Text
-  , profileStatusEmoji :: Maybe Text
+  , profileStatusEmoji :: Maybe Emoji
   , profileRealName :: Maybe Text
   , profileDisplayName :: Maybe Text
   , profileRealNameNormalized :: Maybe Text

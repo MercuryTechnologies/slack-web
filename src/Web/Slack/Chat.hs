@@ -15,6 +15,7 @@ module Web.Slack.Chat (
 import Web.FormUrlEncoded
 import Web.Slack.Conversation (ConversationId)
 import Web.Slack.Prelude
+import Web.Slack.Types (Emoji)
 import Web.Slack.Util
 
 data PostMsg = PostMsg
@@ -27,7 +28,7 @@ data PostMsg = PostMsg
   , postMsgUsername :: Maybe Text
   , postMsgAsUser :: Maybe Bool
   , postMsgIconUrl :: Maybe Text
-  , postMsgIconEmoji :: Maybe Text
+  , postMsgIconEmoji :: Maybe Emoji
   , postMsgThreadTs :: Maybe Text
   , postMsgReplyBroadcast :: Maybe Bool
   }
@@ -51,7 +52,7 @@ data PostMsgReq = PostMsgReq
   , postMsgReqUsername :: Maybe Text
   , postMsgReqAsUser :: Maybe Bool
   , postMsgReqIconUrl :: Maybe Text
-  , postMsgReqIconEmoji :: Maybe Text
+  , postMsgReqIconEmoji :: Maybe Emoji
   , postMsgReqThreadTs :: Maybe Text
   , postMsgReqReplyBroadcast :: Maybe Bool
   }
