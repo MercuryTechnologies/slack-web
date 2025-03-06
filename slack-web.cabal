@@ -123,6 +123,7 @@ library
       Web.Slack.Files.Types
       Web.Slack.Internal
       Web.Slack.MessageParser
+      Web.Slack.Reactions
       Web.Slack.Pager
       Web.Slack.Pager.Types
       Web.Slack.Types
