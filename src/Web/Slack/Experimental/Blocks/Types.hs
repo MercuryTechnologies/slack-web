@@ -398,13 +398,30 @@ slackSectionWithText t =
     }
 
 data SlackBlock
-  = SlackBlockSection SlackSection
+  = -- | Section block. Similar in concept to a @p@ or @div@ tag in HTML.
+    --
+    -- <https://api.slack.com/reference/block-kit/blocks#section>
+    SlackBlockSection SlackSection
   | SlackBlockImage SlackImage
-  | SlackBlockContext SlackContext
-  | SlackBlockDivider
+  | -- | Context block: smaller, grey, text, and rendered inline. Like a @span@ in HTML.
+    --
+    -- <https://api.slack.com/reference/block-kit/blocks#context>
+    SlackBlockContext SlackContext
+  | -- | Horizontal line. Similar to an html @hr@ tag.
+    --
+    -- <https://api.slack.com/reference/block-kit/blocks#divider>
+    SlackBlockDivider
   | SlackBlockRichText RichText
-  | SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
-  | SlackBlockHeader SlackPlainTextOnly -- max length 150
+  | -- | Inline container for interactive actions.
+    --
+    -- <https://api.slack.com/reference/block-kit/blocks#actions>
+    SlackBlockActions (Maybe SlackBlockId) SlackActionList -- 1 to 5 elements
+  | -- | Header block.
+    --
+    -- The text is max 150 characters long.
+    --
+    -- <https://api.slack.com/reference/block-kit/blocks#header>
+    SlackBlockHeader SlackPlainTextOnly
   | SlackBlockOther Object
   deriving stock (Eq)
 
