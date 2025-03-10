@@ -14,6 +14,8 @@
   experimental module `Web.Slack.Experimental.Blocks.Builder`.
 
   This makes the DSL for specifying messages built with blocks a bit nicer.
+* [#143](https://github.com/MercuryTechnologies/slack-web/pull/143)
+  Add the `bot_profile` field to messages.
 
 # 2.0.1.0 (2025-01-09)
 * [#136](https://github.com/MercuryTechnologies/slack-web/pull/136)

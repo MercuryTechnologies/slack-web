@@ -144,6 +144,19 @@ instance FromJSON MessageAttachment where
     -- Return the structured data with raw JSON preserved
     pure MessageAttachment {decoded = decodedContent, raw = ov}
 
+-- | @bot_profile@ field of message events.
+--
+-- @since 2.1.0.0
+data BotProfile = BotProfile
+  { id :: Text
+  , name :: Text
+  , appId :: Text
+  , teamId :: TeamId
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''BotProfile)
+
 -- | <https://api.slack.com/events/message>
 -- and
 -- <https://api.slack.com/events/message/file_share>
@@ -162,14 +175,20 @@ data MessageEvent = MessageEvent
   , appId :: Maybe Text
   -- ^ Present if it's sent by an app
   --
-  --   For mysterious reasons, this is NOT
-  --   <https://api.slack.com/events/message/bot_message>, this is a regular
-  --   message but with bot metadata. I Think it's because there *is* an
-  --   associated user.
+  --   This is always the case for messages sent by modern Slack Apps, as
+  --   opposed to legacy bots, which send 'BotMessageEvent' so they do not
+  --   require an associated user ID. Modern Slack Apps have user IDs *and* App
+  --   IDs *and* Bot IDs.
   --
   --   See @botMessage.json@ golden parser test.
   , botId :: Maybe Text
   -- ^ Present if it's sent by a bot user
+  , botProfile :: Maybe BotProfile
+  -- ^ The bot profile of the app sending the message, if any.
+  --
+  --   This is (ill)-documented, sorta, at <https://api.slack.com/events/message/bot_message>.
+  --
+  --   @since 2.1.0.0
   , attachments :: Maybe [MessageAttachment]
   -- ^ @since 2.0.0.3
   -- Present if the message has attachments
@@ -181,6 +200,13 @@ $(deriveFromJSON snakeCaseOptions ''MessageEvent)
 -- | <https://api.slack.com/events/message/bot_message>
 -- This is similar to a MessageEvent but sent by a bot, for example
 -- messages that Reacji Channeler sends.
+--
+-- This only applies to *legacy* bots. Modern Slack apps do not send
+-- @bot_message@ events; see the Slack documentation.
+--
+-- FIXME(jadel): remove this completely after March 31 2025 (?) or
+-- March 2026 (?) since the things that send these will likely vanish.
+-- <https://api.slack.com/changelog/2024-09-legacy-custom-bots-classic-apps-deprecation>
 --
 -- @since 2.0.0.2
 data BotMessageEvent = BotMessageEvent
