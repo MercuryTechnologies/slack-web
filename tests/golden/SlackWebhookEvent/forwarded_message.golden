@@ -22,6 +22,7 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Nothing
                 , botId = Nothing
+                , botProfile = Nothing
                 , attachments = Just
                     [ MessageAttachment
                         { decoded = Just

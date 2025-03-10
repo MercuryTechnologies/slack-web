@@ -22,6 +22,15 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Just "A01BP7R4KNY"
                 , botId = Just "B07LDR01Z63"
+                , botProfile = Just
+                    ( BotProfile
+                        { id = "B07LDR01Z63"
+                        , name = "GitHub"
+                        , appId = "A01BP7R4KNY"
+                        , teamId = TeamId
+                            { unTeamId = "T043DB835ML" }
+                        }
+                    )
                 , attachments = Just
                     [ MessageAttachment
                         { decoded = Just

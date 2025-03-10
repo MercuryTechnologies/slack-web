@@ -37,6 +37,15 @@ EventEventCallback
                 , threadTs = Just "1664216109.798919"
                 , appId = Just "A0442TUPHGR"
                 , botId = Just "B0439P161B9"
+                , botProfile = Just
+                    ( BotProfile
+                        { id = "B0439P161B9"
+                        , name = "Slacklinker dev"
+                        , appId = "A0442TUPHGR"
+                        , teamId = TeamId
+                            { unTeamId = "T043DB835ML" }
+                        }
+                    )
                 , attachments = Nothing
                 }
             )

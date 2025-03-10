@@ -50,6 +50,15 @@ EventEventCallback
                 , threadTs = Nothing
                 , appId = Just "A56789123"
                 , botId = Just "B01234687"
+                , botProfile = Just
+                    ( BotProfile
+                        { id = "B01234687"
+                        , name = "CircleCI integration"
+                        , appId = "A56789123"
+                        , teamId = TeamId
+                            { unTeamId = "T0123456789" }
+                        }
+                    )
                 , attachments = Nothing
                 }
             )
