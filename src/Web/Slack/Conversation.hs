@@ -5,6 +5,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeOperators #-}
 -- FIXME: squashes warnings
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
@@ -34,6 +35,11 @@ module Web.Slack.Conversation (
   RepliesReq (..),
   mkRepliesReq,
   ResponseMetadata (..),
+  Api,
+  InfoReq (..),
+  InfoRsp (..),
+  conversationsInfo,
+  conversationsInfo_,
 ) where
 
 import Data.Aeson
@@ -43,9 +49,14 @@ import Data.Aeson.TH
 import Data.Aeson.Types
 import Data.Scientific
 import Data.Text qualified as T
+import Servant.API (AuthProtect, FormUrlEncoded, JSON, Post, ReqBody, (:>))
+import Servant.Client (ClientM, client)
+import Servant.Client.Core (AuthenticatedRequest)
 import Web.FormUrlEncoded
 import Web.HttpApiData
 import Web.Slack.Common
+import Web.Slack.Internal (ResponseJSON (..), SlackConfig (..), mkSlackAuthenticateReq, run)
+import Web.Slack.Pager (Response)
 import Web.Slack.Pager.Types (PagedRequest (..), PagedResponse (..), ResponseMetadata (..))
 import Web.Slack.Prelude
 import Web.Slack.Util
@@ -118,7 +129,7 @@ instance NFData ChannelConversation
 $(deriveJSON (jsonOpts "channel") ''ChannelConversation)
 
 -- | Conversation object representing a private channel or
---   _a multi-party instant message (mpim)*, which only invited people in the
+--   _a multi-party instant message (mpim)_, which only invited people in the
 --  team can join in and see.
 data GroupConversation = GroupConversation
   { groupId :: ConversationId
@@ -171,7 +182,7 @@ data ImConversation = ImConversation
   , imIsArchived :: Bool
   , imIsOrgShared :: Bool
   , imUser :: UserId
-  , imIsUserDeleted :: Bool
+  , imIsUserDeleted :: Maybe Bool
   , imPriority :: Scientific
   }
   deriving stock (Eq, Show, Generic)
@@ -429,3 +440,61 @@ mkRepliesReq channel ts =
     , repliesReqOldest = Nothing
     , repliesReqInclusive = True
     }
+
+-- | @conversations.info@ request: retrieve a conversation's metadata.
+--
+-- <https://api.slack.com/methods/conversations.info>
+--
+-- @since 2.2.0.0
+data InfoReq = InfoReq
+  { infoReqChannel :: ConversationId
+  , infoReqIncludeLocale :: Maybe Bool
+  , infoReqIncludeNumMembers :: Maybe Bool
+  }
+  deriving stock (Eq, Show, Generic)
+
+instance ToForm InfoReq where
+  toForm InfoReq {..} =
+    [("channel", unConversationId infoReqChannel)]
+      <> toQueryParamIfJust "include_locale" infoReqIncludeLocale
+      <> toQueryParamIfJust "include_num_members" infoReqIncludeNumMembers
+
+-- | @conversations.info@ response
+--
+-- <https://api.slack.com/methods/conversations.info>
+--
+-- @since 2.2.0.0
+data InfoRsp = InfoRsp
+  { infoRspChannel :: Conversation
+  }
+  deriving stock (Eq, Show, Generic)
+
+$(deriveJSON (jsonOpts "infoRsp") ''InfoRsp)
+
+-- | FIXME(jadel): move the rest of the Conversations API into here since the old "shoving all the API in one spot" is soft deprecated.
+-- @since 2.2.0.0
+type Api =
+  "conversations.info"
+    :> AuthProtect "token"
+    :> ReqBody '[FormUrlEncoded] InfoReq
+    :> Post '[JSON] (ResponseJSON InfoRsp)
+
+-- | Retrieve a conversation's metadata.
+--
+-- <https://api.slack.com/methods/conversations.info>
+--
+-- @since 2.2.0.0
+conversationsInfo ::
+  SlackConfig ->
+  InfoReq ->
+  IO (Response InfoRsp)
+conversationsInfo = flip $ \listReq -> do
+  authR <- mkSlackAuthenticateReq
+  run (conversationsInfo_ authR listReq) . slackConfigManager
+
+-- | @since 2.2.0.0
+conversationsInfo_ ::
+  AuthenticatedRequest (AuthProtect "token") ->
+  InfoReq ->
+  ClientM (ResponseJSON InfoRsp)
+conversationsInfo_ = client (Proxy @Api)

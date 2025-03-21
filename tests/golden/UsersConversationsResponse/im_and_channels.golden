@@ -79,7 +79,7 @@ UsersConversationsResponse
                 , imIsOrgShared = False
                 , imUser = UserId
                     { unUserId = "U043H11ES4V" }
-                , imIsUserDeleted = False
+                , imIsUserDeleted = Just False
                 , imPriority = 0.0
                 }
             )
@@ -92,7 +92,7 @@ UsersConversationsResponse
                 , imIsOrgShared = False
                 , imUser = UserId
                     { unUserId = "USLACKBOT" }
-                , imIsUserDeleted = False
+                , imIsUserDeleted = Just False
                 , imPriority = 0.0
                 }
             )

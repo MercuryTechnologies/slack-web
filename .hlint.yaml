@@ -1,0 +1,1 @@
+- ignore: {name: "Use newtype instead of data"} # Forces things to be newtypes when they could grow more fields in future; making them newtypes makes undesired API promises.

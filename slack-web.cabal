@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: slack-web
-version: 2.1.0.0
+version: 2.2.0.0
 
 build-type: Simple
 
@@ -35,6 +35,8 @@ extra-source-files:
   tests/golden/PublishResp/*.golden
   tests/golden/ResponseJSON/*.json
   tests/golden/ResponseJSON/*.golden
+  tests/golden/InfoRsp/*.golden
+  tests/golden/InfoRsp/*.json
 
 category: Web
 

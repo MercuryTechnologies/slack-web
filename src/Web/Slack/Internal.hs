@@ -23,6 +23,8 @@ data SlackConfig = SlackConfig
 newtype ResponseJSON a = ResponseJSON (Either Common.ResponseSlackError a)
   deriving stock (Show)
 
+type role ResponseJSON representational
+
 instance (FromJSON a) => FromJSON (ResponseJSON a) where
   parseJSON = withObject "Response" $ \o -> do
     ok <- o .: "ok"

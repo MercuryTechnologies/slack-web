@@ -1,0 +1,71 @@
+{
+    "ok": true,
+    "channel": {
+        "id": "D0442US94JD",
+        "created": 1663960005,
+        "is_archived": false,
+        "is_im": true,
+        "is_org_shared": false,
+        "context_team_id": "T043DB835ML",
+        "updated": 1740098832769,
+        "user": "U043H11ES4V",
+        "last_read": "1671145573.165309",
+        "latest": {
+            "user": "U0442US8QGH",
+            "type": "message",
+            "ts": "1741206064.642559",
+            "bot_id": "B0439P161B9",
+            "app_id": "A0442TUPHGR",
+            "text": "Done!",
+            "team": "T043DB835ML",
+            "bot_profile": {
+                "id": "B0439P161B9",
+                "deleted": false,
+                "name": "Slacklinker dev",
+                "updated": 1740097237,
+                "app_id": "A0442TUPHGR",
+                "icons": {
+                    "image_36": "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png",
+                    "image_48": "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png",
+                    "image_72": "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+                },
+                "team_id": "T043DB835ML"
+            },
+            "blocks": [
+                {
+                    "type": "rich_text",
+                    "block_id": "rdhT",
+                    "elements": [
+                        {
+                            "type": "rich_text_section",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "text": "Done!"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "unread_count": 48,
+        "unread_count_display": 4,
+        "is_open": true,
+        "properties": {
+            "tabs": [
+                {
+                    "type": "files",
+                    "label": "",
+                    "id": "files"
+                }
+            ],
+            "tabz": [
+                {
+                    "type": "files"
+                }
+            ]
+        },
+        "priority": 0
+    }
+}
