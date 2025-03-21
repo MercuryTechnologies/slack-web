@@ -37,6 +37,8 @@ extra-source-files:
   tests/golden/ResponseJSON/*.golden
   tests/golden/InfoRsp/*.golden
   tests/golden/InfoRsp/*.json
+  tests/golden/JoinRsp/*.json
+  tests/golden/JoinRsp/*.golden
 
 category: Web
 

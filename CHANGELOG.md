@@ -3,6 +3,8 @@
   Implement `conversations.info` API method.
 
   Breaking change: imIsUserDeleted is now Maybe to reflect reality.
+* [#146](https://github.com/MercuryTechnologies/slack-web/pull/146)
+  Implement `conversations.join` API method.
 
 # 2.1.0.0 (2025-03-06)
 * [#138](https://github.com/MercuryTechnologies/slack-web/pull/138)
