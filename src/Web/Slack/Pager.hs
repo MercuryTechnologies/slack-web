@@ -6,8 +6,8 @@ module Web.Slack.Pager (
   module Web.Slack.Pager.Types,
 ) where
 
+import Data.Kind (Type)
 import Web.Slack.Common qualified as Common
-import Web.Slack.Conversation qualified as Conversation
 import Web.Slack.Pager.Types
 import Web.Slack.Prelude
 
@@ -18,6 +18,8 @@ type Response a = Either Common.SlackClientError a
 --   to get the next page.
 --   If there is no more response, the action returns an empty list.
 type LoadPage m a = m (Response [a])
+
+type LoadPage :: forall {k}. (Type -> k) -> Type -> k
 
 -- | Utility function for 'LoadPage'. Perform the 'LoadPage' action to call
 --   the function with the loaded page, until an empty page is loaded.
@@ -46,7 +48,7 @@ fetchAllBy sendRequest initialRequest = do
 
   let requestFromCursor cursor = setCursor cursor initialRequest
       collectAndUpdateCursor resp = do
-        let newCursor = Conversation.responseMetadataNextCursor =<< getResponseMetadata resp
+        let newCursor = responseMetadataNextCursor =<< getResponseMetadata resp
             -- emptyCursor is used for the marker to show that there are no more pages.
             cursorToSave = if isNothing newCursor then emptyCursor else newCursor
         writeIORef cursorRef cursorToSave

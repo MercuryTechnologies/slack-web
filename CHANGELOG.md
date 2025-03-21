@@ -1,3 +1,7 @@
+# 2.1.1.0
+* [#145](https://github.com/MercuryTechnologies/slack-web/pull/145)
+  Implement `conversations.info` API method.
+
 # 2.1.0.0 (2025-03-06)
 * [#138](https://github.com/MercuryTechnologies/slack-web/pull/138)
   Implement `views.publish` method and App Home tab events.
