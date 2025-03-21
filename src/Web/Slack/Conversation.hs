@@ -182,7 +182,7 @@ data ImConversation = ImConversation
   , imIsArchived :: Bool
   , imIsOrgShared :: Bool
   , imUser :: UserId
-  , imIsUserDeleted :: Bool
+  , imIsUserDeleted :: Maybe Bool
   , imPriority :: Scientific
   }
   deriving stock (Eq, Show, Generic)
@@ -445,7 +445,7 @@ mkRepliesReq channel ts =
 --
 -- <https://api.slack.com/methods/conversations.info>
 --
--- @since 2.1.1.0
+-- @since 2.2.0.0
 data InfoReq = InfoReq
   { infoReqChannel :: ConversationId
   , infoReqIncludeLocale :: Maybe Bool
@@ -463,16 +463,16 @@ instance ToForm InfoReq where
 --
 -- <https://api.slack.com/methods/conversations.info>
 --
--- @since 2.1.1.0
+-- @since 2.2.0.0
 data InfoRsp = InfoRsp
-  { infoRspChannel :: ChannelConversation
+  { infoRspChannel :: Conversation
   }
   deriving stock (Eq, Show, Generic)
 
 $(deriveJSON (jsonOpts "infoRsp") ''InfoRsp)
 
 -- | FIXME(jadel): move the rest of the Conversations API into here since the old "shoving all the API in one spot" is soft deprecated.
--- @since 2.1.1.0
+-- @since 2.2.0.0
 type Api =
   "conversations.info"
     :> AuthProtect "token"
@@ -483,7 +483,7 @@ type Api =
 --
 -- <https://api.slack.com/methods/conversations.info>
 --
--- @since 2.1.1.0
+-- @since 2.2.0.0
 conversationsInfo ::
   SlackConfig ->
   InfoReq ->
@@ -492,7 +492,7 @@ conversationsInfo = flip $ \listReq -> do
   authR <- mkSlackAuthenticateReq
   run (conversationsInfo_ authR listReq) . slackConfigManager
 
--- | @since 2.1.1.0
+-- | @since 2.2.0.0
 conversationsInfo_ ::
   AuthenticatedRequest (AuthProtect "token") ->
   InfoReq ->

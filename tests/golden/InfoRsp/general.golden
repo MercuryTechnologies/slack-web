@@ -1,35 +1,37 @@
 InfoRsp
-    { infoRspChannel = ChannelConversation
-        { channelId = ConversationId
-            { unConversationId = "C043YJGBY49" }
-        , channelName = "general"
-        , channelCreated = 1663890553
-        , channelIsArchived = False
-        , channelIsGeneral = True
-        , channelUnlinked = 0
-        , channelNameNormalized = "general"
-        , channelIsShared = False
-        , channelCreator = UserId
-            { unUserId = "U043H11ES4V" }
-        , channelIsExtShared = False
-        , channelIsOrgShared = False
-        , channelSharedTeamIds = Just
-            [ TeamId
-                { unTeamId = "T043DB835ML" }
-            ]
-        , channelIsPendingExtShared = False
-        , channelIsMember = Just True
-        , channelTopic = Topic
-            { topicValue = ""
-            , topicCreator = ""
-            , topicLastSet = 0
+    { infoRspChannel = Channel
+        ( ChannelConversation
+            { channelId = ConversationId
+                { unConversationId = "C043YJGBY49" }
+            , channelName = "general"
+            , channelCreated = 1663890553
+            , channelIsArchived = False
+            , channelIsGeneral = True
+            , channelUnlinked = 0
+            , channelNameNormalized = "general"
+            , channelIsShared = False
+            , channelCreator = UserId
+                { unUserId = "U043H11ES4V" }
+            , channelIsExtShared = False
+            , channelIsOrgShared = False
+            , channelSharedTeamIds = Just
+                [ TeamId
+                    { unTeamId = "T043DB835ML" }
+                ]
+            , channelIsPendingExtShared = False
+            , channelIsMember = Just True
+            , channelTopic = Topic
+                { topicValue = ""
+                , topicCreator = ""
+                , topicLastSet = 0
+                }
+            , channelPurpose = Purpose
+                { purposeValue = "This is the one channel that will always include everyone. It’s a great spot for announcements and team-wide conversations."
+                , purposeCreator = "U043H11ES4V"
+                , purposeLastSet = 1663890553
+                }
+            , channelPreviousNames = []
+            , channelNumMembers = Nothing
             }
-        , channelPurpose = Purpose
-            { purposeValue = "This is the one channel that will always include everyone. It’s a great spot for announcements and team-wide conversations."
-            , purposeCreator = "U043H11ES4V"
-            , purposeLastSet = 1663890553
-            }
-        , channelPreviousNames = []
-        , channelNumMembers = Nothing
-        }
+        )
     }
