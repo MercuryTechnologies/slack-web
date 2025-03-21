@@ -40,6 +40,10 @@ module Web.Slack.Conversation (
   InfoRsp (..),
   conversationsInfo,
   conversationsInfo_,
+  JoinReq (..),
+  JoinRsp (..),
+  conversationsJoin,
+  conversationsJoin_,
 ) where
 
 import Data.Aeson
@@ -49,7 +53,7 @@ import Data.Aeson.TH
 import Data.Aeson.Types
 import Data.Scientific
 import Data.Text qualified as T
-import Servant.API (AuthProtect, FormUrlEncoded, JSON, Post, ReqBody, (:>))
+import Servant.API (AuthProtect, FormUrlEncoded, JSON, Post, ReqBody, (:<|>) (..), (:>))
 import Servant.Client (ClientM, client)
 import Servant.Client.Core (AuthenticatedRequest)
 import Web.FormUrlEncoded
@@ -478,6 +482,82 @@ type Api =
     :> AuthProtect "token"
     :> ReqBody '[FormUrlEncoded] InfoReq
     :> Post '[JSON] (ResponseJSON InfoRsp)
+    :<|> "conversations.join"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] JoinReq
+      :> Post '[JSON] (ResponseJSON JoinRsp)
+
+-- | Joins a conversation.
+--
+-- <https://api.slack.com/methods/conversations.join>
+data JoinReq = JoinReq
+  { joinReqChannel :: ConversationId
+  }
+  deriving stock (Eq, Show, Generic)
+
+instance ToForm JoinReq where
+  toForm = genericToForm (formOpts "joinReq")
+
+-- |
+-- @
+-- {
+--     "ok": true,
+--     "channel": {
+--         "id": "C061EG9SL",
+--         "name": "general",
+--         "is_channel": true,
+--         "is_group": false,
+--         "is_im": false,
+--         "created": 1449252889,
+--         "creator": "U061F7AUR",
+--         "is_archived": false,
+--         "is_general": true,
+--         "unlinked": 0,
+--         "name_normalized": "general",
+--         "is_shared": false,
+--         "is_ext_shared": false,
+--         "is_org_shared": false,
+--         "pending_shared": [],
+--         "is_pending_ext_shared": false,
+--         "is_member": true,
+--         "is_private": false,
+--         "is_mpim": false,
+--         "topic": {
+--             "value": "Which widget do you worry about?",
+--             "creator": "",
+--             "last_set": 0
+--         },
+--         "purpose": {
+--             "value": "For widget discussion",
+--             "creator": "",
+--             "last_set": 0
+--         },
+--         "previous_names": []
+--     },
+--     "warning": "already_in_channel",
+--     "response_metadata": {
+--         "warnings": [
+--             "already_in_channel"
+--         ]
+--     }
+-- }
+-- @
+data JoinRsp = JoinRsp
+  { joinRspChannel :: Conversation
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON (jsonOpts "joinRsp") ''JoinRsp)
+
+-- | @since 2.2.0.0
+conversationsJoin_ :: AuthenticatedRequest (AuthProtect "token") -> JoinReq -> ClientM (ResponseJSON JoinRsp)
+
+-- | @since 2.2.0.0
+conversationsInfo_ ::
+  AuthenticatedRequest (AuthProtect "token") ->
+  InfoReq ->
+  ClientM (ResponseJSON InfoRsp)
+conversationsInfo_ :<|> conversationsJoin_ = client (Proxy @Api)
 
 -- | Retrieve a conversation's metadata.
 --
@@ -492,9 +572,15 @@ conversationsInfo = flip $ \listReq -> do
   authR <- mkSlackAuthenticateReq
   run (conversationsInfo_ authR listReq) . slackConfigManager
 
--- | @since 2.2.0.0
-conversationsInfo_ ::
-  AuthenticatedRequest (AuthProtect "token") ->
-  InfoReq ->
-  ClientM (ResponseJSON InfoRsp)
-conversationsInfo_ = client (Proxy @Api)
+-- | Joins a conversation.
+--
+-- <https://api.slack.com/methods/conversations.join>
+--
+-- @since 2.2.0.0
+conversationsJoin ::
+  SlackConfig ->
+  JoinReq ->
+  IO (Response JoinRsp)
+conversationsJoin slackConfig req = do
+  let authR = mkSlackAuthenticateReq slackConfig
+  run (conversationsJoin_ authR req) . slackConfigManager $ slackConfig

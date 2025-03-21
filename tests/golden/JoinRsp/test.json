@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "channel": {
+    "id": "C0451SKQN72",
+    "name": "new-channel-2",
+    "is_channel": true,
+    "is_group": false,
+    "is_im": false,
+    "is_mpim": false,
+    "is_private": false,
+    "created": 1664407230,
+    "is_archived": false,
+    "is_general": false,
+    "unlinked": 0,
+    "name_normalized": "new-channel-2",
+    "is_shared": false,
+    "is_org_shared": false,
+    "is_pending_ext_shared": false,
+    "pending_shared": [],
+    "context_team_id": "T043DB835ML",
+    "parent_conversation": null,
+    "creator": "U043H11ES4V",
+    "is_ext_shared": false,
+    "shared_team_ids": ["T043DB835ML"],
+    "pending_connected_team_ids": [],
+    "is_member": true,
+    "last_read": "1664407230.583859",
+    "topic": { "value": "", "creator": "", "last_set": 0 },
+    "purpose": { "value": "", "creator": "", "last_set": 0 },
+    "previous_names": [],
+    "priority": 0
+  }
+}
+

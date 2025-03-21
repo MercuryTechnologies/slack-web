@@ -1,0 +1,37 @@
+JoinRsp
+    { joinRspChannel = Channel
+        ( ChannelConversation
+            { channelId = ConversationId
+                { unConversationId = "C0451SKQN72" }
+            , channelName = "new-channel-2"
+            , channelCreated = 1664407230
+            , channelIsArchived = False
+            , channelIsGeneral = False
+            , channelUnlinked = 0
+            , channelNameNormalized = "new-channel-2"
+            , channelIsShared = False
+            , channelCreator = UserId
+                { unUserId = "U043H11ES4V" }
+            , channelIsExtShared = False
+            , channelIsOrgShared = False
+            , channelSharedTeamIds = Just
+                [ TeamId
+                    { unTeamId = "T043DB835ML" }
+                ]
+            , channelIsPendingExtShared = False
+            , channelIsMember = Just True
+            , channelTopic = Topic
+                { topicValue = ""
+                , topicCreator = ""
+                , topicLastSet = 0
+                }
+            , channelPurpose = Purpose
+                { purposeValue = ""
+                , purposeCreator = ""
+                , purposeLastSet = 0
+                }
+            , channelPreviousNames = []
+            , channelNumMembers = Nothing
+            }
+        )
+    }
