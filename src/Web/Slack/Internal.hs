@@ -1,9 +1,10 @@
+-- Due to AuthClientData
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 -- | Internal things in slack-web. May be changed arbitrarily!
 module Web.Slack.Internal where
 
 import Data.Aeson (Value (..))
--- import Servant.Client.Core
-
 import Data.Aeson.KeyMap qualified as KM
 import Network.HTTP.Client (Manager)
 import Servant.API hiding (addHeader)
