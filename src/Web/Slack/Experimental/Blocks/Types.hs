@@ -715,13 +715,14 @@ data SlackInteractivePayload = SlackInteractivePayload
 
 instance FromJSON SlackInteractivePayload where
   parseJSON = withObject "SlackInteractivePayload" $ \obj -> do
-    user <- obj .: "user"
+    payload <- obj .: "payload"
+    user <- payload .: "user"
     sipUserId <- user .: "id"
     sipUsername <- user .: "username"
     sipName <- user .: "name"
-    sipResponseUrl <- obj .:? "response_url"
-    sipTriggerId <- obj .:? "trigger_id"
-    actionsObj <- obj .: "actions"
+    sipResponseUrl <- payload .:? "response_url"
+    sipTriggerId <- payload .:? "trigger_id"
+    actionsObj <- payload .: "actions"
     sipActions <- parseJSON actionsObj
     pure $ SlackInteractivePayload {..}
 
