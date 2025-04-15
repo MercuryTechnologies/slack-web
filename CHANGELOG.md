@@ -1,4 +1,7 @@
 # 2.3.0.0 (unreleased)
+* [#149](https://github.com/MercuryTechnologies/slack-web/pull/149)
+  Support request verification of non-JSON payloads.
+
 * [#168](https://github.com/MercuryTechnologies/slack-web/pull/168)
   Parse rich-text `message_mention` elements as `RichItemMessageMention`.
   These elements were previously returned as `RichItemOther`.
