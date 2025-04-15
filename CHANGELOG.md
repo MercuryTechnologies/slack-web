@@ -1,3 +1,7 @@
+# 2.2.1.0
+* [#148](https://github.com/MercuryTechnologies/slack-web/pull/148)
+  Fix `FromJSON` instance of `SlackInteractivePayload`
+
 # 2.2.0.0 (2025-03-21)
 * [#145](https://github.com/MercuryTechnologies/slack-web/pull/145)
   Implement `conversations.info` API method.
