@@ -1,3 +1,7 @@
+# 2.3.0.0 (2025-04-16)
+* [#149](https://github.com/MercuryTechnologies/slack-web/pull/149)
+  Support request verification of non-JSON payloads.
+
 # 2.2.0.0 (2025-03-21)
 * [#145](https://github.com/MercuryTechnologies/slack-web/pull/145)
   Implement `conversations.info` API method.

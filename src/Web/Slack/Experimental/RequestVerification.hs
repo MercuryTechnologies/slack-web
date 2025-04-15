@@ -47,8 +47,13 @@ instance FromHttpApiData SlackSignature where
   parseUrlPiece _ = error "SlackSignature should not be in a url piece"
   parseHeader = Right . SlackSignature
 
+-- | Error for an invalid Slack request body.
 type SlackVerificationFailed = SlackVerificationFailed' Text
 
+-- | Error for an invalid Slack request body. Allows for arbitrary parse
+-- error types.
+--
+-- @since 2.3.0.0
 data SlackVerificationFailed' parseError
   = VerificationMissingTimestamp
   | VerificationMalformedTimestamp ByteString
