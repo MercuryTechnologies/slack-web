@@ -2,9 +2,13 @@ module Web.Slack.Experimental.RequestVerification (
   SlackSigningSecret (..),
   SlackSignature (..),
   SlackRequestTimestamp (..),
-  SlackVerificationFailed (..),
+  SlackVerificationFailed,
+  SlackVerificationFailed' (..),
   validateRequest,
   validateRequest',
+  validateRequestRaw,
+  validateRequestRaw',
+  decodeRequestJSON,
 ) where
 
 import Crypto.Hash (SHA256, digestFromByteString)
@@ -19,7 +23,7 @@ import Web.HttpApiData (FromHttpApiData (..))
 import Web.Slack.Prelude
 
 -- | Slack generated Signing Secret placed into configuration.
--- See https://api.slack.com/authentication/verifying-requests-from-slack#signing_secrets_admin_page
+-- See <https://api.slack.com/authentication/verifying-requests-from-slack#signing_secrets_admin_page>
 newtype SlackSigningSecret
   = SlackSigningSecret ByteString
   deriving stock (Eq)
@@ -43,7 +47,14 @@ instance FromHttpApiData SlackSignature where
   parseUrlPiece _ = error "SlackSignature should not be in a url piece"
   parseHeader = Right . SlackSignature
 
-data SlackVerificationFailed
+-- | Error for an invalid Slack request body.
+type SlackVerificationFailed = SlackVerificationFailed' Text
+
+-- | Error for an invalid Slack request body. Allows for arbitrary parse
+-- error types.
+--
+-- @since 2.3.0.0
+data SlackVerificationFailed' parseError
   = VerificationMissingTimestamp
   | VerificationMalformedTimestamp ByteString
   | VerificationTimestampOutOfRange Int
@@ -52,31 +63,78 @@ data SlackVerificationFailed
   | VerificationMalformedSignature String
   | VerificationUndecodableSignature ByteString
   | VerificationSignatureMismatch
-  | VerificationCannotParse Text
+  | VerificationCannotParse parseError
   deriving stock (Show, Eq)
+  deriving anyclass (Exception)
 
-instance Exception SlackVerificationFailed
+type role SlackVerificationFailed' representational
 
+-- | Decodes the JSON request body as plain JSON (as would be seen in a
+-- 'SlackWebhookEvent').
+--
+-- @since 2.3.0.0
+decodeRequestJSON :: (FromJSON body) => ByteString -> Either Text body
+decodeRequestJSON = mapLeft pack . eitherDecodeStrict
+
+-- | Validates that a Slack request is signed appropriately to prove it
+-- originated from Slack, then decodes it as JSON, in the spirit of "Parse,
+-- don't validate".
+--
+-- See: <https://api.slack.com/authentication/verifying-requests-from-slack>
 validateRequest ::
-  (MonadIO m, FromJSON a) =>
+  (MonadIO m, FromJSON body) =>
   SlackSigningSecret ->
   SlackSignature ->
   SlackRequestTimestamp ->
   ByteString ->
-  m (Either SlackVerificationFailed a)
-validateRequest secret sig reqTs body =
-  liftIO getPOSIXTime >>= \time -> pure $ validateRequest' time secret sig reqTs body
+  m (Either SlackVerificationFailed body)
+validateRequest = validateRequestRaw decodeRequestJSON
 
 -- | Pure version of 'validateRequest'. Probably only useful for tests.
 validateRequest' ::
-  (FromJSON a) =>
+  (FromJSON body) =>
   NominalDiffTime ->
   SlackSigningSecret ->
   SlackSignature ->
   SlackRequestTimestamp ->
   ByteString ->
-  Either SlackVerificationFailed a
-validateRequest' now (SlackSigningSecret secret) (SlackSignature sigHeader) (SlackRequestTimestamp timestampString) body = do
+  Either SlackVerificationFailed body
+validateRequest' = validateRequestRaw' decodeRequestJSON
+
+-- | Validates that a Slack request is signed appropriately to prove it
+-- originated from Slack, then decodes it, in the spirit of "Parse, don't
+-- validate".
+--
+-- This function is necessary for the interactive webhooks that are
+-- x-form-urlencoded with a @payload@ field. For more info on those, see
+-- <https://api.slack.com/interactivity/handling#payloads>
+--
+-- See: <https://api.slack.com/authentication/verifying-requests-from-slack>
+--
+-- @since 2.3.0.0
+validateRequestRaw ::
+  (MonadIO m) =>
+  (ByteString -> Either err body) ->
+  SlackSigningSecret ->
+  SlackSignature ->
+  SlackRequestTimestamp ->
+  ByteString ->
+  m (Either (SlackVerificationFailed' err) body)
+validateRequestRaw decoder secret sig reqTs body =
+  liftIO getPOSIXTime >>= \time -> pure $ validateRequestRaw' decoder time secret sig reqTs body
+
+-- | Pure version of 'validateRequestRaw'. Probably only useful for tests.
+--
+-- @since 2.3.0.0
+validateRequestRaw' ::
+  (ByteString -> Either err body) ->
+  NominalDiffTime ->
+  SlackSigningSecret ->
+  SlackSignature ->
+  SlackRequestTimestamp ->
+  ByteString ->
+  Either (SlackVerificationFailed' err) body
+validateRequestRaw' decoder now (SlackSigningSecret secret) (SlackSignature sigHeader) (SlackRequestTimestamp timestampString) body = do
   let fiveMinutes = 5 * 60
   -- timestamp must be an Int for proper basestring construction below
   timestamp <-
@@ -99,4 +157,4 @@ validateRequest' now (SlackSigningSecret secret) (SlackSignature sigHeader) (Sla
   let basestring = encodeUtf8 ("v0:" <> tshow timestamp <> ":") <> body
   when (hmac secret basestring /= sig)
     $ Left VerificationSignatureMismatch
-  mapLeft (VerificationCannotParse . pack) $ eitherDecodeStrict body
+  mapLeft VerificationCannotParse $ decoder body
