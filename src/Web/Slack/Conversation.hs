@@ -479,6 +479,11 @@ data InfoRsp = InfoRsp
 
 $(deriveJSON (jsonOpts "infoRsp") ''InfoRsp)
 
+-- | @conversations.members@ request: retrieve a conversation's members.
+--
+-- <https://api.slack.com/methods/conversations.members>
+--
+-- @since 2.2.1.0
 data MembersReq = MembersReq
   { membersReqChannel :: ConversationId
   }
@@ -489,6 +494,11 @@ $(deriveFromJSON (jsonOpts "membersReq") ''MembersReq)
 instance ToForm MembersReq where
   toForm = genericToForm (formOpts "membersReq")
 
+-- | @conversation.members@ response
+--
+-- <https://api.slack.com/methods/conversations.members>
+--
+-- @since 2.2.1.0
 data MembersRsp = MembersRsp
   { membersRspMembers :: [UserId]
   }
