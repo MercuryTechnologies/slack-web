@@ -1,0 +1,11 @@
+MembersRsp
+    { membersRspMembers =
+        [ UserId
+            { unUserId = "U023BECGF" }
+        , UserId
+            { unUserId = "U061F7AUR" }
+        , UserId
+            { unUserId = "W012A3CDE" }
+        ]
+    }
+

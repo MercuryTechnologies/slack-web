@@ -44,6 +44,10 @@ module Web.Slack.Conversation (
   JoinRsp (..),
   conversationsJoin,
   conversationsJoin_,
+  MembersReq (..),
+  MembersRsp (..),
+  conversationsMembers,
+  conversationsMembers_,
 ) where
 
 import Data.Aeson
@@ -475,6 +479,33 @@ data InfoRsp = InfoRsp
 
 $(deriveJSON (jsonOpts "infoRsp") ''InfoRsp)
 
+-- | @conversations.members@ request: retrieve a conversation's members.
+--
+-- <https://api.slack.com/methods/conversations.members>
+--
+-- @since 2.2.1.0
+data MembersReq = MembersReq
+  { membersReqChannel :: ConversationId
+  }
+  deriving stock (Eq, Show, Generic)
+
+$(deriveFromJSON (jsonOpts "membersReq") ''MembersReq)
+
+instance ToForm MembersReq where
+  toForm = genericToForm (formOpts "membersReq")
+
+-- | @conversation.members@ response
+--
+-- <https://api.slack.com/methods/conversations.members>
+--
+-- @since 2.2.1.0
+data MembersRsp = MembersRsp
+  { membersRspMembers :: [UserId]
+  }
+  deriving stock (Eq, Show, Generic)
+
+$(deriveFromJSON (jsonOpts "membersRsp") ''MembersRsp)
+
 -- | FIXME(jadel): move the rest of the Conversations API into here since the old "shoving all the API in one spot" is soft deprecated.
 -- @since 2.2.0.0
 type Api =
@@ -486,6 +517,10 @@ type Api =
       :> AuthProtect "token"
       :> ReqBody '[FormUrlEncoded] JoinReq
       :> Post '[JSON] (ResponseJSON JoinRsp)
+    :<|> "conversations.members"
+      :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] MembersReq
+      :> Post '[JSON] (ResponseJSON MembersRsp)
 
 -- | Joins a conversation.
 --
@@ -552,12 +587,15 @@ $(deriveFromJSON (jsonOpts "joinRsp") ''JoinRsp)
 -- | @since 2.2.0.0
 conversationsJoin_ :: AuthenticatedRequest (AuthProtect "token") -> JoinReq -> ClientM (ResponseJSON JoinRsp)
 
+-- | @since 2.2.1.0
+conversationsMembers_ :: AuthenticatedRequest (AuthProtect "token") -> MembersReq -> ClientM (ResponseJSON MembersRsp)
+
 -- | @since 2.2.0.0
 conversationsInfo_ ::
   AuthenticatedRequest (AuthProtect "token") ->
   InfoReq ->
   ClientM (ResponseJSON InfoRsp)
-conversationsInfo_ :<|> conversationsJoin_ = client (Proxy @Api)
+conversationsInfo_ :<|> conversationsJoin_ :<|> conversationsMembers_ = client (Proxy @Api)
 
 -- | Retrieve a conversation's metadata.
 --
@@ -584,3 +622,12 @@ conversationsJoin ::
 conversationsJoin slackConfig req = do
   let authR = mkSlackAuthenticateReq slackConfig
   run (conversationsJoin_ authR req) . slackConfigManager $ slackConfig
+
+-- | @since 2.2.1.0
+conversationsMembers ::
+  SlackConfig ->
+  MembersReq ->
+  IO (Response MembersRsp)
+conversationsMembers slackConfig req = do
+  let authR = mkSlackAuthenticateReq slackConfig
+  run (conversationsMembers_ authR req) . slackConfigManager $ slackConfig

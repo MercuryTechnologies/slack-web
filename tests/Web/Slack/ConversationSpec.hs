@@ -116,6 +116,7 @@ spec = describe "ToJSON and FromJSON for Conversation" $ do
     mapM_ (oneGoldenTestDecode @Conversation) ["shared_channel"]
     mapM_ (oneGoldenTestDecode @InfoRsp) ["general"]
     mapM_ (oneGoldenTestDecode @JoinRsp) ["test"]
+    mapM_ (oneGoldenTestDecode @MembersRsp) ["test"]
 
   it "errors accurately if no variant matches" $ do
     let badData =
