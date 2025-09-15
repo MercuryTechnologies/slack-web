@@ -21,5 +21,5 @@ read resp
 [[ "$resp" == "$version" ]]
 
 cabal upload "$sdist"
-git tag "v${version}"
+git tag -a -m "Version ${version}" "v${version}"
 git push origin "v${version}"
