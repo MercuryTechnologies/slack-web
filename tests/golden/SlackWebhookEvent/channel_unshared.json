@@ -1,0 +1,25 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "channel_unshared",
+    "previously_connected_team_id": "E163Q94DX",
+    "channel": "C123ABC456",
+    "is_ext_shared": false,
+    "event_ts": "1561064063.001100"
+  },
+  "type": "event_callback",
+  "event_id": "Ev044RKJHB8W",
+  "event_time": 1664827321,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": false,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false
+}

@@ -283,6 +283,31 @@ data ChannelLeftEvent = ChannelLeftEvent
 
 $(deriveFromJSON snakeCaseOptions ''ChannelLeftEvent)
 
+-- | A channel has been shared with an external workspace.
+--
+-- <https://docs.slack.dev/reference/events/channel_shared/>
+data ChannelSharedEvent = ChannelSharedEvent
+  { connectedTeamId :: TeamId
+  , channel :: ConversationId
+  , eventTs :: Text
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''ChannelSharedEvent)
+
+-- | A channel has been unshared with an external workspace.
+--
+-- <https://docs.slack.dev/reference/events/channel_unshared/>
+data ChannelUnsharedEvent = ChannelUnsharedEvent
+  { previouslyConnectedTeamId :: TeamId
+  , channel :: ConversationId
+  , isExtShared :: Bool
+  , eventTs :: Text
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''ChannelUnsharedEvent)
+
 -- | <https://api.slack.com/events/url_verification>
 data UrlVerificationPayload = UrlVerificationPayload
   { challenge :: Text
@@ -347,6 +372,8 @@ data Event
     EventChannelJoinMessage
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
+  | EventChannelShared ChannelSharedEvent
+  | EventChannelUnshared ChannelUnsharedEvent
   | -- | @since 2.1.0.0
     EventAppHomeOpened AppHomeOpenedEvent
   | EventUnknown Value
@@ -366,6 +393,8 @@ instance FromJSON Event where
       ("message", Just "file_share") -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("channel_created", Nothing) -> EventChannelCreated <$> parseJSON (Object obj)
       ("channel_left", Nothing) -> EventChannelLeft <$> parseJSON (Object obj)
+      ("channel_shared", Nothing) -> EventChannelShared <$> parseJSON (Object obj)
+      ("channel_unshared", Nothing) -> EventChannelUnshared <$> parseJSON (Object obj)
       ("app_home_opened", Nothing) -> EventAppHomeOpened <$> parseJSON (Object obj)
       _ -> pure $ EventUnknown (Object obj)
 
