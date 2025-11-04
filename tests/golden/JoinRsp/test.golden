@@ -30,7 +30,7 @@ JoinRsp
                 , purposeCreator = ""
                 , purposeLastSet = 0
                 }
-            , channelPreviousNames = []
+            , channelPreviousNames = Just []
             , channelNumMembers = Nothing
             }
         )

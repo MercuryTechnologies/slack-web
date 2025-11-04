@@ -126,7 +126,7 @@ data ChannelConversation = ChannelConversation
   -- ^ Absent from @users.conversations@ response
   , channelTopic :: Topic
   , channelPurpose :: Purpose
-  , channelPreviousNames :: [Text]
+  , channelPreviousNames :: Maybe [Text]
   , channelNumMembers :: Maybe Integer
   -- ^ Absent from @conversations.join@ response
   }

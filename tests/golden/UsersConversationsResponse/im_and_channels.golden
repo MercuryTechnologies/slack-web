@@ -31,7 +31,7 @@ UsersConversationsResponse
                     , purposeCreator = "U043H11ES4V"
                     , purposeLastSet = 1663890553
                     }
-                , channelPreviousNames = []
+                , channelPreviousNames = Just []
                 , channelNumMembers = Nothing
                 }
             )
@@ -66,7 +66,7 @@ UsersConversationsResponse
                     , purposeCreator = ""
                     , purposeLastSet = 0
                     }
-                , channelPreviousNames = []
+                , channelPreviousNames = Just []
                 , channelNumMembers = Nothing
                 }
             )

@@ -26,7 +26,7 @@ Channel
             , purposeCreator = ""
             , purposeLastSet = 0
             }
-        , channelPreviousNames = Just []
+        , channelPreviousNames = Nothing
         , channelNumMembers = Just 12
         }
     )

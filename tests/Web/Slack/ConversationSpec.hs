@@ -114,6 +114,7 @@ spec = describe "ToJSON and FromJSON for Conversation" $ do
 
   describe "Golden tests" $ do
     mapM_ (oneGoldenTestDecode @Conversation) ["shared_channel"]
+    mapM_ (oneGoldenTestDecode @Conversation) ["no_previous_names"]
     mapM_ (oneGoldenTestDecode @InfoRsp) ["general"]
     mapM_ (oneGoldenTestDecode @JoinRsp) ["test"]
     mapM_ (oneGoldenTestDecode @MembersRsp) ["test"]

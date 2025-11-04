@@ -1,0 +1,36 @@
+{
+  "id": "C0000000000",
+  "name": "shared-channel",
+  "is_channel": true,
+  "is_group": false,
+  "is_im": false,
+  "is_mpim": false,
+  "is_private": false,
+  "created": 1667519517,
+  "is_archived": false,
+  "is_general": false,
+  "unlinked": 0,
+  "name_normalized": "shared-channel",
+  "is_shared": true,
+  "is_org_shared": false,
+  "is_pending_ext_shared": false,
+  "pending_shared": [],
+  "context_team_id": "TAAAAAAAA",
+  "parent_conversation": null,
+  "creator": "UAAAAAAAA",
+  "is_ext_shared": true,
+  "pending_connected_team_ids": [],
+  "conversation_host_id": "TAAAAAAAA",
+  "is_member": false,
+  "topic": {
+    "value": "",
+    "creator": "",
+    "last_set": 0
+  },
+  "purpose": {
+    "value": "",
+    "creator": "",
+    "last_set": 0
+  },
+  "num_members": 12
+}

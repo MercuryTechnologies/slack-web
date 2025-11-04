@@ -30,7 +30,7 @@ InfoRsp
                 , purposeCreator = "U043H11ES4V"
                 , purposeLastSet = 1663890553
                 }
-            , channelPreviousNames = []
+            , channelPreviousNames = Just []
             , channelNumMembers = Nothing
             }
         )
