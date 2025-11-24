@@ -22,6 +22,8 @@ spec = describe "Types for Slack events" do
         , "messageIm"
         , "slackbotIm"
         , "channel_left"
+        , "channel_shared"
+        , "channel_unshared"
         , "share_without_message"
         , "share_with_message"
         , "circleci"

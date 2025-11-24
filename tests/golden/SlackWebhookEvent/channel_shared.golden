@@ -1,0 +1,21 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev044RKJHB8W" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1664827321
+            , systemNanoseconds = 0
+            }
+        , event = EventChannelShared
+            ( ChannelSharedEvent
+                { connectedTeamId = TeamId
+                    { unTeamId = "E163Q94DX" }
+                , channel = ConversationId
+                    { unConversationId = "C123ABC456" }
+                , eventTs = "1561064063.001100"
+                }
+            )
+        }
+    )
