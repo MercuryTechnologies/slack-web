@@ -1,0 +1,20 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev043QRVT9FE" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1663969383
+            , systemNanoseconds = 0
+            }
+        , event = EventMessageDeleted
+            ( MessageDeletedEvent
+                { channel = ConversationId
+                    { unConversationId = "C043YJGBY49" }
+                , ts = "1663969383.001500"
+                , deletedTs = "1663966382.046509"
+                }
+            )
+        }
+    )
