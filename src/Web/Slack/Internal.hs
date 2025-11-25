@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 -- | Internal things in slack-web. May be changed arbitrarily!
 module Web.Slack.Internal where
 

@@ -16,7 +16,7 @@
 
   outputs = { self, nixpkgs, flake-utils, pre-commit-hooks }:
     let
-      ghcVer = "ghc96";
+      ghcVer = "ghc910";
       makeHaskellOverlay = overlay: final: prev: {
         haskell = prev.haskell // {
           packages = prev.haskell.packages // {
