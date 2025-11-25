@@ -12,7 +12,7 @@ module Web.Slack.Prelude (
 import ClassyPrelude hiding (link)
 import Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.:?), (.=))
 import Data.Aeson.TH (deriveFromJSON, deriveJSON, deriveToJSON)
-import Data.Default.Class (Default (..))
+import Data.Default (Default (..))
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Proxy (Proxy (..))
 import Data.String.Conversions (cs)

@@ -153,14 +153,14 @@ library
     , classy-prelude
     , containers
     , crypton
-    , data-default-class
+    , data-default
     , deepseq
     , either
     , errors
     , hashable
     , http-api-data >= 0.3 && < 0.7
     , http-client >= 0.5 && < 0.8
-    , http-client-tls >= 0.3 && < 0.4
+    , http-client-tls >= 0.3
     , megaparsec >= 5.0 && < 10
     , mono-traversable
     , mtl
