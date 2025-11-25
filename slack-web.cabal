@@ -160,7 +160,7 @@ library
     , hashable
     , http-api-data >= 0.3 && < 0.7
     , http-client >= 0.5 && < 0.8
-    , http-client-tls >= 0.3
+    , http-client-tls >= 0.3 && < 0.4
     , megaparsec >= 5.0 && < 10
     , mono-traversable
     , mtl
