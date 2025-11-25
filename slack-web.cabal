@@ -152,7 +152,7 @@ library
     , bytestring
     , classy-prelude
     , containers
-    , crypton >= 1.0.4
+    , crypton
     , data-default
     , deepseq
     , either
