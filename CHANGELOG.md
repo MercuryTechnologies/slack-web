@@ -1,3 +1,7 @@
+# 2.2.3.0 (2025-09-15)
+* [#156](https://github.com/MercuryTechnologies/slack-web/pull/156)
+  Implement `message_deleted` event.
+
 # 2.2.2.0 (2025-09-15)
 * [#153](https://github.com/MercuryTechnologies/slack-web/pull/153)
   Implement `channel_shared` and `channel_unshared` events.

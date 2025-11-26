@@ -1,0 +1,37 @@
+{
+  "token": "aaaa",
+  "team_id": "T043DB835ML",
+  "api_app_id": "A0442TUPHGR",
+  "event": {
+    "type": "message",
+    "subtype": "message_deleted",
+    "hidden": true,
+    "channel": "C043YJGBY49",
+    "previous_message": {
+      "client_msg_id": "de349a9f-62a4-4293-b64d-701a1f566e8a",
+      "type": "message",
+      "text": "This message will be deleted",
+      "user": "U043H11ES4V",
+      "ts": "1663966382.046509",
+      "team": "T043DB835ML"
+    },
+    "deleted_ts": "1663966382.046509",
+    "ts": "1663969383.001500",
+    "event_ts": "1663969383.001500",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev043QRVT9FE",
+  "event_time": 1663969383,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T043DB835ML",
+      "user_id": "U0442US8QGH",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "aaaa"
+}
