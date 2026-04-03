@@ -7,5 +7,12 @@ MembersRsp
         , UserId
             { unUserId = "W012A3CDE" }
         ]
+    , membersRspResponseMetadata = Just
+        ( ResponseMetadata
+            { responseMetadataNextCursor = Just
+                ( Cursor
+                    { unCursor = "e3VzZXJfaWQ6IFcxMjM0NTY3fQ==" }
+                )
+            }
+        )
     }
-

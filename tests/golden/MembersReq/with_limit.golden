@@ -1,0 +1,9 @@
+MembersReq
+    { membersReqChannel = ConversationId
+        { unConversationId = "C1234567890" }
+    , membersReqCursor = Just
+        ( Cursor
+            { unCursor = "dXNlcjpVMDYxRjdBVVI=" }
+        )
+    , membersReqLimit = Just 200
+    }
