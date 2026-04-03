@@ -1,0 +1,87 @@
+ListRsp
+    { listRspMembers =
+        [ User
+            { userId = UserId
+                { unUserId = "U023BECGF" }
+            , userName = "alice"
+            , userDeleted = False
+            , userColor = Just
+                ( Color
+                    { unColor = "9f69e7" }
+                )
+            , userProfile = Just
+                ( Profile
+                    { profileAvatarHash = Just "ge3b51ca72de"
+                    , profileStatusText = Just "Working remotely"
+                    , profileStatusEmoji = Just
+                        ( Emoji
+                            { unEmoji = ":house_with_garden:" }
+                        )
+                    , profileRealName = Just "Alice Johnson"
+                    , profileDisplayName = Just "alice"
+                    , profileRealNameNormalized = Just "Alice Johnson"
+                    , profileDisplayNameNormalized = Just "alice"
+                    , profileEmail = Just "alice@example.com"
+                    , profileImage_24 = "https://example.com/24.png"
+                    , profileImage_32 = "https://example.com/32.png"
+                    , profileImage_48 = "https://example.com/48.png"
+                    , profileImage_72 = "https://example.com/72.png"
+                    , profileImage_192 = "https://example.com/192.png"
+                    , profileImage_512 = "https://example.com/512.png"
+                    , profileTeam = Just "T012AB3C4"
+                    }
+                )
+            , userIsAdmin = Just True
+            , userIsOwner = Just False
+            , userIsPrimaryOwner = Just False
+            , userIsRestricted = Just False
+            , userIsUltraRestricted = Just False
+            , userIsBot = Just False
+            , userUpdated = 1502138686s
+            }
+        , User
+            { userId = UserId
+                { unUserId = "U061F7AUR" }
+            , userName = "good-morning-bot"
+            , userDeleted = False
+            , userColor = Just
+                ( Color
+                    { unColor = "e7392d" }
+                )
+            , userProfile = Nothing
+            , userIsAdmin = Just False
+            , userIsOwner = Just False
+            , userIsPrimaryOwner = Just False
+            , userIsRestricted = Just False
+            , userIsUltraRestricted = Just False
+            , userIsBot = Just True
+            , userUpdated = 1502138687s
+            }
+        , User
+            { userId = UserId
+                { unUserId = "W012A3CDE" }
+            , userName = "bob"
+            , userDeleted = True
+            , userColor = Just
+                ( Color
+                    { unColor = "4bbe2e" }
+                )
+            , userProfile = Nothing
+            , userIsAdmin = Just False
+            , userIsOwner = Just False
+            , userIsPrimaryOwner = Just False
+            , userIsRestricted = Just False
+            , userIsUltraRestricted = Just False
+            , userIsBot = Just False
+            , userUpdated = 1502138688s
+            }
+        ]
+    , listRspResponseMetadata = Just
+        ( ResponseMetadata
+            { responseMetadataNextCursor = Just
+                ( Cursor
+                    { unCursor = "" }
+                )
+            }
+        )
+    }
