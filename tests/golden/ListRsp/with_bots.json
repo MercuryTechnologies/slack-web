@@ -1,0 +1,64 @@
+{
+    "ok": true,
+    "members": [
+        {
+            "id": "U023BECGF",
+            "name": "alice",
+            "deleted": false,
+            "color": "9f69e7",
+            "profile": {
+                "avatar_hash": "ge3b51ca72de",
+                "status_text": "Working remotely",
+                "status_emoji": ":house_with_garden:",
+                "real_name": "Alice Johnson",
+                "display_name": "alice",
+                "real_name_normalized": "Alice Johnson",
+                "display_name_normalized": "alice",
+                "email": "alice@example.com",
+                "image_24": "https://example.com/24.png",
+                "image_32": "https://example.com/32.png",
+                "image_48": "https://example.com/48.png",
+                "image_72": "https://example.com/72.png",
+                "image_192": "https://example.com/192.png",
+                "image_512": "https://example.com/512.png",
+                "team": "T012AB3C4"
+            },
+            "is_admin": true,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "is_bot": false,
+            "updated": 1502138686
+        },
+        {
+            "id": "U061F7AUR",
+            "name": "good-morning-bot",
+            "deleted": false,
+            "color": "e7392d",
+            "is_admin": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "is_bot": true,
+            "updated": 1502138687
+        },
+        {
+            "id": "W012A3CDE",
+            "name": "bob",
+            "deleted": true,
+            "color": "4bbe2e",
+            "is_admin": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "is_bot": false,
+            "updated": 1502138688
+        }
+    ],
+    "response_metadata": {
+        "next_cursor": ""
+    }
+}
