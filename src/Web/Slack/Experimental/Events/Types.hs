@@ -244,6 +244,20 @@ data MessageUpdateEvent = MessageUpdateEvent
 
 $(deriveFromJSON snakeCaseOptions ''MessageUpdateEvent)
 
+-- | A message was deleted from a channel or DM.
+--
+-- <https://docs.slack.dev/reference/events/message/message_deleted/>
+--
+-- @since 2.2.3.0
+data MessageDeletedEvent = MessageDeletedEvent
+  { channel :: ConversationId
+  , ts :: Text
+  , deletedTs :: Text
+  }
+  deriving stock (Show)
+
+$(deriveFromJSON snakeCaseOptions ''MessageDeletedEvent)
+
 -- | FIXME: this might be a Channel, but may also be missing some fields/have bonus
 -- because Slack is cursed.
 data CreatedChannel = CreatedChannel
@@ -286,6 +300,8 @@ $(deriveFromJSON snakeCaseOptions ''ChannelLeftEvent)
 -- | A channel has been shared with an external workspace.
 --
 -- <https://docs.slack.dev/reference/events/channel_shared/>
+--
+-- @since 2.2.2.0
 data ChannelSharedEvent = ChannelSharedEvent
   { connectedTeamId :: TeamId
   , channel :: ConversationId
@@ -298,6 +314,8 @@ $(deriveFromJSON snakeCaseOptions ''ChannelSharedEvent)
 -- | A channel has been unshared with an external workspace.
 --
 -- <https://docs.slack.dev/reference/events/channel_unshared/>
+--
+-- @since 2.2.2.0
 data ChannelUnsharedEvent = ChannelUnsharedEvent
   { previouslyConnectedTeamId :: TeamId
   , channel :: ConversationId
@@ -364,6 +382,8 @@ data Event
   = EventMessage MessageEvent
   | EventBotMessage BotMessageEvent
   | EventMessageChanged
+  | -- | @since 2.2.3.0
+    EventMessageDeleted MessageDeletedEvent
   | -- | Weird message event of subtype channel_join. Sent "sometimes", according
     -- to a random Slack blog post from 2017:
     -- <https://api.slack.com/changelog/2017-05-rethinking-channel-entrance-and-exit-events-and-messages>
@@ -372,8 +392,10 @@ data Event
     EventChannelJoinMessage
   | EventChannelCreated ChannelCreatedEvent
   | EventChannelLeft ChannelLeftEvent
-  | EventChannelShared ChannelSharedEvent
-  | EventChannelUnshared ChannelUnsharedEvent
+  | -- | @since 2.2.2.0
+    EventChannelShared ChannelSharedEvent
+  | -- | @since 2.2.2.0
+    EventChannelUnshared ChannelUnsharedEvent
   | -- | @since 2.1.0.0
     EventAppHomeOpened AppHomeOpenedEvent
   | EventUnknown Value
@@ -387,6 +409,7 @@ instance FromJSON Event where
       ("message", Nothing) -> EventMessage <$> parseJSON @MessageEvent (Object obj)
       ("message", Just "bot_message") -> EventBotMessage <$> parseJSON @BotMessageEvent (Object obj)
       ("message", Just "message_changed") -> pure EventMessageChanged
+      ("message", Just "message_deleted") -> EventMessageDeleted <$> parseJSON @MessageDeletedEvent (Object obj)
       ("message", Just "channel_join") -> pure EventChannelJoinMessage
       -- n.b. these are unified since it is *identical* to a Message event with
       -- a bonus files field
