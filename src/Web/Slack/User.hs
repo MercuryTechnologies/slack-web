@@ -55,6 +55,7 @@ data User = User
   , userIsPrimaryOwner :: Maybe Bool
   , userIsRestricted :: Maybe Bool
   , userIsUltraRestricted :: Maybe Bool
+  , userIsBot :: Maybe Bool
   , userUpdated :: POSIXTime
   }
   deriving stock (Eq, Generic, Show)
