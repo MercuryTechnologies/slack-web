@@ -45,6 +45,7 @@ module Web.Slack.Conversation (
   conversationsJoin,
   conversationsJoin_,
   MembersReq (..),
+  mkMembersReq,
   MembersRsp (..),
   conversationsMembers,
   conversationsMembers_,
@@ -486,13 +487,34 @@ $(deriveJSON (jsonOpts "infoRsp") ''InfoRsp)
 -- @since 2.2.1.0
 data MembersReq = MembersReq
   { membersReqChannel :: ConversationId
+  , membersReqCursor :: Maybe Cursor
+  , membersReqLimit :: Maybe Int
   }
   deriving stock (Eq, Show, Generic)
+
+instance NFData MembersReq
 
 $(deriveFromJSON (jsonOpts "membersReq") ''MembersReq)
 
 instance ToForm MembersReq where
-  toForm = genericToForm (formOpts "membersReq")
+  toForm MembersReq {..} =
+    [("channel", toQueryParam membersReqChannel)]
+      <> toQueryParamIfJust "cursor" membersReqCursor
+      <> toQueryParamIfJust "limit" membersReqLimit
+
+-- | Smart constructor for 'MembersReq' with defaults.
+--
+-- @since 2.2.1.0
+mkMembersReq :: ConversationId -> MembersReq
+mkMembersReq channel =
+  MembersReq
+    { membersReqChannel = channel
+    , membersReqCursor = Nothing
+    , membersReqLimit = Nothing
+    }
+
+instance PagedRequest MembersReq where
+  setCursor c r = r {membersReqCursor = c}
 
 -- | @conversation.members@ response
 --
@@ -501,10 +523,18 @@ instance ToForm MembersReq where
 -- @since 2.2.1.0
 data MembersRsp = MembersRsp
   { membersRspMembers :: [UserId]
+  , membersRspResponseMetadata :: Maybe ResponseMetadata
   }
   deriving stock (Eq, Show, Generic)
 
+instance NFData MembersRsp
+
 $(deriveFromJSON (jsonOpts "membersRsp") ''MembersRsp)
+
+instance PagedResponse MembersRsp where
+  type ResponseObject MembersRsp = UserId
+  getResponseData MembersRsp {membersRspMembers} = membersRspMembers
+  getResponseMetadata MembersRsp {membersRspResponseMetadata} = membersRspResponseMetadata
 
 -- | FIXME(jadel): move the rest of the Conversations API into here since the old "shoving all the API in one spot" is soft deprecated.
 -- @since 2.2.0.0
