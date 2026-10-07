@@ -1,3 +1,10 @@
+# 2.3.0.0 (unreleased)
+* [#168](https://github.com/MercuryTechnologies/slack-web/pull/168)
+  Parse rich-text `message_mention` elements as `RichItemMessageMention`.
+  These elements were previously returned as `RichItemOther`.
+
+  Breaking change: `RichItem` has a new `RichItemMessageMention` constructor.
+
 # 2.2.3.0 (2025-09-15)
 * [#156](https://github.com/MercuryTechnologies/slack-web/pull/156)
   Implement `message_deleted` event.
