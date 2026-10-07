@@ -16,17 +16,19 @@ EventEventCallback
                             ( NonEmptyText "nmh" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemLink
-                                    ( RichLinkAttrs
-                                        { style = RichStyle
-                                            { rsBold = False
-                                            , rsItalic = False
+                                ( RichTextSection
+                                    [ RichItemLink
+                                        ( RichLinkAttrs
+                                            { style = RichStyle
+                                                { rsBold = False
+                                                , rsItalic = False
+                                                }
+                                            , url = "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929"
+                                            , text = Nothing
                                             }
-                                        , url = "https://myworkspace.slack.com/archives/C07KTH1T4CQ/p1724954997876929"
-                                        , text = Nothing
-                                        }
-                                    )
-                                ]
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

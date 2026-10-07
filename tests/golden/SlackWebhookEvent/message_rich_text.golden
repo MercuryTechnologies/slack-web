@@ -16,58 +16,60 @@ EventEventCallback
                             ( NonEmptyText "6r5Zo" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemChannel
-                                    ( ConversationId
-                                        { unConversationId = "C043YJGBY49" }
-                                    )
-                                , RichItemText " "
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                , RichItemEmoji
-                                    ( Emoji
-                                        { unEmoji = "cat" }
-                                    )
-                                , RichItemText " "
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                , RichItemUser
-                                    ( UserId
-                                        { unUserId = "U043H11ES4V" }
-                                    )
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                , RichItemText " "
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                , RichItemLink
-                                    ( RichLinkAttrs
-                                        { style = RichStyle
+                                ( RichTextSection
+                                    [ RichItemChannel
+                                        ( ConversationId
+                                            { unConversationId = "C043YJGBY49" }
+                                        )
+                                    , RichItemText " "
+                                        ( RichStyle
                                             { rsBold = False
                                             , rsItalic = False
                                             }
-                                        , url = "https://google.com"
-                                        , text = Nothing
-                                        }
-                                    )
-                                , RichItemText " text text text"
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                ]
+                                        )
+                                    , RichItemEmoji
+                                        ( Emoji
+                                            { unEmoji = "cat" }
+                                        )
+                                    , RichItemText " "
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    , RichItemUser
+                                        ( UserId
+                                            { unUserId = "U043H11ES4V" }
+                                        )
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    , RichItemText " "
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    , RichItemLink
+                                        ( RichLinkAttrs
+                                            { style = RichStyle
+                                                { rsBold = False
+                                                , rsItalic = False
+                                                }
+                                            , url = "https://google.com"
+                                            , text = Nothing
+                                            }
+                                        )
+                                    , RichItemText " text text text"
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

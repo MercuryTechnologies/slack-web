@@ -16,13 +16,15 @@ EventEventCallback
                             ( NonEmptyText "u6n" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemText "dgsfklsdgf"
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                ]
+                                ( RichTextSection
+                                    [ RichItemText "dgsfklsdgf"
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

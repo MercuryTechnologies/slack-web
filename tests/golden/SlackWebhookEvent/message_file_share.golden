@@ -16,13 +16,15 @@ EventEventCallback
                             ( NonEmptyText "MeAN" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemText "message message message"
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                ]
+                                ( RichTextSection
+                                    [ RichItemText "message message message"
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

@@ -16,17 +16,19 @@ EventEventCallback
                             ( NonEmptyText "MEdM" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemLink
-                                    ( RichLinkAttrs
-                                        { style = RichStyle
-                                            { rsBold = False
-                                            , rsItalic = False
+                                ( RichTextSection
+                                    [ RichItemLink
+                                        ( RichLinkAttrs
+                                            { style = RichStyle
+                                                { rsBold = False
+                                                , rsItalic = False
+                                                }
+                                            , url = "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869"
+                                            , text = Nothing
                                             }
-                                        , url = "https://jadeapptesting.slack.com/archives/C043YJGBY49/p1663961604007869"
-                                        , text = Nothing
-                                        }
-                                    )
-                                ]
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

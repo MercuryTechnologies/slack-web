@@ -16,13 +16,15 @@ EventEventCallback
                             ( NonEmptyText "Yyg6K" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemText "hello check that out!"
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                ]
+                                ( RichTextSection
+                                    [ RichItemText "hello check that out!"
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]
@@ -72,13 +74,15 @@ EventEventCallback
                                                         ( NonEmptyText "BXn1o" )
                                                     , elements =
                                                         [ RichTextSectionItemRichText
-                                                            [ RichItemText "this will be shared with a message"
-                                                                ( RichStyle
-                                                                    { rsBold = False
-                                                                    , rsItalic = False
-                                                                    }
-                                                                )
-                                                            ]
+                                                            ( RichTextSection
+                                                                [ RichItemText "this will be shared with a message"
+                                                                    ( RichStyle
+                                                                        { rsBold = False
+                                                                        , rsItalic = False
+                                                                        }
+                                                                    )
+                                                                ]
+                                                            )
                                                         ]
                                                     }
                                                 ]

@@ -16,22 +16,24 @@ EventEventCallback
                             ( NonEmptyText "ZRe" )
                         , elements =
                             [ RichTextSectionItemRichText
-                                [ RichItemText "You have been removed from #testing-slack-app by "
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                , RichItemUser
-                                    ( UserId
-                                        { unUserId = "U043H11ES4V" }
-                                    )
-                                    ( RichStyle
-                                        { rsBold = False
-                                        , rsItalic = False
-                                        }
-                                    )
-                                ]
+                                ( RichTextSection
+                                    [ RichItemText "You have been removed from #testing-slack-app by "
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    , RichItemUser
+                                        ( UserId
+                                            { unUserId = "U043H11ES4V" }
+                                        )
+                                        ( RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        )
+                                    ]
+                                )
                             ]
                         }
                     ]

@@ -57,13 +57,15 @@ EventEventCallback
                                                         ( NonEmptyText "nXUog" )
                                                     , elements =
                                                         [ RichTextSectionItemRichText
-                                                            [ RichItemText "123"
-                                                                ( RichStyle
-                                                                    { rsBold = False
-                                                                    , rsItalic = False
-                                                                    }
-                                                                )
-                                                            ]
+                                                            ( RichTextSection
+                                                                [ RichItemText "123"
+                                                                    ( RichStyle
+                                                                        { rsBold = False
+                                                                        , rsItalic = False
+                                                                        }
+                                                                    )
+                                                                ]
+                                                            )
                                                         ]
                                                     }
                                                 ]
