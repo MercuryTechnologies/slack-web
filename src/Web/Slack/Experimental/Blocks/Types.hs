@@ -88,7 +88,7 @@ instance FromJSON SlackTextObject where
       "mrkdwn" -> do
         text <- obj .: "text"
         pure . SlackMarkdownText . SlackText $ lines text
-      _ -> fail "Unknown SlackTextObject type, must be one of ['plain_text', 'mrkdwn']"
+      _ -> fail $ "Unknown SlackTextObject type " <> show slackTextType <> ", must be one of ['plain_text', 'mrkdwn']"
 
 instance Show SlackText where
   show (SlackText arr) = show $ concat arr
@@ -216,7 +216,7 @@ instance FromJSON SlackContent where
           Just innerObj -> innerObj .: "text"
           Nothing -> pure Nothing
         pure $ SlackContentImage $ SlackImage slackImageTitleText slackImageAltText slackImageUrl
-      _ -> fail "Unknown SlackContent type, must be one of ['mrkdwn', 'image']"
+      _ -> fail $ "Unknown SlackContent type " <> show slackContentType <> ", must be one of ['mrkdwn', 'image']"
 
 newtype SlackContext = SlackContext [SlackContent]
   deriving newtype (Semigroup, Monoid, Eq)
@@ -364,7 +364,11 @@ instance ToJSON SlackAccessory where
   toJSON (SlackButtonAccessory btn) = toJSON btn
 
 instance FromJSON SlackAccessory where
-  parseJSON v = SlackButtonAccessory <$> parseJSON v
+  parseJSON = withObject "SlackAccessory" \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "button" -> SlackButtonAccessory <$> parseJSON (Object obj)
+      _ -> fail $ "Unknown SlackAccessory type " <> show kind <> ", must be one of ['button']"
 
 instance Show SlackAccessory where
   show (SlackButtonAccessory btn) = show btn
@@ -805,7 +809,7 @@ instance FromJSON SlackActionComponent where
         slackButtonStyle <- obj .:? "style"
         slackButtonConfirm <- obj .:? "confirm"
         pure $ SlackButton {..}
-      _ -> fail "Unknown SlackActionComponent type, must be one of ['button']"
+      _ -> fail $ "Unknown SlackActionComponent type " <> show slackActionType <> ", must be one of ['button']"
 
 instance Show SlackActionComponent where
   show SlackButton {..} = "[button " <> show slackButtonText <> "]"
