@@ -13,6 +13,27 @@ jsonRoundtrips a = do
 
 spec :: Spec
 spec = do
+  describe "unknown component diagnostics" do
+    it "reports the rejected text object type" do
+      Aeson.eitherDecode @SlackTextObject "{\"type\":\"unexpected_text\"}"
+        `shouldBe` Left "Error in $: Unknown SlackTextObject type \"unexpected_text\", must be one of ['plain_text', 'mrkdwn']"
+
+    it "reports the rejected content type at its nested JSON path" do
+      Aeson.eitherDecode @SlackBlock "{\"type\":\"context\",\"elements\":[{\"type\":\"unexpected_content\"}]}"
+        `shouldBe` Left "Error in $.elements: Unknown SlackContent type \"unexpected_content\", must be one of ['mrkdwn', 'image']"
+
+    it "reports the rejected action component type at its nested JSON path" do
+      Aeson.eitherDecode @SlackBlock "{\"type\":\"actions\",\"elements\":[{\"type\":\"static_select\",\"action_id\":\"select\"}]}"
+        `shouldBe` Left "Error in $.elements[0]: Unknown SlackActionComponent type \"static_select\", must be one of ['button']"
+
+    it "reports the rejected accessory type before requiring action fields" do
+      Aeson.eitherDecode @SlackAccessory "{\"type\":\"image\",\"image_url\":\"https://example.com/image.png\",\"alt_text\":\"example\"}"
+        `shouldBe` Left "Error in $: Unknown SlackAccessory type \"image\", must be one of ['button']"
+
+    it "reports the rejected accessory type even when action fields are present" do
+      Aeson.eitherDecode @SlackAccessory "{\"type\":\"static_select\",\"action_id\":\"select\"}"
+        `shouldBe` Left "Error in $: Unknown SlackAccessory type \"static_select\", must be one of ['button']"
+
   let
     aSlackAccessory = SlackButtonAccessory aSlackAction
     aSlackAction = SlackAction
