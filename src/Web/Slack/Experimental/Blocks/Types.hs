@@ -794,7 +794,7 @@ data SlackActionComponent = SlackButton
   deriving stock (Eq)
 
 instance FromJSON SlackActionComponent where
-  parseJSON = withObject "SlactActionComponent" $ \obj -> do
+  parseJSON = withObject "SlackActionComponent" $ \obj -> do
     (slackActionType :: Text) <- obj .: "type"
     case slackActionType of
       "button" -> do
