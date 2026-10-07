@@ -4,6 +4,7 @@ import Data.Aeson qualified as Aeson
 import Data.StringVariants.NonEmptyText.Internal (pattern NonEmptyText)
 import Refined.Unsafe (reallyUnsafeRefine)
 import TestImport
+import Web.Slack.Common (ConversationId (..))
 import Web.Slack.Experimental.Blocks.Types
 
 jsonRoundtrips :: (Show a, Eq a, Aeson.ToJSON a, Aeson.FromJSON a) => a -> Spec
@@ -33,6 +34,11 @@ spec = do
     it "reports the rejected accessory type even when action fields are present" do
       Aeson.eitherDecode @SlackAccessory "{\"type\":\"static_select\",\"action_id\":\"select\"}"
         `shouldBe` Left "Error in $: Unknown SlackAccessory type \"static_select\", must be one of ['button']"
+
+  describe "incoming Block Kit components" do
+    it "parses a message mention without a URL" do
+      Aeson.eitherDecode @RichItem "{\"type\":\"message_mention\",\"channel_id\":\"C123ABC456\",\"message_ts\":\"1720710212.123456\"}"
+        `shouldBe` Right (RichItemMessageMention (RichMessageMention (ConversationId "C123ABC456") "1720710212.123456" Nothing Nothing))
 
   let
     aSlackAccessory = SlackButtonAccessory aSlackAction

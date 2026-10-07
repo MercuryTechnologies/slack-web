@@ -289,6 +289,34 @@ data RichLinkAttrs = RichLinkAttrs
   }
   deriving stock (Eq, Show)
 
+-- | An inline reference to a message. The URL is optional; consumers can build
+-- a permalink from the channel and message timestamp in the current workspace.
+--
+-- Parsed as part of 'RichItemMessageMention' in incoming rich text.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/message-mention-element/>
+--
+-- @since 2.3.0.0
+data RichMessageMention = RichMessageMention
+  { rmmChannelId :: ConversationId
+  -- ^ Channel containing the referenced message.
+  --
+  -- @since 2.3.0.0
+  , rmmMessageTs :: Text
+  -- ^ Timestamp identifying the referenced message, preserved as Slack's text.
+  --
+  -- @since 2.3.0.0
+  , rmmThreadTs :: Maybe Text
+  -- ^ Optional @thread_ts@ timestamp supplied by Slack.
+  --
+  -- @since 2.3.0.0
+  , rmmUrl :: Maybe Text
+  -- ^ URL of the referenced message, when supplied by Slack.
+  --
+  -- @since 2.3.0.0
+  }
+  deriving stock (Eq, Show)
+
 -- | Seemingly only documented at
 --  <https://api.slack.com/changelog/2019-09-what-they-see-is-what-you-get-and-more-and-less>
 --
@@ -298,6 +326,10 @@ data RichItem
   | RichItemChannel ConversationId
   | RichItemUser UserId RichStyle
   | RichItemLink RichLinkAttrs
+  | -- | An inline @message_mention@ reference to another message.
+    --
+    -- @since 2.3.0.0
+    RichItemMessageMention RichMessageMention
   | RichItemEmoji Emoji
   | RichItemOther Text Value
   -- FIXME(jadel): date, usergroup, team, broadcast
@@ -322,6 +354,12 @@ instance FromJSON RichItem where
         text <- obj .:? "text"
         style <- obj .:? "style" .!= mempty
         pure $ RichItemLink RichLinkAttrs {..}
+      "message_mention" -> do
+        rmmChannelId <- obj .: "channel_id"
+        rmmMessageTs <- obj .: "message_ts"
+        rmmThreadTs <- obj .:? "thread_ts"
+        rmmUrl <- obj .:? "url"
+        pure $ RichItemMessageMention RichMessageMention {..}
       "user" -> do
         userId <- obj .: "user_id"
         style <- obj .:? "style" .!= mempty
