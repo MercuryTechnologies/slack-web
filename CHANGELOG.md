@@ -1,14 +1,41 @@
-# 2.3.0.0 (unreleased)
+# 2.3.0.0 (2026-10-09)
+* [#158](https://github.com/MercuryTechnologies/slack-web/pull/158),
+  [#159](https://github.com/MercuryTechnologies/slack-web/pull/159)
+  Decode the optional `is_bot` field on user objects.
+
+  Breaking change: `User` has a new `userIsBot :: Maybe Bool` field.
+* [#160](https://github.com/MercuryTechnologies/slack-web/pull/160)
+  Add cursor-based pagination and page-size control to `conversationsMembers`.
+
+  Breaking change: `MembersReq` has new `membersReqCursor` and `membersReqLimit`
+  fields; `MembersRsp` has a new `membersRspResponseMetadata` field.
+* [#155](https://github.com/MercuryTechnologies/slack-web/pull/155)
+  Replace the `data-default-class` dependency with `data-default`.
+* [#164](https://github.com/MercuryTechnologies/slack-web/pull/164),
+  [#165](https://github.com/MercuryTechnologies/slack-web/pull/165)
+  Include more information in Block Kit parse errors. If an unexpected value is
+  found, it will now include the invalid value as part of the error.
+
+  Before:
+
+      Unknown SlackActionComponent type, must be one of ['button']
+
+  After:
+
+      Unknown SlackActionComponent type 'weird_type', must be one of ['button']
+
 * [#168](https://github.com/MercuryTechnologies/slack-web/pull/168)
   Parse rich-text `message_mention` elements as `RichItemMessageMention`.
   These elements were previously returned as `RichItemOther`.
 
   Breaking change: `RichItem` has a new `RichItemMessageMention` constructor.
-* Introduce `RichTextSection` for `rich_text_section` objects.
+* [#169](https://github.com/MercuryTechnologies/slack-web/pull/169)
+  Introduce `RichTextSection` for `rich_text_section` objects.
 
   Breaking change: `RichTextSectionItemRichText` now wraps `RichTextSection`
   instead of `[RichItem]`.
-* Breaking change: `RichTextSectionItem` has new `RichTextSectionItemList`,
+* [#170](https://github.com/MercuryTechnologies/slack-web/pull/170)
+  Breaking change: `RichTextSectionItem` has new `RichTextSectionItemList`,
   `RichTextSectionItemQuote`, and `RichTextSectionItemPreformatted` constructors.
 
 # 2.2.3.0 (2025-09-15)
