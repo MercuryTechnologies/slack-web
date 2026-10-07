@@ -366,8 +366,24 @@ instance FromJSON RichItem where
         pure $ RichItemUser userId style
       _ -> pure $ RichItemOther kind (Object obj)
 
+-- | A @rich_text_section@ object containing inline 'RichItem' values.
+-- Its JSON decoder requires @type = "rich_text_section"@.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-section-element/>
+--
+-- @since 2.3.0.0
+newtype RichTextSection = RichTextSection [RichItem]
+  deriving stock (Eq, Show)
+
+instance FromJSON RichTextSection where
+  parseJSON = withObject "RichTextSection" \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "rich_text_section" -> RichTextSection <$> obj .: "elements"
+      _ -> fail $ "Unexpected RichTextSection type " <> show kind <> ", must be 'rich_text_section'"
+
 data RichTextSectionItem
-  = RichTextSectionItemRichText [RichItem]
+  = RichTextSectionItemRichText RichTextSection
   | RichTextSectionItemUnknown Text Value
   deriving stock (Eq, Show)
 
@@ -375,9 +391,7 @@ instance FromJSON RichTextSectionItem where
   parseJSON = withObject "RichTextSectionItem" \obj -> do
     kind <- obj .: "type"
     case kind of
-      "rich_text_section" -> do
-        elts <- obj .: "elements"
-        pure $ RichTextSectionItemRichText elts
+      "rich_text_section" -> RichTextSectionItemRichText <$> parseJSON (Object obj)
       _ -> pure $ RichTextSectionItemUnknown kind (Object obj)
 
 data RichText = RichText

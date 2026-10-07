@@ -57,13 +57,15 @@ EventEventCallback
                                                         ( NonEmptyText "TNHa4" )
                                                     , elements =
                                                         [ RichTextSectionItemRichText
-                                                            [ RichItemText "blahblahblahblahblah"
-                                                                ( RichStyle
-                                                                    { rsBold = False
-                                                                    , rsItalic = False
-                                                                    }
-                                                                )
-                                                            ]
+                                                            ( RichTextSection
+                                                                [ RichItemText "blahblahblahblahblah"
+                                                                    ( RichStyle
+                                                                        { rsBold = False
+                                                                        , rsItalic = False
+                                                                        }
+                                                                    )
+                                                                ]
+                                                            )
                                                         ]
                                                     }
                                                 ]

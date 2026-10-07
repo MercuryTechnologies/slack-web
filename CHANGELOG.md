@@ -4,6 +4,10 @@
   These elements were previously returned as `RichItemOther`.
 
   Breaking change: `RichItem` has a new `RichItemMessageMention` constructor.
+* Introduce `RichTextSection` for `rich_text_section` objects.
+
+  Breaking change: `RichTextSectionItemRichText` now wraps `RichTextSection`
+  instead of `[RichItem]`.
 
 # 2.2.3.0 (2025-09-15)
 * [#156](https://github.com/MercuryTechnologies/slack-web/pull/156)

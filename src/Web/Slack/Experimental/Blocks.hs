@@ -32,6 +32,7 @@ module Web.Slack.Experimental.Blocks (
   RichStyle (..),
   RichLinkAttrs (..),
   RichMessageMention (..),
+  RichTextSection (..),
   RichTextSectionItem (..),
   RichText (..),
 
