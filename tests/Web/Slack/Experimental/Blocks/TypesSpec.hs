@@ -1,6 +1,8 @@
 module Web.Slack.Experimental.Blocks.TypesSpec where
 
 import Data.Aeson qualified as Aeson
+import Data.Aeson.Types (parseEither)
+import Data.Either (isLeft)
 import Data.StringVariants.NonEmptyText.Internal (pattern NonEmptyText)
 import Refined.Unsafe (reallyUnsafeRefine)
 import TestImport
@@ -39,6 +41,32 @@ spec = do
     it "parses a message mention without a URL" do
       Aeson.eitherDecode @RichItem "{\"type\":\"message_mention\",\"channel_id\":\"C123ABC456\",\"message_ts\":\"1720710212.123456\"}"
         `shouldBe` Right (RichItemMessageMention (RichMessageMention (ConversationId "C123ABC456") "1720710212.123456" Nothing Nothing))
+
+    describe "rich-text list entries" do
+      let listWith entry =
+            object
+              [ "type" .= ("rich_text_list" :: Text)
+              , "style" .= ("bullet" :: Text)
+              , "elements" .= [entry]
+              ]
+          decodeList = parseEither (parseJSON @RichTextSectionItem) . listWith
+
+      for_ ["rich_text_list", "rich_text_quote", "rich_text_preformatted", "text", "future_container"] \(kind :: Text) ->
+        it ("rejects a " <> unpack kind <> " as a list entry") do
+          decodeList
+            (object ["type" .= kind, "elements" .= ([] :: [Aeson.Value]), "style" .= ("bullet" :: Text), "text" .= ("inline" :: Text)])
+            `shouldSatisfy` isLeft
+
+      it "requires the section type tag" do
+        decodeList (object ["elements" .= ([] :: [Aeson.Value])]) `shouldSatisfy` isLeft
+
+      it "requires the section contents" do
+        decodeList (object ["type" .= ("rich_text_section" :: Text)]) `shouldSatisfy` isLeft
+
+      it "preserves unknown inline items inside a section" do
+        let inlineItem = object ["type" .= ("future_inline" :: Text), "text" .= ("preserved" :: Text)]
+        decodeList (object ["type" .= ("rich_text_section" :: Text), "elements" .= [inlineItem]])
+          `shouldBe` Right (RichTextSectionItemList [RichTextSection [RichItemOther "future_inline" inlineItem]])
 
   let
     aSlackAccessory = SlackButtonAccessory aSlackAction

@@ -1,0 +1,73 @@
+{
+  "type": "event_callback",
+  "team_id": "T043DB835ML",
+  "event_id": "EvRichTextContainers",
+  "event_time": 1720710300,
+  "event": {
+    "type": "message",
+    "channel": "C045V0VJT16",
+    "channel_type": "channel",
+    "user": "U043H11ES4V",
+    "ts": "1720710300.654321",
+    "text": "References in a list, a quote, and a code block",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "elements": [
+          {
+            "type": "rich_text_list",
+            "style": "bullet",
+            "indent": 0,
+            "elements": [
+              {
+                "type": "rich_text_section",
+                "elements": [
+                  {
+                    "type": "message_mention",
+                    "channel_id": "C123ABC456",
+                    "message_ts": "1720710212.123456"
+                  }
+                ]
+              },
+              {
+                "type": "rich_text_section",
+                "elements": [
+                  {
+                    "type": "link",
+                    "url": "https://example.com/list-item"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "rich_text_quote",
+            "border": 1,
+            "elements": [
+              {
+                "type": "message_mention",
+                "channel_id": "C123ABC456",
+                "message_ts": "1720710250.012345"
+              }
+            ]
+          },
+          {
+            "type": "rich_text_preformatted",
+            "language": "text",
+            "border": 0,
+            "elements": [
+              {
+                "type": "text",
+                "text": "See the documentation:\n"
+              },
+              {
+                "type": "link",
+                "url": "https://example.com/code-reference"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

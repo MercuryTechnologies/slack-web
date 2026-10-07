@@ -317,10 +317,11 @@ data RichMessageMention = RichMessageMention
   }
   deriving stock (Eq, Show)
 
--- | Seemingly only documented at
---  <https://api.slack.com/changelog/2019-09-what-they-see-is-what-you-get-and-more-and-less>
+-- | Inline content inside rich-text sections, quotes, and preformatted blocks.
 --
---  They warn of undocumented element types. Joy.
+-- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-section-element/>
+--
+-- Unrecognized element types are preserved as 'RichItemOther'.
 data RichItem
   = RichItemText Text RichStyle
   | RichItemChannel ConversationId
@@ -367,7 +368,12 @@ instance FromJSON RichItem where
       _ -> pure $ RichItemOther kind (Object obj)
 
 -- | A @rich_text_section@ object containing inline 'RichItem' values.
--- Its JSON decoder requires @type = "rich_text_section"@.
+-- A section can appear directly in a @rich_text@ block or as an entry in a
+-- @rich_text_list@. Its JSON decoder requires @type = "rich_text_section"@.
+--
+-- t'RichTextSectionItem' represents the broader set of structural children of
+-- a rich-text block; this type represents only a section. Lists contain
+-- sections, so their entries use this narrower type.
 --
 -- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-section-element/>
 --
@@ -382,8 +388,40 @@ instance FromJSON RichTextSection where
       "rich_text_section" -> RichTextSection <$> obj .: "elements"
       _ -> fail $ "Unexpected RichTextSection type " <> show kind <> ", must be 'rich_text_section'"
 
+-- | Structural children of a @rich_text@ block: sections, lists, quotes, and
+-- preformatted blocks. The name refers to this broader set of containers;
+-- t'RichTextSection' represents a single @rich_text_section@, and 'RichItem'
+-- represents inline content such as text, links, and message mentions.
+--
+-- <https://docs.slack.dev/reference/block-kit/blocks/rich-text-block/>
 data RichTextSectionItem
-  = RichTextSectionItemRichText RichTextSection
+  = -- | A @rich_text_section@ containing inline items.
+    --
+    -- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-section-element/>
+    RichTextSectionItemRichText RichTextSection
+  | -- | A @rich_text_list@ whose entries are sections. The t'RichTextSection'
+    -- decoder rejects entries with any other container type.
+    -- The decoder ignores Slack's @style@, @indent@, @offset@, and @border@ fields.
+    --
+    -- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-list-element/>
+    --
+    -- @since 2.3.0.0
+    RichTextSectionItemList [RichTextSection]
+  | -- | A @rich_text_quote@ containing inline items.
+    -- The decoder ignores Slack's optional @border@ field.
+    --
+    -- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-quote-element/>
+    --
+    -- @since 2.3.0.0
+    RichTextSectionItemQuote [RichItem]
+  | -- | A @rich_text_preformatted@ code block. Slack documents text and link
+    -- elements as its contents; 'RichItem' also permits other constructors.
+    -- Border and syntax-highlighting language are not retained.
+    --
+    -- <https://docs.slack.dev/reference/block-kit/block-elements/rich-text-preformatted-element/>
+    --
+    -- @since 2.3.0.0
+    RichTextSectionItemPreformatted [RichItem]
   | RichTextSectionItemUnknown Text Value
   deriving stock (Eq, Show)
 
@@ -392,6 +430,9 @@ instance FromJSON RichTextSectionItem where
     kind <- obj .: "type"
     case kind of
       "rich_text_section" -> RichTextSectionItemRichText <$> parseJSON (Object obj)
+      "rich_text_list" -> RichTextSectionItemList <$> obj .: "elements"
+      "rich_text_quote" -> RichTextSectionItemQuote <$> obj .: "elements"
+      "rich_text_preformatted" -> RichTextSectionItemPreformatted <$> obj .: "elements"
       _ -> pure $ RichTextSectionItemUnknown kind (Object obj)
 
 data RichText = RichText
