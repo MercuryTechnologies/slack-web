@@ -197,6 +197,7 @@ test-suite tests
       Web.Slack.ChatSpec
       Web.Slack.Files.TypesSpec
       Web.Slack.InternalSpec
+      Web.Slack.UserSpec
       Web.Slack.UsersConversationsSpec
       Web.Slack.Experimental.RequestVerificationSpec
       Web.Slack.Experimental.Events.TypesSpec
