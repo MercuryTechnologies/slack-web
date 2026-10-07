@@ -1,0 +1,91 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "EvRichTextContainers" }
+        , teamId = TeamId
+            { unTeamId = "T043DB835ML" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1720710300
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
+                    [ RichText
+                        { blockId = Nothing
+                        , elements =
+                            [ RichTextSectionItemList
+                                [ RichTextSection
+                                    [ RichItemMessageMention
+                                        ( RichMessageMention
+                                            { rmmChannelId = ConversationId
+                                                { unConversationId = "C123ABC456" }
+                                            , rmmMessageTs = "1720710212.123456"
+                                            , rmmThreadTs = Nothing
+                                            , rmmUrl = Nothing
+                                            }
+                                        )
+                                    ]
+                                , RichTextSection
+                                    [ RichItemLink
+                                        ( RichLinkAttrs
+                                            { style = RichStyle
+                                                { rsBold = False
+                                                , rsItalic = False
+                                                }
+                                            , url = "https://example.com/list-item"
+                                            , text = Nothing
+                                            }
+                                        )
+                                    ]
+                                ]
+                            , RichTextSectionItemQuote
+                                [ RichItemMessageMention
+                                    ( RichMessageMention
+                                        { rmmChannelId = ConversationId
+                                            { unConversationId = "C123ABC456" }
+                                        , rmmMessageTs = "1720710250.012345"
+                                        , rmmThreadTs = Nothing
+                                        , rmmUrl = Nothing
+                                        }
+                                    )
+                                ]
+                            , RichTextSectionItemPreformatted
+                                [ RichItemText "See the documentation:
+                                  "
+                                    ( RichStyle
+                                        { rsBold = False
+                                        , rsItalic = False
+                                        }
+                                    )
+                                , RichItemLink
+                                    ( RichLinkAttrs
+                                        { style = RichStyle
+                                            { rsBold = False
+                                            , rsItalic = False
+                                            }
+                                        , url = "https://example.com/code-reference"
+                                        , text = Nothing
+                                        }
+                                    )
+                                ]
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C045V0VJT16" }
+                , text = "References in a list, a quote, and a code block"
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U043H11ES4V" }
+                , ts = "1720710300.654321"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                , botProfile = Nothing
+                , attachments = Nothing
+                }
+            )
+        }
+    )

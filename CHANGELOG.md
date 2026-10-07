@@ -8,6 +8,8 @@
 
   Breaking change: `RichTextSectionItemRichText` now wraps `RichTextSection`
   instead of `[RichItem]`.
+* Breaking change: `RichTextSectionItem` has new `RichTextSectionItemList`,
+  `RichTextSectionItemQuote`, and `RichTextSectionItemPreformatted` constructors.
 
 # 2.2.3.0 (2025-09-15)
 * [#156](https://github.com/MercuryTechnologies/slack-web/pull/156)
