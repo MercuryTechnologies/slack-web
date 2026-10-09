@@ -27,17 +27,17 @@ slackShowBlockFormat =
       sectionBlock (bold $ list ["blah", "blah2", "blah3"])
       sectionBlockWithAccessory
         (monospaced @Text "blah")
-        (button slackActionDoNothing ":mag: Look at it" buttonSettings {buttonUrl = google})
+        (SlackButtonAccessory $ button slackActionDoNothing ":mag: Look at it" buttonSettings {buttonUrl = google})
       sectionBlockWithAccessory
         (bold $ list ["blah", "blah2", "blah3"])
-        (button slackActionDoNothing ":office: Look at it but different" buttonSettings {buttonUrl = google})
+        (SlackButtonAccessory $ button slackActionDoNothing ":office: Look at it but different" buttonSettings {buttonUrl = google})
       sectionBlock (bold (textMessage "Letters:") <> newline (list ["a", "b", "c"]))
       sectionBlock (list ["blah1", "blah2", "blah3"])
       dividerBlock
       sectionBlock (bold . textMessage $ "blah")
       sectionBlockWithAccessory
         (bold . textMessage $ "blah")
-        (button slackActionDoNothing ":bank: Look at it!" buttonSettings {buttonUrl = google})
+        (SlackButtonAccessory $ button slackActionDoNothing ":bank: Look at it!" buttonSettings {buttonUrl = google})
       sectionBlockWithFields
         (message @Text "Section with text and fields")
         [ (bold $ message @Text "Field 1") <> (newline $ message @Text "Foo")

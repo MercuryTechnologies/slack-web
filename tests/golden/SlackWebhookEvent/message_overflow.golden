@@ -1,0 +1,49 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "Ev123" }
+        , teamId = TeamId
+            { unTeamId = "T123" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1663966382
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
+                    [ "actions(Just (NonEmptyText "item-actions")) = ["SlackActionId {unSlackActionId = NonEmptyText \"open\"} [button SlackButtonText (NonEmptyText \"Open\")], SlackActionId {unSlackActionId = NonEmptyText \"more\"} [overflow SlackOverflowOptions {unSlackOverflowOptions = Refined [SlackOverflowOption {slackOverflowOptionText = SlackPlainTextOnly \"Archive\", slackOverflowOptionValue = \"archive\", slackOverflowOptionDescription = Nothing, slackOverflowOptionUrl = Nothing},SlackOverflowOption {slackOverflowOptionText = SlackPlainTextOnly \"View details\", slackOverflowOptionValue = \"details\", slackOverflowOptionDescription = Just (SlackPlainTextOnly \"Open in your browser\"), slackOverflowOptionUrl = Just (NonEmptyText \"https://example.com/item/details\")}]} Just (SlackConfirmObject {slackConfirmTitle = SlackPlainTextOnly \"Continue?\", slackConfirmText = SlackMarkdownText \"Apply this action to the item?\", slackConfirmConfirm = SlackPlainTextOnly \"Yes\", slackConfirmDeny = SlackPlainTextOnly \"No\", slackConfirmStyle = Just SlackStylePrimary})]"]"
+                    , SlackSection
+                        { slackSectionText = Just "Another item"
+                        , slackSectionBlockId = Nothing
+                        , slackSectionFields = Nothing
+                        , slackSectionAccessory = Just
+                            [ overflow SlackOverflowOptions
+                                { unSlackOverflowOptions = Refined
+                                    [ SlackOverflowOption
+                                        { slackOverflowOptionText = SlackPlainTextOnly "Open"
+                                        , slackOverflowOptionValue = "open"
+                                        , slackOverflowOptionDescription = Nothing
+                                        , slackOverflowOptionUrl = Nothing
+                                        }
+                                    ]
+                                } Nothing
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C123" }
+                , text = "An item with more actions"
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U123" }
+                , ts = "1663966382.046509"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                , botProfile = Nothing
+                , attachments = Nothing
+                }
+            )
+        }
+    )

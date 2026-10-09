@@ -62,6 +62,31 @@ module Web.Slack.Experimental.Blocks (
     buttonStyle,
     buttonConfirm
   ),
+  overflow,
+  overflowSettings,
+  OverflowSettings (overflowConfirm),
+  SlackOverflowOption (..),
+  SlackOverflowOptions (..),
+  staticSelect,
+  staticSelectSettings,
+  StaticSelectSettings (
+    staticSelectInitialOption,
+    staticSelectConfirm,
+    staticSelectFocusOnLoad,
+    staticSelectPlaceholder
+  ),
+  externalSelect,
+  externalSelectSettings,
+  ExternalSelectSettings (
+    externalSelectInitialOption,
+    externalSelectMinQueryLength,
+    externalSelectConfirm,
+    externalSelectFocusOnLoad,
+    externalSelectPlaceholder
+  ),
+  SlackSelectOption (..),
+  SlackSelectOptionGroup (..),
+  SlackStaticSelectOptions (..),
   confirm,
   confirmAreYouSure,
   ConfirmSettings (

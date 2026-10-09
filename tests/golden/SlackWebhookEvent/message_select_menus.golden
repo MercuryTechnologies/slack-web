@@ -1,0 +1,83 @@
+EventEventCallback
+    ( EventCallback
+        { eventId = EventId
+            { unEventId = "EvSelect" }
+        , teamId = TeamId
+            { unTeamId = "T123" }
+        , eventTime = MkSystemTime
+            { systemSeconds = 1663966382
+            , systemNanoseconds = 0
+            }
+        , event = EventMessage
+            ( MessageEvent
+                { blocks = Just
+                    [ "actions(Just (NonEmptyText "item-actions")) = ["SlackActionId {unSlackActionId = NonEmptyText \"open\"} [button SlackButtonText (NonEmptyText \"Open\")], SlackActionId {unSlackActionId = NonEmptyText \"more\"} [overflow SlackOverflowOptions {unSlackOverflowOptions = Refined [SlackOverflowOption {slackOverflowOptionText = SlackPlainTextOnly \"Archive\", slackOverflowOptionValue = \"archive\", slackOverflowOptionDescription = Nothing, slackOverflowOptionUrl = Nothing}]} Nothing], SlackActionId {unSlackActionId = NonEmptyText \"assignee\"} [external_select SlackExternalSelectMenu {slackExternalSelectInitialOption = Just (SlackSelectOption {slackSelectOptionText = SlackPlainTextOnly \"Alex\", slackSelectOptionValue = \"person-123\", slackSelectOptionDescription = Just (SlackPlainTextOnly \"Current assignee\")}), slackExternalSelectMinQueryLength = Just 0, slackExternalSelectConfirm = Just (SlackConfirmObject {slackConfirmTitle = SlackPlainTextOnly \"Reassign?\", slackConfirmText = SlackMarkdownText \"Change the *assignee*?\", slackConfirmConfirm = SlackPlainTextOnly \"Yes\", slackConfirmDeny = SlackPlainTextOnly \"No\", slackConfirmStyle = Nothing}), slackExternalSelectFocusOnLoad = Just False, slackExternalSelectPlaceholder = Just (SlackPlainTextOnly \"Find a person\")}], SlackActionId {unSlackActionId = NonEmptyText \"status\"} [static_select SlackStaticSelectMenu {slackStaticSelectOptions = SlackSelectOptions (Refined [SlackSelectOption {slackSelectOptionText = SlackPlainTextOnly \"Open\", slackSelectOptionValue = \"open\", slackSelectOptionDescription = Nothing},SlackSelectOption {slackSelectOptionText = SlackPlainTextOnly \"Closed\", slackSelectOptionValue = \"closed\", slackSelectOptionDescription = Nothing}]), slackStaticSelectInitialOption = Just (SlackSelectOption {slackSelectOptionText = SlackPlainTextOnly \"Open\", slackSelectOptionValue = \"open\", slackSelectOptionDescription = Nothing}), slackStaticSelectConfirm = Just (SlackConfirmObject {slackConfirmTitle = SlackPlainTextOnly \"Change status?\", slackConfirmText = SlackPlainText \"Apply this status to the item?\", slackConfirmConfirm = SlackPlainTextOnly \"Yes\", slackConfirmDeny = SlackPlainTextOnly \"No\", slackConfirmStyle = Just SlackStylePrimary}), slackStaticSelectFocusOnLoad = Just True, slackStaticSelectPlaceholder = Just (SlackPlainTextOnly \"Choose a status\")}]"]"
+                    , SlackSection
+                        { slackSectionText = Just "Choose a category"
+                        , slackSectionBlockId = Nothing
+                        , slackSectionFields = Nothing
+                        , slackSectionAccessory = Just
+                            [ static_select SlackStaticSelectMenu
+                                { slackStaticSelectOptions = SlackSelectOptionGroups
+                                    ( Refined
+                                        [ SlackSelectOptionGroup
+                                            { slackSelectOptionGroupLabel = SlackPlainTextOnly "Engineering"
+                                            , slackSelectOptionGroupOptions = Refined
+                                                [ SlackSelectOption
+                                                    { slackSelectOptionText = SlackPlainTextOnly "Bug"
+                                                    , slackSelectOptionValue = "bug"
+                                                    , slackSelectOptionDescription = Nothing
+                                                    }
+                                                ]
+                                            }
+                                        , SlackSelectOptionGroup
+                                            { slackSelectOptionGroupLabel = SlackPlainTextOnly "Support"
+                                            , slackSelectOptionGroupOptions = Refined
+                                                [ SlackSelectOption
+                                                    { slackSelectOptionText = SlackPlainTextOnly "Question"
+                                                    , slackSelectOptionValue = "question"
+                                                    , slackSelectOptionDescription = Nothing
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    )
+                                , slackStaticSelectInitialOption = Nothing
+                                , slackStaticSelectConfirm = Nothing
+                                , slackStaticSelectFocusOnLoad = Nothing
+                                , slackStaticSelectPlaceholder = Nothing
+                                }
+                            ]
+                        }
+                    , SlackSection
+                        { slackSectionText = Just "Search for a related item"
+                        , slackSectionBlockId = Nothing
+                        , slackSectionFields = Nothing
+                        , slackSectionAccessory = Just
+                            [ external_select SlackExternalSelectMenu
+                                { slackExternalSelectInitialOption = Nothing
+                                , slackExternalSelectMinQueryLength = Nothing
+                                , slackExternalSelectConfirm = Nothing
+                                , slackExternalSelectFocusOnLoad = Nothing
+                                , slackExternalSelectPlaceholder = Nothing
+                                }
+                            ]
+                        }
+                    ]
+                , channel = ConversationId
+                    { unConversationId = "C123" }
+                , text = "Choose a status and an assignee"
+                , channelType = Channel
+                , files = Nothing
+                , user = UserId
+                    { unUserId = "U123" }
+                , ts = "1663966382.046509"
+                , threadTs = Nothing
+                , appId = Nothing
+                , botId = Nothing
+                , botProfile = Nothing
+                , attachments = Nothing
+                }
+            )
+        }
+    )
