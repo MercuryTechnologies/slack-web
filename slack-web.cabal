@@ -195,6 +195,7 @@ test-suite tests
       Web.Slack.MessageParserSpec
       Web.Slack.ConversationSpec
       Web.Slack.ChatSpec
+      Web.Slack.CommonSpec
       Web.Slack.Files.TypesSpec
       Web.Slack.InternalSpec
       Web.Slack.UserSpec
@@ -224,6 +225,7 @@ test-suite tests
     , pretty-simple ^>= 4.1
     , quickcheck-instances
     , refined
+    , servant-client
     , slack-web
     , string-conversions
     , string-variants
