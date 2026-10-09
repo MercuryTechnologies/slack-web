@@ -1,3 +1,10 @@
+# 2.4.0.0 (unreleased)
+* [#172](https://github.com/MercuryTechnologies/slack-web/pull/172)
+  Allow omitted action IDs in message blocks.
+
+  Breaking change: `SlackAction` is now a record, and its `slackActionId` field
+  is now a `Maybe SlackActionId` (previously it was a `SlackActionId`).
+
 # 2.3.0.0 (2026-10-09)
 * [#158](https://github.com/MercuryTechnologies/slack-web/pull/158),
   [#159](https://github.com/MercuryTechnologies/slack-web/pull/159)

@@ -699,7 +699,7 @@ buttonSettings =
 -- | Button builder.
 button :: SlackActionId -> SlackButtonText -> ButtonSettings -> SlackAction
 button actionId buttonText ButtonSettings {..} =
-  SlackAction actionId
+  SlackAction (Just actionId)
     $ SlackButton
       { slackButtonText = buttonText
       , slackButtonUrl = unOptionalSetting buttonUrl
@@ -758,12 +758,22 @@ confirm ConfirmSettings {..} =
 -- of a message. If a message is updated, use a new block_id.
 type SlackBlockId = NonEmptyText 255
 
--- | All Slack Actions must have a 'SlackActionId' and one 'SlackActionComponent' (such as a button).
-data SlackAction = SlackAction SlackActionId SlackActionComponent
+-- | A component with an optional action identifier. Slack may omit @action_id@
+-- in message blocks.
+data SlackAction = SlackAction
+  { slackActionId :: Maybe SlackActionId
+  -- ^ Optional identifier for this action, unique within its block.
+  --
+  -- @since 2.4.0.0
+  , slackActionComponent :: SlackActionComponent
+  -- ^ Interactive component associated with the optional identifier.
+  --
+  -- @since 2.4.0.0
+  }
   deriving stock (Eq)
 
 instance Show SlackAction where
-  show (SlackAction actionId component) = show actionId <> " " <> show component
+  show SlackAction {..} = maybe "" (\actionId -> show actionId <> " ") slackActionId <> show slackActionComponent
 
 -- | [Confirm dialog object](https://api.slack.com/reference/block-kit/composition-objects#confirm).
 data SlackConfirmObject = SlackConfirmObject
@@ -908,10 +918,19 @@ instance Show SlackActionComponent where
   show SlackButton {..} = "[button " <> show slackButtonText <> "]"
 
 instance ToJSON SlackAction where
-  toJSON (SlackAction actionId SlackButton {..}) =
+  toJSON SlackAction {..} = slackActionJSON slackActionId slackActionComponent
+
+-- | Encode an action component, omitting @action_id@ when the identifier is
+-- 'Nothing'. This is also the encoding used by the 'ToJSON' instance for
+-- 'SlackAction'.
+--
+-- @since 2.4.0.0
+slackActionJSON :: Maybe SlackActionId -> SlackActionComponent -> Value
+slackActionJSON actionId = \case
+  SlackButton {..} ->
     objectOptional
       [ "type" .=! ("button" :: Text)
-      , "action_id" .=! actionId
+      , "action_id" .=? actionId
       , "text" .=! plaintext slackButtonText
       , "url" .=? slackButtonUrl
       , "value" .=? slackButtonValue
@@ -921,6 +940,6 @@ instance ToJSON SlackAction where
 
 instance FromJSON SlackAction where
   parseJSON = withObject "SlackAction" $ \obj -> do
-    actionId <- obj .: "action_id"
+    slackActionId <- obj .:? "action_id"
     slackActionComponent <- parseJSON $ Object obj
-    pure $ SlackAction actionId slackActionComponent
+    pure SlackAction {..}

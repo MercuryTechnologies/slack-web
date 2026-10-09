@@ -71,14 +71,14 @@ spec = do
   let
     aSlackAccessory = SlackButtonAccessory aSlackAction
     aSlackAction = SlackAction
-      do SlackActionId $ NonEmptyText "action-id"
+      do Just $ SlackActionId $ NonEmptyText "action-id"
       do aSlackButton
     aSlackActionList =
       SlackActionList
         . reallyUnsafeRefine
         $ [ aSlackAction
           , SlackAction
-              do SlackActionId $ NonEmptyText "another-action-id"
+              do Just $ SlackActionId $ NonEmptyText "another-action-id"
               do
                 SlackButton
                   do SlackButtonText $ NonEmptyText "another-button-text"
