@@ -1,0 +1,99 @@
+{
+  "type": "event_callback",
+  "token": "example-token",
+  "team_id": "T123",
+  "api_app_id": "A123",
+  "event_id": "EvSelect",
+  "event_time": 1663966382,
+  "event": {
+    "type": "message",
+    "user": "U123",
+    "text": "Choose a status and an assignee",
+    "ts": "1663966382.046509",
+    "channel": "C123",
+    "event_ts": "1663966382.046509",
+    "channel_type": "channel",
+    "blocks": [
+      {
+        "type": "actions",
+        "block_id": "item-actions",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "open",
+            "text": { "type": "plain_text", "text": "Open" }
+          },
+          {
+            "type": "overflow",
+            "action_id": "more",
+            "options": [
+              { "text": { "type": "plain_text", "text": "Archive" }, "value": "archive" }
+            ]
+          },
+          {
+            "type": "external_select",
+            "action_id": "assignee",
+            "placeholder": { "type": "plain_text", "text": "Find a person" },
+            "min_query_length": 0,
+            "initial_option": {
+              "text": { "type": "plain_text", "text": "Alex" },
+              "value": "person-123",
+              "description": { "type": "plain_text", "text": "Current assignee" }
+            },
+            "focus_on_load": false,
+            "confirm": {
+              "title": { "type": "plain_text", "text": "Reassign?" },
+              "text": { "type": "mrkdwn", "text": "Change the *assignee*?" },
+              "confirm": { "type": "plain_text", "text": "Yes" },
+              "deny": { "type": "plain_text", "text": "No" }
+            }
+          },
+          {
+            "type": "static_select",
+            "action_id": "status",
+            "placeholder": { "type": "plain_text", "text": "Choose a status" },
+            "options": [
+              { "text": { "type": "plain_text", "text": "Open", "emoji": true }, "value": "open" },
+              { "text": { "type": "plain_text", "text": "Closed" }, "value": "closed" }
+            ],
+            "initial_option": { "text": { "type": "plain_text", "text": "Open" }, "value": "open" },
+            "focus_on_load": true,
+            "confirm": {
+              "title": { "type": "plain_text", "text": "Change status?" },
+              "text": { "type": "plain_text", "text": "Apply this status to the item?" },
+              "confirm": { "type": "plain_text", "text": "Yes" },
+              "deny": { "type": "plain_text", "text": "No" },
+              "style": "primary"
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "text": { "type": "mrkdwn", "text": "Choose a category" },
+        "accessory": {
+          "type": "static_select",
+          "option_groups": [
+            {
+              "label": { "type": "plain_text", "text": "Engineering" },
+              "options": [
+                { "text": { "type": "plain_text", "text": "Bug" }, "value": "bug" }
+              ]
+            },
+            {
+              "label": { "type": "plain_text", "text": "Support" },
+              "options": [
+                { "text": { "type": "plain_text", "text": "Question" }, "value": "question" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "type": "section",
+        "text": { "type": "mrkdwn", "text": "Search for a related item" },
+        "accessory": { "type": "external_select" }
+      }
+    ]
+  }
+}

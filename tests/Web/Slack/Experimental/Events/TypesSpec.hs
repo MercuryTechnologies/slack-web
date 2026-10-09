@@ -15,6 +15,8 @@ spec = describe "Types for Slack events" do
         , "message_deleted"
         , "message_rich_text"
         , "message_rich_text_containers"
+        , "message_overflow"
+        , "message_select_menus"
         , "message_file_share"
         , "message_file_share_slack_connect"
         , "link"

@@ -5,9 +5,10 @@ module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
 import Data.Aeson (Object, Result (..), Value (..), fromJSON, withArray)
-import Data.Aeson.Types ((.!=))
+import Data.Aeson.Types (Pair, (.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
+import Numeric.Natural (Natural)
 import Refined
 import Refined.Unsafe (reallyUnsafeRefine)
 import Web.Slack.AesonUtils
@@ -451,20 +452,41 @@ instance FromJSON RichText where
 --   <https://api.slack.com/reference/block-kit/blocks#section_fields>
 data SlackAccessory
   = SlackButtonAccessory SlackAction -- button
+  | -- | An overflow menu beside a section. Construct the action with 'overflow'.
+    --
+    -- @since 2.4.0.0
+    SlackOverflowAccessory SlackAction
+  | -- | A static select menu beside a section. Construct the action with 'staticSelect'.
+    --
+    -- @since 2.4.0.0
+    SlackStaticSelectAccessory SlackAction
+  | -- | An external select menu beside a section. Construct the action with 'externalSelect'.
+    --
+    -- @since 2.4.0.0
+    SlackExternalSelectAccessory SlackAction
   deriving stock (Eq)
 
 instance ToJSON SlackAccessory where
   toJSON (SlackButtonAccessory btn) = toJSON btn
+  toJSON (SlackOverflowAccessory menu) = toJSON menu
+  toJSON (SlackStaticSelectAccessory menu) = toJSON menu
+  toJSON (SlackExternalSelectAccessory menu) = toJSON menu
 
 instance FromJSON SlackAccessory where
   parseJSON = withObject "SlackAccessory" \obj -> do
     kind :: Text <- obj .: "type"
     case kind of
       "button" -> SlackButtonAccessory <$> parseJSON (Object obj)
-      _ -> fail $ "Unknown SlackAccessory type " <> show kind <> ", must be one of ['button']"
+      "overflow" -> SlackOverflowAccessory <$> parseJSON (Object obj)
+      "static_select" -> SlackStaticSelectAccessory <$> parseJSON (Object obj)
+      "external_select" -> SlackExternalSelectAccessory <$> parseJSON (Object obj)
+      _ -> fail $ "Unknown SlackAccessory type " <> show kind <> ", must be one of ['button', 'overflow', 'static_select', 'external_select']"
 
 instance Show SlackAccessory where
   show (SlackButtonAccessory btn) = show btn
+  show (SlackOverflowAccessory menu) = show menu
+  show (SlackStaticSelectAccessory menu) = show menu
+  show (SlackExternalSelectAccessory menu) = show menu
 
 -- | Small helper function for constructing a section with a button accessory out of a button and text components
 sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
@@ -701,6 +723,7 @@ button :: SlackActionId -> SlackButtonText -> ButtonSettings -> SlackAction
 button actionId buttonText ButtonSettings {..} =
   SlackAction (Just actionId)
     $ SlackButton
+    $ SlackButtonElement
       { slackButtonText = buttonText
       , slackButtonUrl = unOptionalSetting buttonUrl
       , slackButtonValue = unOptionalSetting buttonValue
@@ -889,15 +912,425 @@ instance Slack SlackButtonText where
 instance IsString SlackButtonText where
   fromString s = SlackButtonText . unsafeMkNonEmptyText . cs $ take 75 s
 
--- | The component in a 'SlackAction'. Do not use directly.
--- Use the builder functions such as 'button' instead.
-data SlackActionComponent = SlackButton
+-- | An option in an overflow menu. Text and description must be plain text
+-- (up to 75 characters); the value may contain up to 150 characters.
+--
+-- <https://docs.slack.dev/reference/block-kit/composition-objects/option-object/>
+--
+-- @since 2.4.0.0
+data SlackOverflowOption = SlackOverflowOption
+  { slackOverflowOptionText :: SlackPlainTextOnly
+  -- ^ Label displayed for this option. Slack allows up to 75 characters;
+  -- this limit is not enforced by the type.
+  --
+  -- @since 2.4.0.0
+  , slackOverflowOptionValue :: Text
+  -- ^ Value identifying this option in an interaction payload. Slack allows
+  -- up to 150 characters; this limit is not enforced by the type.
+  --
+  -- @since 2.4.0.0
+  , slackOverflowOptionDescription :: Maybe SlackPlainTextOnly
+  -- ^ Optional description displayed below the label. Slack allows up to
+  -- 75 characters; this limit is not enforced by the type.
+  --
+  -- @since 2.4.0.0
+  , slackOverflowOptionUrl :: Maybe (NonEmptyText 3000)
+  -- ^ Optional URL opened when the option is selected, up to 3000 characters.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackOverflowOption where
+  parseJSON = withObject "SlackOverflowOption" $ \obj -> do
+    slackOverflowOptionText <- obj .: "text"
+    slackOverflowOptionValue <- obj .: "value"
+    slackOverflowOptionDescription <- obj .:? "description"
+    slackOverflowOptionUrl <- obj .:? "url"
+    pure SlackOverflowOption {..}
+
+instance ToJSON SlackOverflowOption where
+  toJSON SlackOverflowOption {..} =
+    objectOptional
+      [ "text" .=! slackOverflowOptionText
+      , "value" .=! slackOverflowOptionValue
+      , "description" .=? slackOverflowOptionDescription
+      , "url" .=? slackOverflowOptionUrl
+      ]
+
+-- | Overflow menus contain between one and five options.
+-- Construct the refined list with 'refine'; JSON decoding also checks its size.
+--
+-- @since 2.4.0.0
+newtype SlackOverflowOptions = SlackOverflowOptions
+  { unSlackOverflowOptions :: Refined (SizeGreaterThan 0 && SizeLessThan 6) [SlackOverflowOption]
+  -- ^ The nonempty list of at most five menu options.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Show)
+  deriving newtype (Eq, FromJSON, ToJSON)
+
+-- | Build an overflow menu with an optional confirmation dialog.
+-- Use the result in an actions block or wrap it in 'SlackOverflowAccessory'
+-- for a section. This builder supplies an action ID; to represent a message
+-- where Slack omitted it, use
+-- @SlackAction Nothing (SlackOverflow (SlackOverflowMenu options confirmDialog))@.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/overflow-menu-element/>
+--
+-- @since 2.4.0.0
+overflow :: SlackActionId -> SlackOverflowOptions -> OverflowSettings -> SlackAction
+overflow actionId options OverflowSettings {..} =
+  SlackAction (Just actionId) $ SlackOverflow $ SlackOverflowMenu options (unOptionalSetting overflowConfirm)
+
+-- | Optional settings for 'overflow'.
+--
+-- @since 2.4.0.0
+newtype OverflowSettings = OverflowSettings
+  { overflowConfirm :: OptionalSetting SlackConfirmObject
+  -- ^ Optional confirmation dialog.
+  --
+  -- @since 2.4.0.0
+  }
+
+-- | Default overflow settings, omitting the confirmation dialog.
+--
+-- @since 2.4.0.0
+overflowSettings :: OverflowSettings
+overflowSettings = OverflowSettings {overflowConfirm = emptySetting}
+
+-- | A select-menu option. Unlike overflow options, select options cannot have
+-- a URL. Text and description are plain text (up to 75 characters); the value
+-- may contain up to 150 characters. These text limits are not enforced by the type.
+--
+-- <https://docs.slack.dev/reference/block-kit/composition-objects/option-object/>
+--
+-- @since 2.4.0.0
+data SlackSelectOption = SlackSelectOption
+  { slackSelectOptionText :: SlackPlainTextOnly
+  -- ^ Label displayed for the option.
+  --
+  -- @since 2.4.0.0
+  , slackSelectOptionValue :: Text
+  -- ^ Value identifying this option in an interaction payload.
+  --
+  -- @since 2.4.0.0
+  , slackSelectOptionDescription :: Maybe SlackPlainTextOnly
+  -- ^ Optional description displayed with the label.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackSelectOption where
+  parseJSON = withObject "SlackSelectOption" $ \obj -> do
+    slackSelectOptionText <- obj .: "text"
+    slackSelectOptionValue <- obj .: "value"
+    slackSelectOptionDescription <- obj .:? "description"
+    pure SlackSelectOption {..}
+
+instance ToJSON SlackSelectOption where
+  toJSON SlackSelectOption {..} =
+    objectOptional
+      [ "text" .=! slackSelectOptionText
+      , "value" .=! slackSelectOptionValue
+      , "description" .=? slackSelectOptionDescription
+      ]
+
+-- | A labelled group of up to 100 select-menu options.
+--
+-- <https://docs.slack.dev/reference/block-kit/composition-objects/option-group-object/>
+--
+-- @since 2.4.0.0
+data SlackSelectOptionGroup = SlackSelectOptionGroup
+  { slackSelectOptionGroupLabel :: SlackPlainTextOnly
+  -- ^ Plain-text heading displayed above this group's options.
+  --
+  -- @since 2.4.0.0
+  , slackSelectOptionGroupOptions :: Refined (SizeLessThan 101) [SlackSelectOption]
+  -- ^ Options in this group. Construct the bounded list with 'refine'; JSON
+  -- decoding also checks the maximum of 100 options.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackSelectOptionGroup where
+  parseJSON = withObject "SlackSelectOptionGroup" $ \obj -> do
+    slackSelectOptionGroupLabel <- obj .: "label"
+    slackSelectOptionGroupOptions <- obj .: "options"
+    pure SlackSelectOptionGroup {..}
+
+instance ToJSON SlackSelectOptionGroup where
+  toJSON SlackSelectOptionGroup {..} =
+    object
+      [ "label" .= slackSelectOptionGroupLabel
+      , "options" .= slackSelectOptionGroupOptions
+      ]
+
+-- | A static menu supplies either options or option groups, never both.
+-- JSON decoding rejects objects with both sources or neither source.
+--
+-- @since 2.4.0.0
+data SlackStaticSelectOptions
+  = -- | A flat list of at most 100 options, bounded using 'refine'.
+    --
+    -- @since 2.4.0.0
+    SlackSelectOptions (Refined (SizeLessThan 101) [SlackSelectOption])
+  | -- | At most 100 labelled groups, bounded using 'refine'.
+    --
+    -- @since 2.4.0.0
+    SlackSelectOptionGroups (Refined (SizeLessThan 101) [SlackSelectOptionGroup])
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackStaticSelectOptions where
+  parseJSON = withObject "SlackStaticSelectOptions" $ \obj -> do
+    options <- obj .:? "options"
+    groups <- obj .:? "option_groups"
+    case (options, groups) of
+      (Just opts, Nothing) -> pure $ SlackSelectOptions opts
+      (Nothing, Just grps) -> pure $ SlackSelectOptionGroups grps
+      _ -> fail "A static select menu requires exactly one of 'options' or 'option_groups'"
+
+-- | Encode the option source as an @options@ or @option_groups@ field for
+-- inclusion in a static select menu's JSON object.
+--
+-- @since 2.4.0.0
+slackStaticSelectOptionsPair :: SlackStaticSelectOptions -> Pair
+slackStaticSelectOptionsPair = \case
+  SlackSelectOptions options -> "options" .= options
+  SlackSelectOptionGroups groups -> "option_groups" .= groups
+
+-- | The definition of a static select menu in a message block. This is not
+-- the @selected_option@ sent in an interaction response.
+-- Use 'staticSelect' to build one for sending in a message.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element/>
+--
+-- @since 2.4.0.0
+data SlackStaticSelectMenu = SlackStaticSelectMenu
+  { slackStaticSelectOptions :: SlackStaticSelectOptions
+  -- ^ Available options, either flat or grouped.
+  --
+  -- @since 2.4.0.0
+  , slackStaticSelectInitialOption :: Maybe SlackSelectOption
+  -- ^ Optional selection displayed when the menu first loads.
+  --
+  -- @since 2.4.0.0
+  , slackStaticSelectConfirm :: Maybe SlackConfirmObject
+  -- ^ Optional confirmation dialog for a selection.
+  --
+  -- @since 2.4.0.0
+  , slackStaticSelectFocusOnLoad :: Maybe Bool
+  -- ^ Whether to focus this menu when its containing view opens.
+  -- 'Nothing' omits the field from JSON.
+  --
+  -- @since 2.4.0.0
+  , slackStaticSelectPlaceholder :: Maybe SlackPlainTextOnly
+  -- ^ Optional prompt displayed before an option is selected.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackStaticSelectMenu where
+  parseJSON = withObject "SlackStaticSelectMenu" $ \obj -> do
+    slackStaticSelectOptions <- parseJSON $ Object obj
+    slackStaticSelectInitialOption <- obj .:? "initial_option"
+    slackStaticSelectConfirm <- obj .:? "confirm"
+    slackStaticSelectFocusOnLoad <- obj .:? "focus_on_load"
+    slackStaticSelectPlaceholder <- obj .:? "placeholder"
+    pure SlackStaticSelectMenu {..}
+
+-- | The definition of an external select menu in a message block. Its options
+-- are loaded separately, so no options list is required here.
+-- Use 'externalSelect' to build one for sending in a message.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element/>
+--
+-- @since 2.4.0.0
+data SlackExternalSelectMenu = SlackExternalSelectMenu
+  { slackExternalSelectInitialOption :: Maybe SlackSelectOption
+  -- ^ Optional selection displayed when the menu first loads.
+  --
+  -- @since 2.4.0.0
+  , slackExternalSelectMinQueryLength :: Maybe Natural
+  -- ^ Minimum query length before loading options. Zero is permitted;
+  -- 'Nothing' omits the field so Slack uses its default.
+  --
+  -- @since 2.4.0.0
+  , slackExternalSelectConfirm :: Maybe SlackConfirmObject
+  -- ^ Optional confirmation dialog for a selection.
+  --
+  -- @since 2.4.0.0
+  , slackExternalSelectFocusOnLoad :: Maybe Bool
+  -- ^ Whether to focus this menu when its containing view opens.
+  -- 'Nothing' omits the field from JSON.
+  --
+  -- @since 2.4.0.0
+  , slackExternalSelectPlaceholder :: Maybe SlackPlainTextOnly
+  -- ^ Optional prompt displayed before an option is selected.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackExternalSelectMenu where
+  parseJSON = withObject "SlackExternalSelectMenu" $ \obj -> do
+    slackExternalSelectInitialOption <- obj .:? "initial_option"
+    slackExternalSelectMinQueryLength <- obj .:? "min_query_length"
+    slackExternalSelectConfirm <- obj .:? "confirm"
+    slackExternalSelectFocusOnLoad <- obj .:? "focus_on_load"
+    slackExternalSelectPlaceholder <- obj .:? "placeholder"
+    pure SlackExternalSelectMenu {..}
+
+-- | Optional settings for 'staticSelect'. See 'SlackStaticSelectMenu' for field semantics.
+--
+-- @since 2.4.0.0
+data StaticSelectSettings = StaticSelectSettings
+  { staticSelectInitialOption :: OptionalSetting SlackSelectOption
+  -- ^ See 'slackStaticSelectInitialOption'.
+  --
+  -- @since 2.4.0.0
+  , staticSelectConfirm :: OptionalSetting SlackConfirmObject
+  -- ^ See 'slackStaticSelectConfirm'.
+  --
+  -- @since 2.4.0.0
+  , staticSelectFocusOnLoad :: OptionalSetting Bool
+  -- ^ See 'slackStaticSelectFocusOnLoad'.
+  --
+  -- @since 2.4.0.0
+  , staticSelectPlaceholder :: OptionalSetting SlackPlainTextOnly
+  -- ^ See 'slackStaticSelectPlaceholder'.
+  --
+  -- @since 2.4.0.0
+  }
+
+-- | Default static select settings, omitting all optional fields.
+--
+-- @since 2.4.0.0
+staticSelectSettings :: StaticSelectSettings
+staticSelectSettings =
+  StaticSelectSettings
+    { staticSelectInitialOption = emptySetting
+    , staticSelectConfirm = emptySetting
+    , staticSelectFocusOnLoad = emptySetting
+    , staticSelectPlaceholder = emptySetting
+    }
+
+-- | Build a static select menu with an action ID and flat or grouped options.
+--
+-- @since 2.4.0.0
+staticSelect :: SlackActionId -> SlackStaticSelectOptions -> StaticSelectSettings -> SlackAction
+staticSelect actionId options StaticSelectSettings {..} =
+  SlackAction (Just actionId)
+    $ SlackStaticSelect
+      SlackStaticSelectMenu
+        { slackStaticSelectOptions = options
+        , slackStaticSelectInitialOption = unOptionalSetting staticSelectInitialOption
+        , slackStaticSelectConfirm = unOptionalSetting staticSelectConfirm
+        , slackStaticSelectFocusOnLoad = unOptionalSetting staticSelectFocusOnLoad
+        , slackStaticSelectPlaceholder = unOptionalSetting staticSelectPlaceholder
+        }
+
+-- | Optional settings for 'externalSelect'. See 'SlackExternalSelectMenu' for field semantics.
+--
+-- @since 2.4.0.0
+data ExternalSelectSettings = ExternalSelectSettings
+  { externalSelectInitialOption :: OptionalSetting SlackSelectOption
+  -- ^ See 'slackExternalSelectInitialOption'.
+  --
+  -- @since 2.4.0.0
+  , externalSelectMinQueryLength :: OptionalSetting Natural
+  -- ^ See 'slackExternalSelectMinQueryLength'.
+  --
+  -- @since 2.4.0.0
+  , externalSelectConfirm :: OptionalSetting SlackConfirmObject
+  -- ^ See 'slackExternalSelectConfirm'.
+  --
+  -- @since 2.4.0.0
+  , externalSelectFocusOnLoad :: OptionalSetting Bool
+  -- ^ See 'slackExternalSelectFocusOnLoad'.
+  --
+  -- @since 2.4.0.0
+  , externalSelectPlaceholder :: OptionalSetting SlackPlainTextOnly
+  -- ^ See 'slackExternalSelectPlaceholder'.
+  --
+  -- @since 2.4.0.0
+  }
+
+-- | Default external select settings, omitting all optional fields.
+--
+-- @since 2.4.0.0
+externalSelectSettings :: ExternalSelectSettings
+externalSelectSettings =
+  ExternalSelectSettings
+    { externalSelectInitialOption = emptySetting
+    , externalSelectMinQueryLength = emptySetting
+    , externalSelectConfirm = emptySetting
+    , externalSelectFocusOnLoad = emptySetting
+    , externalSelectPlaceholder = emptySetting
+    }
+
+-- | Build an external select menu with an action ID.
+--
+-- @since 2.4.0.0
+externalSelect :: SlackActionId -> ExternalSelectSettings -> SlackAction
+externalSelect actionId ExternalSelectSettings {..} =
+  SlackAction (Just actionId)
+    $ SlackExternalSelect
+      SlackExternalSelectMenu
+        { slackExternalSelectInitialOption = unOptionalSetting externalSelectInitialOption
+        , slackExternalSelectMinQueryLength = unOptionalSetting externalSelectMinQueryLength
+        , slackExternalSelectConfirm = unOptionalSetting externalSelectConfirm
+        , slackExternalSelectFocusOnLoad = unOptionalSetting externalSelectFocusOnLoad
+        , slackExternalSelectPlaceholder = unOptionalSetting externalSelectPlaceholder
+        }
+
+-- | A button's text and optional action settings.
+--
+-- @since 2.4.0.0
+data SlackButtonElement = SlackButtonElement
   { slackButtonText :: SlackButtonText -- max length 75, may truncate to ~30
   , slackButtonUrl :: Maybe (NonEmptyText 3000) -- max length 3000
   , slackButtonValue :: Maybe (NonEmptyText 2000) -- max length 2000
   , slackButtonStyle :: Maybe SlackStyle
   , slackButtonConfirm :: Maybe SlackConfirmObject
   }
+  deriving stock (Eq, Show)
+
+-- | An overflow menu with one to five options and an optional confirmation dialog.
+--
+-- @since 2.4.0.0
+data SlackOverflowMenu = SlackOverflowMenu
+  { slackOverflowOptions :: SlackOverflowOptions
+  -- ^ Options displayed in the menu.
+  --
+  -- @since 2.4.0.0
+  , slackOverflowConfirm :: Maybe SlackConfirmObject
+  -- ^ Optional dialog shown before completing the selected action.
+  --
+  -- @since 2.4.0.0
+  }
+  deriving stock (Eq, Show)
+
+-- | A component in a message's 'SlackAction'. Use builder functions such as
+-- 'button', 'overflow', 'staticSelect', and 'externalSelect'.
+data SlackActionComponent
+  = SlackButton SlackButtonElement
+  | -- | An overflow menu in a message, with one to five options.
+    --
+    -- @since 2.4.0.0
+    SlackOverflow SlackOverflowMenu
+  | -- | A select menu whose options are included in the message.
+    --
+    -- @since 2.4.0.0
+    SlackStaticSelect SlackStaticSelectMenu
+  | -- | A select menu whose options are loaded from an external source.
+    --
+    -- @since 2.4.0.0
+    SlackExternalSelect SlackExternalSelectMenu
   deriving stock (Eq)
 
 instance FromJSON SlackActionComponent where
@@ -911,11 +1344,20 @@ instance FromJSON SlackActionComponent where
         slackButtonValue <- obj .:? "value"
         slackButtonStyle <- obj .:? "style"
         slackButtonConfirm <- obj .:? "confirm"
-        pure $ SlackButton {..}
-      _ -> fail $ "Unknown SlackActionComponent type " <> show slackActionType <> ", must be one of ['button']"
+        pure $ SlackButton SlackButtonElement {..}
+      "overflow" -> do
+        slackOverflowOptions <- obj .: "options"
+        slackOverflowConfirm <- obj .:? "confirm"
+        pure $ SlackOverflow SlackOverflowMenu {..}
+      "static_select" -> SlackStaticSelect <$> parseJSON (Object obj)
+      "external_select" -> SlackExternalSelect <$> parseJSON (Object obj)
+      _ -> fail $ "Unknown SlackActionComponent type " <> show slackActionType <> ", must be one of ['button', 'overflow', 'static_select', 'external_select']"
 
 instance Show SlackActionComponent where
-  show SlackButton {..} = "[button " <> show slackButtonText <> "]"
+  show (SlackButton SlackButtonElement {..}) = "[button " <> show slackButtonText <> "]"
+  show (SlackOverflow SlackOverflowMenu {..}) = "[overflow " <> show slackOverflowOptions <> " " <> show slackOverflowConfirm <> "]"
+  show (SlackStaticSelect menu) = "[static_select " <> show menu <> "]"
+  show (SlackExternalSelect menu) = "[external_select " <> show menu <> "]"
 
 instance ToJSON SlackAction where
   toJSON SlackAction {..} = slackActionJSON slackActionId slackActionComponent
@@ -927,7 +1369,7 @@ instance ToJSON SlackAction where
 -- @since 2.4.0.0
 slackActionJSON :: Maybe SlackActionId -> SlackActionComponent -> Value
 slackActionJSON actionId = \case
-  SlackButton {..} ->
+  SlackButton SlackButtonElement {..} ->
     objectOptional
       [ "type" .=! ("button" :: Text)
       , "action_id" .=? actionId
@@ -936,6 +1378,33 @@ slackActionJSON actionId = \case
       , "value" .=? slackButtonValue
       , "style" .=? slackButtonStyle
       , "confirm" .=? slackButtonConfirm
+      ]
+  SlackOverflow SlackOverflowMenu {..} ->
+    objectOptional
+      [ "type" .=! ("overflow" :: Text)
+      , "action_id" .=? actionId
+      , "options" .=! slackOverflowOptions
+      , "confirm" .=? slackOverflowConfirm
+      ]
+  SlackStaticSelect SlackStaticSelectMenu {..} ->
+    objectOptional
+      [ "type" .=! ("static_select" :: Text)
+      , "action_id" .=? actionId
+      , Just $ slackStaticSelectOptionsPair slackStaticSelectOptions
+      , "initial_option" .=? slackStaticSelectInitialOption
+      , "confirm" .=? slackStaticSelectConfirm
+      , "focus_on_load" .=? slackStaticSelectFocusOnLoad
+      , "placeholder" .=? slackStaticSelectPlaceholder
+      ]
+  SlackExternalSelect SlackExternalSelectMenu {..} ->
+    objectOptional
+      [ "type" .=! ("external_select" :: Text)
+      , "action_id" .=? actionId
+      , "initial_option" .=? slackExternalSelectInitialOption
+      , "min_query_length" .=? slackExternalSelectMinQueryLength
+      , "confirm" .=? slackExternalSelectConfirm
+      , "focus_on_load" .=? slackExternalSelectFocusOnLoad
+      , "placeholder" .=? slackExternalSelectPlaceholder
       ]
 
 instance FromJSON SlackAction where
