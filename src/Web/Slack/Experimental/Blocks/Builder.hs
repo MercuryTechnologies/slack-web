@@ -4,7 +4,7 @@
 module Web.Slack.Experimental.Blocks.Builder where
 
 import Control.Monad.Writer.Strict
-import Web.Slack.Experimental.Blocks.Types (SlackAccessory (..), SlackAction, SlackActionList, SlackBlock (..), SlackBlockId, SlackContent, SlackContext (..), SlackPlainTextOnly (..), SlackSection (..), SlackText, slackSectionWithText)
+import Web.Slack.Experimental.Blocks.Types (SlackAccessory, SlackActionList, SlackBlock (..), SlackBlockId, SlackContent, SlackContext (..), SlackPlainTextOnly (..), SlackSection (..), SlackText, slackSectionWithText)
 import Web.Slack.Prelude
 
 type BlockBuilder = WriterT [SlackBlock]
@@ -56,9 +56,9 @@ sectionBlockWithFields text fields =
 sectionBlockWithAccessory ::
   (Monad m) =>
   SlackText ->
-  SlackAction ->
+  SlackAccessory ->
   BlockBuilder m ()
-sectionBlockWithAccessory t b =
+sectionBlockWithAccessory t accessory =
   tell
     $ pure
     $ SlackBlockSection
@@ -66,7 +66,7 @@ sectionBlockWithAccessory t b =
         { slackSectionText = Just t
         , slackSectionBlockId = Nothing
         , slackSectionFields = Nothing
-        , slackSectionAccessory = Just $ SlackButtonAccessory b
+        , slackSectionAccessory = Just accessory
         }
 
 -- | Horizontal line. Similar to an html @hr@ tag.
