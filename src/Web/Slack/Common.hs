@@ -47,7 +47,12 @@ import Data.Aeson.TH
 -- slack-web
 
 -- text
+
+import Data.ByteString.Lazy qualified as BSL
 import Data.Text (Text)
+import Data.Text qualified as Text
+import Data.Text.Encoding qualified as TE
+import Data.Text.Encoding.Error qualified as TEE
 import GHC.Generics (Generic)
 import Servant.Client
 import Web.Slack.Types
@@ -100,6 +105,16 @@ data ResponseSlackError = ResponseSlackError
 
 instance NFData ResponseSlackError
 
+instance Exception ResponseSlackError where
+  displayException ResponseSlackError {errorText, responseMetadata} =
+    -- One day we will all be free of `type String = [Char]`. But not today.
+    Text.unpack $
+      "Slack API response error: "
+        <> errorText
+        <> if null responseMetadata
+          then ""
+          else ": " <> TE.decodeUtf8With TEE.lenientDecode (BSL.toStrict (encode responseMetadata))
+
 -- |
 -- Errors that can be triggered by a slack request.
 data SlackClientError
@@ -111,4 +126,12 @@ data SlackClientError
 
 instance NFData SlackClientError
 
-instance Exception SlackClientError
+instance Exception SlackClientError where
+  displayException err =
+    case err of
+      ServantError servantError ->
+        -- Note: Servant is a bad library which uses the default
+        -- `displayException = show` implementation, so this will
+        -- produce bad error messages. Take it up with them!
+        "Servant error: " <> displayException servantError
+      SlackError responseSlackError -> displayException responseSlackError
