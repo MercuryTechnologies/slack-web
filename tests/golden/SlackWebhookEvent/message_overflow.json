@@ -1,0 +1,67 @@
+{
+  "type": "event_callback",
+  "token": "example-token",
+  "team_id": "T123",
+  "api_app_id": "A123",
+  "event_id": "Ev123",
+  "event_time": 1663966382,
+  "event": {
+    "type": "message",
+    "user": "U123",
+    "text": "An item with more actions",
+    "ts": "1663966382.046509",
+    "channel": "C123",
+    "event_ts": "1663966382.046509",
+    "channel_type": "channel",
+    "blocks": [
+      {
+        "type": "actions",
+        "block_id": "item-actions",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "open",
+            "text": { "type": "plain_text", "text": "Open" },
+            "url": "https://example.com/item"
+          },
+          {
+            "type": "overflow",
+            "action_id": "more",
+            "options": [
+              {
+                "text": { "type": "plain_text", "text": "Archive", "emoji": true },
+                "value": "archive"
+              },
+              {
+                "text": { "type": "plain_text", "text": "View details" },
+                "value": "details",
+                "description": { "type": "plain_text", "text": "Open in your browser" },
+                "url": "https://example.com/item/details"
+              }
+            ],
+            "confirm": {
+              "title": { "type": "plain_text", "text": "Continue?" },
+              "text": { "type": "mrkdwn", "text": "Apply this action to the item?" },
+              "confirm": { "type": "plain_text", "text": "Yes" },
+              "deny": { "type": "plain_text", "text": "No" },
+              "style": "primary"
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "text": { "type": "mrkdwn", "text": "Another item" },
+        "accessory": {
+          "type": "overflow",
+          "options": [
+            {
+              "text": { "type": "plain_text", "text": "Open" },
+              "value": "open"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

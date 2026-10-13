@@ -4,6 +4,20 @@
 
   Breaking change: `SlackAction` is now a record, and its `slackActionId` field
   is now a `Maybe SlackActionId` (previously it was a `SlackActionId`).
+* [#173](https://github.com/MercuryTechnologies/slack-web/pull/173)
+  New components in message actions and section accessories: `static_select`,
+  `external_select`, `overflow`.
+
+  Breaking change: `SlackActionComponent` has new constructors:
+  `SlackStaticSelect`, `SlackExternalSelect`, `SlackOverflow`.
+
+  `SlackAccessory` has new corresponding constructors:
+  `SlackStaticSelectAccessory`, `SlackExternalSelectAccessory`,
+  `SlackOverflowAccessory`.
+
+  Breaking change: `sectionBlockWithAccessory` now takes a `SlackAccessory`
+  instead of a `SlackAction`. Wrap existing button arguments in
+  `SlackButtonAccessory`.
 
 # 2.3.0.0 (2026-10-09)
 * [#158](https://github.com/MercuryTechnologies/slack-web/pull/158),
