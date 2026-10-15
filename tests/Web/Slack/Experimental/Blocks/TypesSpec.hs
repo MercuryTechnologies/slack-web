@@ -25,17 +25,44 @@ spec = do
       Aeson.eitherDecode @SlackBlock "{\"type\":\"context\",\"elements\":[{\"type\":\"unexpected_content\"}]}"
         `shouldBe` Left "Error in $.elements: Unknown SlackContent type \"unexpected_content\", must be one of ['mrkdwn', 'image']"
 
-    it "reports the rejected action component type at its nested JSON path" do
-      Aeson.eitherDecode @SlackBlock "{\"type\":\"actions\",\"elements\":[{\"type\":\"static_select\",\"action_id\":\"select\"}]}"
-        `shouldBe` Left "Error in $.elements[0]: Unknown SlackActionComponent type \"static_select\", must be one of ['button']"
+  describe "element definitions and placements" do
+    for_ [Nothing, Just (SlackActionId (NonEmptyText "open"))] $ \identifier -> do
+      let element = (button (SlackActionId (NonEmptyText "open")) "Open" buttonSettings) {slackButtonActionId = identifier}
+      it ("shares the button wire format across placements, with ID " <> show identifier) do
+        toJSON (ActionsButton element) `shouldBe` toJSON element
+        toJSON (SectionButton element) `shouldBe` toJSON element
+        Aeson.fromJSON (toJSON element) `shouldBe` Aeson.Success (ActionsButton element)
+        Aeson.fromJSON (toJSON element) `shouldBe` Aeson.Success (SectionButton element)
+      jsonRoundtrips element
+    it "rejects a wrong discriminator when parsing a concrete button" do
+      Aeson.eitherDecode @SlackButtonElement "{\"type\":\"future_element\",\"text\":{\"type\":\"plain_text\",\"text\":\"Open\"}}" `shouldSatisfy` isLeft
 
-    it "reports the rejected accessory type before requiring action fields" do
-      Aeson.eitherDecode @SlackAccessory "{\"type\":\"image\",\"image_url\":\"https://example.com/image.png\",\"alt_text\":\"example\"}"
-        `shouldBe` Left "Error in $: Unknown SlackAccessory type \"image\", must be one of ['button']"
+  describe "unknown and malformed elements" do
+    let unknown = object ["type" .= ("future_element" :: Text), "extra" .= object ["value" .= (42 :: Int)]]
+    it "preserves unsupported actions and accessories exactly" do
+      fmap toJSON (parseEither (parseJSON @SlackActionsElement) unknown) `shouldBe` Right unknown
+      fmap toJSON (parseEither (parseJSON @SlackSectionAccessory) unknown) `shouldBe` Right unknown
+      let section = object ["type" .= ("section" :: Text), "accessory" .= unknown]
+      case parseEither (parseJSON @SlackBlock) section of
+        Right (SlackBlockSection value) -> fmap toJSON (slackSectionAccessory value) `shouldBe` Just unknown
+        result -> expectationFailure (show result)
+    it "does not drop malformed known accessories and retains their error path" do
+      Aeson.eitherDecode @SlackBlock "{\"type\":\"section\",\"accessory\":{\"type\":\"button\"}}"
+        `shouldBe` Left "Error in $.accessory: key \"text\" not found"
+    for_ ["{}", "[]", "{\"type\":42}", "{\"type\":\"button\"}"] $ \json ->
+      it "cannot disguise malformed or supported elements as unknown" do
+        Aeson.eitherDecode @SlackUnknownElement json `shouldSatisfy` isLeft
 
-    it "reports the rejected accessory type even when action fields are present" do
-      Aeson.eitherDecode @SlackAccessory "{\"type\":\"static_select\",\"action_id\":\"select\"}"
-        `shouldBe` Left "Error in $: Unknown SlackAccessory type \"static_select\", must be one of ['button']"
+  describe "interaction results" do
+    it "parses a button click independently of definition-only constraints" do
+      let click = object ["type" .= ("button" :: Text), "block_id" .= ("block" :: Text), "action_id" .= ("open" :: Text), "text" .= plaintextonly ("Open" :: Text), "style" .= ("not-a-definition-style" :: Text), "value" .= ("item" :: Text)]
+      parseEither (parseJSON @SlackActionResponse) click
+        `shouldBe` Right (SlackActionResponse (NonEmptyText "block") (SlackActionId (NonEmptyText "open")) (ButtonClicked (SlackButtonClick (plaintextonly ("Open" :: Text)) (Just "item") Nothing)))
+    it "retains unsupported interaction results" do
+      let unknown = object ["type" .= ("future_interaction" :: Text), "value" .= ("item" :: Text)]
+      case parseEither (parseJSON @SlackActionResult) unknown of
+        Right (ActionResultUnknown value) -> toJSON value `shouldBe` unknown
+        result -> expectationFailure (show result)
 
   describe "incoming Block Kit components" do
     it "parses a message mention without a URL" do
@@ -69,24 +96,12 @@ spec = do
           `shouldBe` Right (RichTextSectionItemList [RichTextSection [RichItemOther "future_inline" inlineItem]])
 
   let
-    aSlackAccessory = SlackButtonAccessory aSlackAction
-    aSlackAction = SlackAction
-      do Just $ SlackActionId $ NonEmptyText "action-id"
-      do aSlackButton
+    aSlackAccessory = SectionButton aSlackButton
+    aSlackAction = ActionsButton aSlackButton
     aSlackActionList =
       SlackActionList
         . reallyUnsafeRefine
-        $ [ aSlackAction
-          , SlackAction
-              do Just $ SlackActionId $ NonEmptyText "another-action-id"
-              do
-                SlackButton
-                  do SlackButtonText $ NonEmptyText "another-button-text"
-                  do Nothing
-                  do Nothing
-                  do Nothing
-                  do Nothing
-          ]
+        $ [aSlackAction, ActionsButton (button (SlackActionId (NonEmptyText "another-action-id")) "another-button-text" buttonSettings)]
     aSlackBlockSection = SlackBlockSection aSlackSection
     aSlackBlockImage = SlackBlockImage aSlackImage
     aSlackBlockContext = SlackBlockContext aSlackContext
@@ -95,8 +110,9 @@ spec = do
       do aSlackActionList
     aSlackBlockHeader = SlackBlockHeader $ SlackPlainTextOnly "block-header"
     aSlackButton =
-      SlackButton
-        { slackButtonText = SlackButtonText (NonEmptyText "button-text")
+      SlackButtonElement
+        { slackButtonActionId = Just (SlackActionId (NonEmptyText "action-id"))
+        , slackButtonText = SlackButtonText (NonEmptyText "button-text")
         , slackButtonUrl = Just (NonEmptyText "button-url")
         , slackButtonValue = Just (NonEmptyText "button-value")
         , slackButtonStyle = Just SlackStylePrimary
@@ -139,10 +155,10 @@ spec = do
         , slackSectionAccessory = Just aSlackAccessory
         }
 
-  describe "SlackAccessory" do
+  describe "SlackSectionAccessory" do
     jsonRoundtrips aSlackAccessory
 
-  describe "SlackAction" do
+  describe "SlackActionsElement" do
     jsonRoundtrips aSlackAction
 
   describe "SlackBlock" do
@@ -203,7 +219,6 @@ spec = do
 --    - RichStyle
 --    - RichText
 --    - RichTextSectionItem
---    - SlackActionComponent
 --    - SlackActionResponse
 --    - SlackInteractivePayload
 --    - SlackInteractiveResponseResponse

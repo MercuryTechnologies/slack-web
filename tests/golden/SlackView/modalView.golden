@@ -5,11 +5,23 @@ SlackView
             , slackSectionBlockId = Just
                 ( NonEmptyText "section1" )
             , slackSectionFields = Nothing
-            , slackSectionAccessory = Just SlackActionId
-                { unSlackActionId = NonEmptyText "button_abc" }
-                [ button SlackButtonText
-                    ( NonEmptyText "Click me" )
-                ]
+            , slackSectionAccessory = Just
+                ( SectionButton
+                    ( SlackButtonElement
+                        { slackButtonActionId = Just
+                            ( SlackActionId
+                                { unSlackActionId = NonEmptyText "button_abc" }
+                            )
+                        , slackButtonText = SlackButtonText
+                            ( NonEmptyText "Click me" )
+                        , slackButtonUrl = Nothing
+                        , slackButtonValue = Just
+                            ( NonEmptyText "Button value" )
+                        , slackButtonStyle = Just SlackStyleDanger
+                        , slackButtonConfirm = Nothing
+                        }
+                    )
+                )
             }
         , SlackBlockOther fromList
             [

@@ -1,17 +1,22 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 
+-- | Concrete element records own their complete wire format. Placement unions
+-- select where those elements occur without duplicating their discriminator.
+-- Interaction results are separate: receiving a click does not require a
+-- complete definition of the element that produced it.
 module Web.Slack.Experimental.Blocks.Types where
 
 import Control.Monad (MonadFail (..))
-import Data.Aeson (Object, Result (..), Value (..), fromJSON, withArray)
-import Data.Aeson.Types ((.!=))
+import Data.Aeson (Object, Value (..), withArray)
+import Data.Aeson.Types (Parser, (.!=))
 import Data.StringVariants
 import Data.Vector qualified as V
 import Refined
 import Refined.Unsafe (reallyUnsafeRefine)
 import Web.Slack.AesonUtils
 import Web.Slack.Common (ConversationId, UserId)
+import Web.Slack.Experimental.Blocks.Unknown qualified as Unknown
 import Web.Slack.Prelude
 import Web.Slack.Types (Emoji)
 
@@ -149,9 +154,6 @@ newtype SlackActionId = SlackActionId {unSlackActionId :: NonEmptyText 255}
   deriving stock (Show, Eq)
   deriving newtype (FromJSON, ToJSON)
 
--- FIXME(jadel): SlackActionId might be worth turning into something more type
--- safe: possibly parameterize SlackAction over a sum type parameter
-
 data SlackImage = SlackImage
   { slackImageTitle :: !(Maybe Text)
   , slackImageAltText :: !Text
@@ -236,7 +238,7 @@ instance FromJSON SlackContext where
 type SlackActionListConstraints = SizeGreaterThan 0 && SizeLessThan 6
 
 -- | List that enforces that Slack actions must have between 1 and 5 actions.
-newtype SlackActionList = SlackActionList {unSlackActionList :: Refined SlackActionListConstraints [SlackAction]}
+newtype SlackActionList = SlackActionList {unSlackActionList :: Refined SlackActionListConstraints [SlackActionsElement]}
   deriving stock (Show)
   deriving newtype (Eq, FromJSON, ToJSON)
 
@@ -247,19 +249,19 @@ class ToSlackActionList a where
 instance ToSlackActionList SlackActionList where
   toSlackActionList = id
 
-instance ToSlackActionList SlackAction where
+instance ToSlackActionList SlackActionsElement where
   toSlackActionList a = SlackActionList $ reallyUnsafeRefine [a]
 
-instance ToSlackActionList (SlackAction, SlackAction) where
+instance ToSlackActionList (SlackActionsElement, SlackActionsElement) where
   toSlackActionList (a, b) = SlackActionList $ reallyUnsafeRefine [a, b]
 
-instance ToSlackActionList (SlackAction, SlackAction, SlackAction) where
+instance ToSlackActionList (SlackActionsElement, SlackActionsElement, SlackActionsElement) where
   toSlackActionList (a, b, c) = SlackActionList $ reallyUnsafeRefine [a, b, c]
 
-instance ToSlackActionList (SlackAction, SlackAction, SlackAction, SlackAction) where
+instance ToSlackActionList (SlackActionsElement, SlackActionsElement, SlackActionsElement, SlackActionsElement) where
   toSlackActionList (a, b, c, d) = SlackActionList $ reallyUnsafeRefine [a, b, c, d]
 
-instance ToSlackActionList (SlackAction, SlackAction, SlackAction, SlackAction, SlackAction) where
+instance ToSlackActionList (SlackActionsElement, SlackActionsElement, SlackActionsElement, SlackActionsElement, SlackActionsElement) where
   toSlackActionList (a, b, c, d, e) = SlackActionList $ reallyUnsafeRefine [a, b, c, d, e]
 
 -- | A rich text style. You can't actually send these, for some reason.
@@ -447,31 +449,12 @@ instance FromJSON RichText where
     elements <- obj .: "elements"
     pure RichText {..}
 
--- | Accessory is a type of optional block element that floats to the right of text in a BlockSection.
---   <https://api.slack.com/reference/block-kit/blocks#section_fields>
-data SlackAccessory
-  = SlackButtonAccessory SlackAction -- button
-  deriving stock (Eq)
-
-instance ToJSON SlackAccessory where
-  toJSON (SlackButtonAccessory btn) = toJSON btn
-
-instance FromJSON SlackAccessory where
-  parseJSON = withObject "SlackAccessory" \obj -> do
-    kind :: Text <- obj .: "type"
-    case kind of
-      "button" -> SlackButtonAccessory <$> parseJSON (Object obj)
-      _ -> fail $ "Unknown SlackAccessory type " <> show kind <> ", must be one of ['button']"
-
-instance Show SlackAccessory where
-  show (SlackButtonAccessory btn) = show btn
-
 -- | Small helper function for constructing a section with a button accessory out of a button and text components
-sectionWithButtonAccessory :: SlackAction -> SlackText -> SlackBlock
+sectionWithButtonAccessory :: SlackButtonElement -> SlackText -> SlackBlock
 sectionWithButtonAccessory btn txt =
   SlackBlockSection
     $ (slackSectionWithText txt)
-      { slackSectionAccessory = Just $ SlackButtonAccessory btn
+      { slackSectionAccessory = Just $ SectionButton btn
       }
 
 -- | <https://api.slack.com/reference/block-kit/blocks#section>
@@ -481,7 +464,7 @@ data SlackSection = SlackSection
   , slackSectionBlockId :: Maybe SlackBlockId
   , slackSectionFields :: Maybe [SlackText]
   -- ^ Required if 'slackSectionText' is not provided.
-  , slackSectionAccessory :: Maybe SlackAccessory
+  , slackSectionAccessory :: Maybe SlackSectionAccessory
   }
   deriving stock (Eq, Show)
 
@@ -585,16 +568,7 @@ instance FromJSON SlackBlock where
         slackSectionBlockId <- obj .:? "block_id"
         slackSectionFieldsContent <- obj .:? "fields"
         let slackSectionFields = slackSectionFieldsContent >>= traverse slackContentToSlackText
-        (slackSectionAccessoryValue :: Maybe Value) <- obj .:? "accessory"
-        -- The section accessory can be any block element but `SlackAcessory`
-        -- only implements button.
-        let slackSectionAccessory =
-              slackSectionAccessoryValue >>= \v ->
-                case fromJSON v of
-                  Error _ ->
-                    Nothing
-                  Success slackAccessory ->
-                    Just slackAccessory
+        slackSectionAccessory <- obj .:? "accessory"
         pure $ SlackBlockSection SlackSection {..}
       "context" -> do
         slackContent <- obj .: "elements"
@@ -697,16 +671,16 @@ buttonSettings =
     }
 
 -- | Button builder.
-button :: SlackActionId -> SlackButtonText -> ButtonSettings -> SlackAction
+button :: SlackActionId -> SlackButtonText -> ButtonSettings -> SlackButtonElement
 button actionId buttonText ButtonSettings {..} =
-  SlackAction (Just actionId)
-    $ SlackButton
-      { slackButtonText = buttonText
-      , slackButtonUrl = unOptionalSetting buttonUrl
-      , slackButtonValue = unOptionalSetting buttonValue
-      , slackButtonStyle = unOptionalSetting buttonStyle
-      , slackButtonConfirm = unOptionalSetting buttonConfirm
-      }
+  SlackButtonElement
+    { slackButtonActionId = Just actionId
+    , slackButtonText = buttonText
+    , slackButtonUrl = unOptionalSetting buttonUrl
+    , slackButtonValue = unOptionalSetting buttonValue
+    , slackButtonStyle = unOptionalSetting buttonStyle
+    , slackButtonConfirm = unOptionalSetting buttonConfirm
+    }
 
 -- | A divider block.
 -- https://api.slack.com/reference/block-kit/blocks#divider
@@ -757,23 +731,6 @@ confirm ConfirmSettings {..} =
 -- | 'SlackBlockId' should be unique for each message and each iteration
 -- of a message. If a message is updated, use a new block_id.
 type SlackBlockId = NonEmptyText 255
-
--- | A component with an optional action identifier. Slack may omit @action_id@
--- in message blocks.
-data SlackAction = SlackAction
-  { slackActionId :: Maybe SlackActionId
-  -- ^ Optional identifier for this action, unique within its block.
-  --
-  -- @since 2.4.0.0
-  , slackActionComponent :: SlackActionComponent
-  -- ^ Interactive component associated with the optional identifier.
-  --
-  -- @since 2.4.0.0
-  }
-  deriving stock (Eq)
-
-instance Show SlackAction where
-  show SlackAction {..} = maybe "" (\actionId -> show actionId <> " ") slackActionId <> show slackActionComponent
 
 -- | [Confirm dialog object](https://api.slack.com/reference/block-kit/composition-objects#confirm).
 data SlackConfirmObject = SlackConfirmObject
@@ -832,20 +789,41 @@ instance FromJSON SlackInteractivePayload where
     sipActions <- parseJSON actionsObj
     pure $ SlackInteractivePayload {..}
 
--- | Which component and it's IDs that triggered an interactive webhook call.
+-- | An interaction carries the originating IDs and a result, not an element
+-- definition. This keeps display requirements out of incoming click payloads.
 data SlackActionResponse = SlackActionResponse
   { sarBlockId :: SlackBlockId
   , sarActionId :: SlackActionId
-  , sarActionComponent :: SlackActionComponent
+  , sarActionResult :: SlackActionResult
   }
-  deriving stock (Show)
+  deriving stock (Eq, Show)
 
 instance FromJSON SlackActionResponse where
-  parseJSON = withObject "SlackActionResponse" $ \obj -> do
-    sarBlockId <- obj .: "block_id"
-    sarActionId <- obj .: "action_id"
-    sarActionComponent <- parseJSON $ Object obj
-    pure $ SlackActionResponse {..}
+  parseJSON = withObject "SlackActionResponse" $ \obj ->
+    SlackActionResponse <$> obj .: "block_id" <*> obj .: "action_id" <*> parseJSON (Object obj)
+
+-- | Only the click's label, value and link matter here; display settings such
+-- as confirmation dialogs are not part of the interaction result.
+data SlackButtonClick = SlackButtonClick
+  { slackButtonClickText :: SlackPlainTextOnly
+  , slackButtonClickValue :: Maybe Text
+  , slackButtonClickUrl :: Maybe Text
+  }
+  deriving stock (Eq, Show)
+
+-- | Unsupported interactions remain inspectable without pretending they are
+-- supported clicks. Known kinds must satisfy their own parser.
+data SlackActionResult
+  = ButtonClicked SlackButtonClick
+  | ActionResultUnknown SlackUnknownElement
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackActionResult where
+  parseJSON = withObject "SlackActionResult" $ \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "button" -> ButtonClicked <$> (SlackButtonClick <$> obj .: "text" <*> obj .:? "value" <*> obj .:? "url")
+      _ -> ActionResultUnknown <$> parseJSON (Object obj)
 
 data SlackInteractiveResponseResponse = SlackInteractiveResponseResponse {unSlackInteractiveResponseResponse :: Bool}
 
@@ -874,7 +852,7 @@ instance ToJSON SlackInteractiveResponse where
   toJSON (ReplaceOriginal msg) = object ["blocks" .= msg, "replace_original" .= True]
   toJSON DeleteOriginal = object ["delete_original" .= True]
 
--- | Text to be displayed in a 'SlackButton'.
+-- | Text to be displayed in a 'SlackButtonElement'.
 -- Up to 75 characters, but may be truncated to 30 characters.
 newtype SlackButtonText = SlackButtonText (NonEmptyText 75)
   deriving stock (Show)
@@ -889,57 +867,93 @@ instance Slack SlackButtonText where
 instance IsString SlackButtonText where
   fromString s = SlackButtonText . unsafeMkNonEmptyText . cs $ take 75 s
 
--- | The component in a 'SlackAction'. Do not use directly.
--- Use the builder functions such as 'button' instead.
-data SlackActionComponent = SlackButton
-  { slackButtonText :: SlackButtonText -- max length 75, may truncate to ~30
-  , slackButtonUrl :: Maybe (NonEmptyText 3000) -- max length 3000
-  , slackButtonValue :: Maybe (NonEmptyText 2000) -- max length 2000
-  , slackButtonStyle :: Maybe SlackStyle
-  , slackButtonConfirm :: Maybe SlackConfirmObject
-  }
-  deriving stock (Eq)
-
-instance FromJSON SlackActionComponent where
-  parseJSON = withObject "SlackActionComponent" $ \obj -> do
-    (slackActionType :: Text) <- obj .: "type"
-    case slackActionType of
-      "button" -> do
-        text <- obj .: "text"
-        slackButtonText <- text .: "text"
-        slackButtonUrl <- obj .:? "url"
-        slackButtonValue <- obj .:? "value"
-        slackButtonStyle <- obj .:? "style"
-        slackButtonConfirm <- obj .:? "confirm"
-        pure $ SlackButton {..}
-      _ -> fail $ "Unknown SlackActionComponent type " <> show slackActionType <> ", must be one of ['button']"
-
-instance Show SlackActionComponent where
-  show SlackButton {..} = "[button " <> show slackButtonText <> "]"
-
-instance ToJSON SlackAction where
-  toJSON SlackAction {..} = slackActionJSON slackActionId slackActionComponent
-
--- | Encode an action component, omitting @action_id@ when the identifier is
--- 'Nothing'. This is also the encoding used by the 'ToJSON' instance for
--- 'SlackAction'.
+-- | A complete button definition, shared by actions blocks and section
+-- accessories. Unlike t'SlackButtonClick', this describes what to display.
+-- Use 'button' for construction with default settings.
+--
+-- <https://docs.slack.dev/reference/block-kit/block-elements/button-element/>
 --
 -- @since 2.4.0.0
-slackActionJSON :: Maybe SlackActionId -> SlackActionComponent -> Value
-slackActionJSON actionId = \case
-  SlackButton {..} ->
+data SlackButtonElement = SlackButtonElement
+  { slackButtonActionId :: Maybe SlackActionId
+  -- ^ Optional identifier, unique within the containing block.
+  , slackButtonText :: SlackButtonText
+  -- ^ Plain-text label, at most 75 characters.
+  , slackButtonUrl :: Maybe (NonEmptyText 3000)
+  -- ^ Link opened on click. Slack still sends an interaction to acknowledge.
+  , slackButtonValue :: Maybe (NonEmptyText 2000)
+  -- ^ Application value included in the click result.
+  , slackButtonStyle :: Maybe SlackStyle
+  -- ^ Optional primary or danger styling.
+  , slackButtonConfirm :: Maybe SlackConfirmObject
+  -- ^ Confirmation shown before completing the action.
+  }
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackButtonElement where
+  parseJSON = withObject "SlackButtonElement" $ \obj -> do
+    _ <- obj .: "type" :: Parser (Expected "button")
+    slackButtonActionId <- obj .:? "action_id"
+    text <- obj .: "text"
+    _ <- text .: "type" :: Parser (Expected "plain_text")
+    slackButtonText <- text .: "text"
+    slackButtonUrl <- obj .:? "url"
+    slackButtonValue <- obj .:? "value"
+    slackButtonStyle <- obj .:? "style"
+    slackButtonConfirm <- obj .:? "confirm"
+    pure SlackButtonElement {..}
+
+instance ToJSON SlackButtonElement where
+  toJSON SlackButtonElement {..} =
     objectOptional
       [ "type" .=! ("button" :: Text)
-      , "action_id" .=? actionId
-      , "text" .=! plaintext slackButtonText
+      , "action_id" .=? slackButtonActionId
+      , "text" .=! plaintextonly slackButtonText
       , "url" .=? slackButtonUrl
       , "value" .=? slackButtonValue
       , "style" .=? slackButtonStyle
       , "confirm" .=? slackButtonConfirm
       ]
 
-instance FromJSON SlackAction where
-  parseJSON = withObject "SlackAction" $ \obj -> do
-    slackActionId <- obj .:? "action_id"
-    slackActionComponent <- parseJSON $ Object obj
-    pure SlackAction {..}
+-- | Opaque original JSON for an unsupported kind. Known kinds cannot be
+-- disguised as unknown values to bypass their parser. No placement guarantee
+-- is made for unknown kinds; this is an incoming-data compatibility escape.
+type SlackUnknownElement = Unknown.UnknownElement
+
+-- | Elements in an actions block. Each payload owns its full wire format;
+-- these wrappers select a placement and add no JSON fields.
+data SlackActionsElement
+  = ActionsButton SlackButtonElement
+  | ActionsUnknown SlackUnknownElement
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackActionsElement where
+  parseJSON = withObject "SlackActionsElement" $ \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "button" -> ActionsButton <$> parseJSON (Object obj)
+      _ -> ActionsUnknown <$> parseJSON (Object obj)
+
+instance ToJSON SlackActionsElement where
+  toJSON = \case
+    ActionsButton e -> toJSON e
+    ActionsUnknown e -> toJSON e
+
+-- | Elements beside section text. Keeping this union separate from actions
+-- allows either placement to grow without widening the other.
+data SlackSectionAccessory
+  = SectionButton SlackButtonElement
+  | SectionUnknown SlackUnknownElement
+  deriving stock (Eq, Show)
+
+instance FromJSON SlackSectionAccessory where
+  parseJSON = withObject "SlackSectionAccessory" $ \obj -> do
+    kind :: Text <- obj .: "type"
+    case kind of
+      "button" -> SectionButton <$> parseJSON (Object obj)
+      _ -> SectionUnknown <$> parseJSON (Object obj)
+
+instance ToJSON SlackSectionAccessory where
+  toJSON = \case
+    SectionButton e -> toJSON e
+    SectionUnknown e -> toJSON e

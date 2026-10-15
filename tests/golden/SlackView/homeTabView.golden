@@ -6,7 +6,7 @@ SlackView
             , slackSectionFields = Nothing
             , slackSectionAccessory = Nothing
             }
-        , "actions(Nothing) = ["SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this\"} [button SlackButtonText (NonEmptyText \"Action A\")], SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this 2\"} [button SlackButtonText (NonEmptyText \"Action B\")]"]"
+        , "actions(Nothing) = ["ActionsButton (SlackButtonElement {slackButtonActionId = Just (SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this\"}), slackButtonText = SlackButtonText (NonEmptyText \"Action A\"), slackButtonUrl = Nothing, slackButtonValue = Nothing, slackButtonStyle = Nothing, slackButtonConfirm = Nothing}), ActionsButton (SlackButtonElement {slackButtonActionId = Just (SlackActionId {unSlackActionId = NonEmptyText \"oops our json decoder requires this 2\"}), slackButtonText = SlackButtonText (NonEmptyText \"Action B\"), slackButtonUrl = Nothing, slackButtonValue = Nothing, slackButtonStyle = Nothing, slackButtonConfirm = Nothing})"]"
         ]
     , privateMetadata = Nothing
     , callbackId = Nothing

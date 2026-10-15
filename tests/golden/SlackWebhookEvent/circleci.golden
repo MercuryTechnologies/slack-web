@@ -28,7 +28,26 @@ EventEventCallback
                             , "*Branch*: master"
                             , "*Author*: someone"
                             ]
-                        , slackSectionAccessory = Nothing
+                        , slackSectionAccessory = Just
+                            ( SectionUnknown
+                                ( UnknownElement
+                                    ( fromList
+                                        [
+                                            ( "alt_text"
+                                            , String "CircleCI logo"
+                                            )
+                                        ,
+                                            ( "image_url"
+                                            , String "https://example.com"
+                                            )
+                                        ,
+                                            ( "type"
+                                            , String "image"
+                                            )
+                                        ]
+                                    )
+                                )
+                            )
                         }
                     , SlackSection
                         { slackSectionText = Nothing
@@ -37,7 +56,7 @@ EventEventCallback
                         , slackSectionFields = Just [ "*Mentions*: <!subteam^S0123468791|@someone>" ]
                         , slackSectionAccessory = Nothing
                         }
-                    , "actions(Just (NonEmptyText "eeK")) = ["SlackActionId {unSlackActionId = NonEmptyText \"zHNw\"} [button SlackButtonText (NonEmptyText \"View Job\")]"]"
+                    , "actions(Just (NonEmptyText "eeK")) = ["ActionsButton (SlackButtonElement {slackButtonActionId = Just (SlackActionId {unSlackActionId = NonEmptyText \"zHNw\"}), slackButtonText = SlackButtonText (NonEmptyText \"View Job\"), slackButtonUrl = Just (NonEmptyText \"https://circleci.com/gh/aaaaaaaaaaaaaaaaaaa/aaaaaaaaaaa/000000\"), slackButtonValue = Nothing, slackButtonStyle = Nothing, slackButtonConfirm = Nothing})"]"
                     ]
                 , channel = ConversationId
                     { unConversationId = "C012345678" }
