@@ -17,6 +17,9 @@ instance FromJSON UnknownElement where
     kind :: Text <- obj .: "type"
     case kind of
       "button" -> fail "A button must be decoded as a supported element"
+      "overflow" -> fail "An overflow menu must be decoded as a supported element"
+      "static_select" -> fail "A static select must be decoded as a supported element"
+      "external_select" -> fail "An external select must be decoded as a supported element"
       _ -> pure $ UnknownElement obj
 
 instance ToJSON UnknownElement where

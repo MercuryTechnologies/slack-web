@@ -1,4 +1,9 @@
 # 2.4.0.0 (unreleased)
+* Support overflow, static-select, and external-select menus in actions blocks
+  and section accessories, with concrete element types and builders.
+  Menu interaction results parse selected options independently of definitions,
+  including cleared selections. Static menus represent flat options or grouped
+  options as alternatives; overflow options separately support link URLs.
 * [#172](https://github.com/MercuryTechnologies/slack-web/pull/172)
   Allow omitted action IDs in message blocks.
 

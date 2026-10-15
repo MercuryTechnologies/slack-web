@@ -10,7 +10,9 @@ spec = describe "Types for Slack events" do
     describe "FromJSON" do
       mapM_
         (oneGoldenTestDecode @SlackWebhookEvent)
-        [ "messageExample"
+        [ "message_overflow"
+        , "message_select_menus"
+        , "messageExample"
         , "messageChange"
         , "message_deleted"
         , "message_rich_text"
