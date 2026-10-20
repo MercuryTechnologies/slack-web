@@ -145,6 +145,7 @@ library
       Web.Slack.Util
       Web.Slack.Prelude
       Web.Slack.AesonUtils
+      Web.Slack.Experimental.Blocks.Unknown
   build-depends:
       aeson >= 2.0 && < 2.3
     , base >= 4.11 && < 4.22
