@@ -27,17 +27,17 @@ slackShowBlockFormat =
       sectionBlock (bold $ list ["blah", "blah2", "blah3"])
       sectionBlockWithAccessory
         (monospaced @Text "blah")
-        (button slackActionDoNothing ":mag: Look at it" buttonSettings {buttonUrl = google})
+        (SectionButton (button slackActionDoNothing ":mag: Look at it" buttonSettings {buttonUrl = google}))
       sectionBlockWithAccessory
         (bold $ list ["blah", "blah2", "blah3"])
-        (button slackActionDoNothing ":office: Look at it but different" buttonSettings {buttonUrl = google})
+        (SectionButton (button slackActionDoNothing ":office: Look at it but different" buttonSettings {buttonUrl = google}))
       sectionBlock (bold (textMessage "Letters:") <> newline (list ["a", "b", "c"]))
       sectionBlock (list ["blah1", "blah2", "blah3"])
       dividerBlock
       sectionBlock (bold . textMessage $ "blah")
       sectionBlockWithAccessory
         (bold . textMessage $ "blah")
-        (button slackActionDoNothing ":bank: Look at it!" buttonSettings {buttonUrl = google})
+        (SectionButton (button slackActionDoNothing ":bank: Look at it!" buttonSettings {buttonUrl = google}))
       sectionBlockWithFields
         (message @Text "Section with text and fields")
         [ (bold $ message @Text "Field 1") <> (newline $ message @Text "Foo")
@@ -49,9 +49,9 @@ slackShowBlockFormat =
       dividerBlock
       actionsBlock Nothing
         $ toSlackActionList
-          ( button slackActionDoNothing ":mag: View" buttonSettings {buttonUrl = google}
-          , button slackActionDoNothing2 ":office: View" buttonSettings {buttonUrl = google}
-          , button slackActionDoNothing3 ":bank: View" buttonSettings {buttonUrl = google}
+          ( ActionsButton (button slackActionDoNothing ":mag: View" buttonSettings {buttonUrl = google})
+          , ActionsButton (button slackActionDoNothing2 ":office: View" buttonSettings {buttonUrl = google})
+          , ActionsButton (button slackActionDoNothing3 ":bank: View" buttonSettings {buttonUrl = google})
           )
   where
     textMessage = message @Text

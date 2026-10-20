@@ -1,9 +1,24 @@
 # 2.4.0.0 (unreleased)
+* Support overflow, static-select, and external-select menus in actions blocks
+  and section accessories, with concrete element types and builders.
+  Menu interaction results parse selected options independently of definitions,
+  including cleared selections. Static menus represent flat options or grouped
+  options as alternatives; overflow options separately support link URLs.
 * [#172](https://github.com/MercuryTechnologies/slack-web/pull/172)
   Allow omitted action IDs in message blocks.
 
-  Breaking change: `SlackAction` is now a record, and its `slackActionId` field
-  is now a `Maybe SlackActionId` (previously it was a `SlackActionId`).
+* Separate Block Kit element definitions, placements, and interaction results.
+
+  Breaking change: replace `SlackAction` and `SlackActionComponent` with
+  `SlackButtonElement`, which owns its optional action ID. `button` returns
+  this concrete type. Wrap it in `ActionsButton` for an actions block or
+  `SectionButton` for a section accessory. `sectionBlockWithAccessory` now
+  takes `SlackSectionAccessory`; `sectionWithButtonAccessory` takes a button.
+
+  Interaction responses expose `sarActionResult :: SlackActionResult` instead
+  of reusing element definitions through `sarActionComponent`.
+  Unsupported action, accessory, and result kinds preserve their original
+  JSON. Malformed supported accessories fail decoding instead of disappearing.
 
 # 2.3.0.0 (2026-10-09)
 * [#158](https://github.com/MercuryTechnologies/slack-web/pull/158),
