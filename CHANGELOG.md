@@ -1,4 +1,7 @@
 # 2.4.0.0 (unreleased)
+* Add `reactionsRemove` binding for `reactions.remove`.
+
+  Breaking change: `Web.Slack.Reactions.Api` now includes `reactions.remove`.
 * [#172](https://github.com/MercuryTechnologies/slack-web/pull/172)
   Allow omitted action IDs in message blocks.
 
